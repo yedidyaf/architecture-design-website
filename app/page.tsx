@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import BeforeAfter from "@/components/BeforeAfter";
+import ContactFab from "@/components/ContactFab";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -59,7 +60,7 @@ export default async function Home() {
         {projects.length > 0 ? (
           <>
             <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-neutral-400 sm:mb-12">
-              פרויקטים נבחרים
+              הגלריה שלי
             </h2>
             <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {projects.map((p) => (
@@ -81,6 +82,8 @@ export default async function Home() {
           <p className="text-center text-neutral-400">פרויקטים יתווספו בקרוב</p>
         )}
       </section>
+
+      <ContactFab />
     </main>
   );
 }
