@@ -25,7 +25,7 @@ export default function BeforeAfter({beforeSrc, afterSrc, beforeAlt = "לפני"
 
   return (
     <div
-      className="group relative aspect-square w-full select-none overflow-hidden rounded-2xl bg-neutral-100"
+      className="group relative aspect-square w-full select-none overflow-hidden rounded-md bg-neutral-100"
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={end}
@@ -33,20 +33,29 @@ export default function BeforeAfter({beforeSrc, afterSrc, beforeAlt = "לפני"
       onPointerCancel={end}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <Image src={afterSrc} alt={afterAlt} fill draggable={false} className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+      <Image
+        src={afterSrc}
+        alt={afterAlt}
+        fill
+        draggable={false}
+        className="object-cover"
+        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+      />
       <Image
         src={beforeSrc}
         alt={beforeAlt}
         fill
         draggable={false}
         className={`object-cover transition-opacity duration-300 ${revealed ? "opacity-100" : "opacity-0"}`}
-        sizes="(max-width:768px) 100vw, 33vw"
+        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
       />
       <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
         {revealed ? beforeAlt : afterAlt}
       </span>
-      <span className={`pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs text-white transition-opacity duration-300 ${revealed ? "opacity-0" : "opacity-100"}`}>
-        החזק כדי לראות לפני
+      <span
+        className={`pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/45 px-2 py-0.5 text-[11px] text-white/90 backdrop-blur-sm transition-opacity duration-300 ${revealed ? "opacity-0" : "opacity-100"}`}
+      >
+        החזק לפני
       </span>
     </div>
   );
