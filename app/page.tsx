@@ -1,31 +1,86 @@
+import Image from "next/image";
+import type { Metadata } from "next";
 import BeforeAfter from "@/components/BeforeAfter";
-import {client} from "@/sanity/lib/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
 
-const builder = imageUrlBuilder(client);
-const urlFor = (source: unknown) => builder.image(source as never);
+type About = { name?: string; logo?: unknown; bio?: string };
+type Project = { _id: string; title?: string; beforeImage: unknown; afterImage: unknown };
+type Data = { about: About | null; projects: Project[] };
 
-type Project = {_id: string; title: string; beforeImage: unknown; afterImage: unknown};
 export const revalidate = 60;
 
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await client.fetch<About | null>(`*[_type == "about"][0]{name, bio}`);
+  return {
+    title: about?.name || "תיק עבודות | אדריכלות",
+    description: about?.bio || "תיק עבודות אדריכלות — פרויקטים נבחרים",
+  };
+}
+
 export default async function Home() {
-  const projects = await client.fetch<Project[]>(
-    `*[_type == "project" && defined(beforeImage) && defined(afterImage)] | order(order asc){_id, title, beforeImage, afterImage}`
+  const { about, projects } = await client.fetch<Data>(
+    `{
+      "about": *[_type == "about"][0]{name, logo, bio},
+      "projects": *[_type == "project" && defined(beforeImage) && defined(afterImage)] | order(order asc){_id, title, beforeImage, afterImage}
+    }`
   );
 
   return (
-    <main dir="rtl" className="mx-auto max-w-6xl px-4 py-10">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p) => (
-          <figure key={p._id} className="space-y-2">
-            <BeforeAfter
-              beforeSrc={urlFor(p.beforeImage).width(800).height(800).url()}
-              afterSrc={urlFor(p.afterImage).width(800).height(800).url()}
-            />
-            <figcaption className="text-sm text-neutral-600">{p.title}</figcaption>
-          </figure>
-        ))}
-      </div>
+    <main className="flex-1">
+      {(about?.logo || about?.name || about?.bio) && (
+        <header className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28">
+          {about?.logo ? (
+            <div className="relative mx-auto mb-8 h-16 w-40 sm:h-20 sm:w-48">
+              <Image
+                src={urlFor(about.logo as never).width(400).height(200).fit("max").url()}
+                alt={about?.name ? `${about.name} — לוגו` : "לוגו"}
+                fill
+                className="object-contain"
+                sizes="200px"
+                priority
+              />
+            </div>
+          ) : null}
+          {about?.name ? (
+            <h1 className="font-serif text-3xl font-medium tracking-tight text-neutral-900 sm:text-4xl">
+              {about.name}
+            </h1>
+          ) : null}
+          {about?.bio ? (
+            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-neutral-600 sm:text-lg">
+              {about.bio}
+            </p>
+          ) : null}
+        </header>
+      )}
+
+      <section className="mx-auto max-w-6xl px-6 pb-24 sm:pb-32">
+        {projects.length > 0 ? (
+          <>
+            <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-neutral-400 sm:mb-12">
+              פרויקטים נבחרים
+            </h2>
+            <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {projects.map((p) => (
+                <figure key={p._id}>
+                  <BeforeAfter
+                    beforeSrc={urlFor(p.beforeImage as never).width(900).height(900).url()}
+                    afterSrc={urlFor(p.afterImage as never).width(900).height(900).url()}
+                  />
+                  {p.title ? (
+                    <figcaption className="mt-4 text-center font-serif text-lg text-neutral-800">
+                      {p.title}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="text-center text-neutral-400">פרויקטים יתווספו בקרוב</p>
+        )}
+      </section>
     </main>
   );
 }
