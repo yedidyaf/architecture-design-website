@@ -2,11 +2,11 @@
 import {useEffect, useRef, useState} from "react";
 
 // Edit these to update the contact details shown in the floating button.
-const WHATSAPP_URL = "https://wa.me/972500000000";
-const INSTAGRAM_URL = "https://instagram.com/USERNAME";
-const PHONE_PRIMARY_URL = "tel:+972500000000";
-const PHONE_SECONDARY_URL = "tel:+972500000000";
-const EMAIL_URL = "mailto:name@example.com";
+const WHATSAPP_URL = "https://wa.me/972546563464";
+const INSTAGRAM_URL = "https://www.instagram.com/miri.friedland/";
+const PHONE_PRIMARY_URL = "tel:+972546563464";
+const PHONE_SECONDARY_URL = "tel:+972527132117";
+const EMAIL_URL = "mailto:mirivlin@gmail.com";
 
 const CONTACT_OPTIONS = [
   {
