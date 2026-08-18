@@ -44,7 +44,7 @@ export default async function Home() {
             </div>
           ) : null}
           {about?.name ? (
-            <h1 className="font-serif text-3xl font-medium tracking-tight text-neutral-900 sm:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
               {about.name}
             </h1>
           ) : null}
@@ -70,7 +70,7 @@ export default async function Home() {
                     afterSrc={urlFor(p.afterImage as never).width(900).height(900).url()}
                   />
                   {p.title ? (
-                    <figcaption className="mt-4 text-center font-serif text-lg text-neutral-800">
+                    <figcaption className="mt-4 text-center text-lg font-medium text-neutral-800">
                       {p.title}
                     </figcaption>
                   ) : null}
