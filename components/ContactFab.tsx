@@ -63,8 +63,8 @@ export default function ContactFab() {
         quirks — the menu can only open inward from the corner, never off-screen.
       */}
       <div
-        className={`fixed inset-x-4 bottom-[5.25rem] z-50 sm:inset-x-8 sm:bottom-[6.25rem] transition-all duration-200 ${
-          open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
+        className={`fixed inset-x-4 bottom-[5.25rem] z-50 origin-bottom-right transition-all duration-200 sm:inset-x-8 sm:bottom-[6.25rem] ${
+          open ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0"
         }`}
       >
         <div className="absolute bottom-0 right-0 flex w-56 max-w-[calc(100vw-2rem)] flex-col gap-2">
