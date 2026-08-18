@@ -56,37 +56,44 @@ export default function ContactFab() {
   }, [open]);
 
   return (
-    <div ref={ref} className="fixed bottom-4 right-4 z-50 sm:bottom-8 sm:right-8">
+    <div ref={ref}>
+      {/*
+        Bounded on both sides (inset-x) so its containing block can never
+        extend past the viewport, regardless of RTL flex/shrink-to-fit
+        quirks — the menu can only open inward from the corner, never off-screen.
+      */}
       <div
-        className={`absolute bottom-full right-0 mb-3 flex w-56 flex-col gap-2 transition-all duration-200 ${
+        className={`fixed inset-x-4 bottom-[5.25rem] z-50 sm:inset-x-8 sm:bottom-[6.25rem] transition-all duration-200 ${
           open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
         }`}
       >
-        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ROW_CLASS}>
-          <span className={ICON_WRAP}>{whatsappIcon}</span>
-          <span>וואטסאפ</span>
-        </a>
+        <div className="absolute bottom-0 right-0 flex w-56 max-w-[calc(100vw-2rem)] flex-col gap-2">
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ROW_CLASS}>
+            <span className={ICON_WRAP}>{whatsappIcon}</span>
+            <span>וואטסאפ</span>
+          </a>
 
-        <a
-          href={PHONE_PRIMARY_URL}
-          className={`${ROW_CLASS} sm:pointer-events-none sm:cursor-default sm:hover:scale-100`}
-        >
-          <span className={ICON_WRAP}>{phoneIcon}</span>
-          <span dir="ltr" className="tabular-nums">{PHONE_PRIMARY_DISPLAY}</span>
-        </a>
+          <a
+            href={PHONE_PRIMARY_URL}
+            className={`${ROW_CLASS} sm:pointer-events-none sm:cursor-default sm:hover:scale-100`}
+          >
+            <span className={ICON_WRAP}>{phoneIcon}</span>
+            <span dir="ltr" className="tabular-nums">{PHONE_PRIMARY_DISPLAY}</span>
+          </a>
 
-        <a
-          href={PHONE_SECONDARY_URL}
-          className={`${ROW_CLASS} sm:pointer-events-none sm:cursor-default sm:hover:scale-100`}
-        >
-          <span className={ICON_WRAP}>{phoneIcon}</span>
-          <span dir="ltr" className="tabular-nums">{PHONE_SECONDARY_DISPLAY}</span>
-        </a>
+          <a
+            href={PHONE_SECONDARY_URL}
+            className={`${ROW_CLASS} sm:pointer-events-none sm:cursor-default sm:hover:scale-100`}
+          >
+            <span className={ICON_WRAP}>{phoneIcon}</span>
+            <span dir="ltr" className="tabular-nums">{PHONE_SECONDARY_DISPLAY}</span>
+          </a>
 
-        <a href={EMAIL_URL} className={ROW_CLASS}>
-          <span className={ICON_WRAP}>{emailIcon}</span>
-          <span>מייל</span>
-        </a>
+          <a href={EMAIL_URL} className={ROW_CLASS}>
+            <span className={ICON_WRAP}>{emailIcon}</span>
+            <span>מייל</span>
+          </a>
+        </div>
       </div>
 
       <button
@@ -94,7 +101,7 @@ export default function ContactFab() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "סגור אפשרויות יצירת קשר" : "יצירת קשר"}
-        className={`flex h-14 w-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-transform ${BRAND_HOVER} hover:scale-105 active:scale-95`}
+        className={`fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-transform sm:bottom-8 sm:right-8 ${BRAND_HOVER} hover:scale-105 active:scale-95`}
       >
         <svg
           viewBox="0 0 24 24"
