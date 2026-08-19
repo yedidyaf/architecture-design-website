@@ -56,18 +56,19 @@ export default function ContactFab() {
   }, [open]);
 
   return (
-    <div ref={ref}>
-      {/*
-        Bounded on both sides (inset-x) so its containing block can never
-        extend past the viewport, regardless of RTL flex/shrink-to-fit
-        quirks — the menu can only open inward from the corner, never off-screen.
-      */}
-      <div
-        className={`fixed inset-x-4 bottom-[5.25rem] z-50 origin-bottom-right transition-all duration-200 sm:inset-x-8 sm:bottom-[6.25rem] ${
-          open ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0"
-        }`}
-      >
-        <div className="absolute bottom-0 right-0 flex w-56 max-w-[calc(100vw-2rem)] flex-col gap-2">
+    // Pinned on both horizontal edges (inset-x) so the box's width is always
+    // exactly 100vw minus the margins — never auto/shrink-to-fit — and the
+    // button anchor below is pushed flush right with margin-left:auto, a
+    // physical property that isn't affected by dir="rtl". Both the button and
+    // the menu live inside this single bounded box, so neither can end up
+    // positioned past the viewport edge.
+    <div ref={ref} className="fixed inset-x-4 bottom-4 z-50 sm:inset-x-8 sm:bottom-8">
+      <div className="relative ml-auto h-14 w-14">
+        <div
+          className={`absolute bottom-full right-0 mb-3 flex w-56 max-w-[calc(100vw-2rem)] origin-bottom-right flex-col gap-2 transition-all duration-200 ${
+            open ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0"
+          }`}
+        >
           <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ROW_CLASS}>
             <span className={ICON_WRAP}>{whatsappIcon}</span>
             <span>וואטסאפ</span>
@@ -94,31 +95,31 @@ export default function ContactFab() {
             <span>מייל</span>
           </a>
         </div>
-      </div>
 
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-label={open ? "סגור אפשרויות יצירת קשר" : "יצירת קשר"}
-        className={`fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-transform sm:bottom-8 sm:right-8 ${BRAND_HOVER} hover:scale-105 active:scale-95`}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={`h-6 w-6 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-label={open ? "סגור אפשרויות יצירת קשר" : "יצירת קשר"}
+          className={`flex h-14 w-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-transform ${BRAND_HOVER} hover:scale-105 active:scale-95`}
         >
-          {open ? (
-            <path d="M18 6 6 18M6 6l12 12" />
-          ) : (
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          )}
-        </svg>
-      </button>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`h-6 w-6 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+          >
+            {open ? (
+              <path d="M18 6 6 18M6 6l12 12" />
+            ) : (
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            )}
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

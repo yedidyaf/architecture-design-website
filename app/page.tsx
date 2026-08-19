@@ -32,13 +32,13 @@ export default async function Home() {
       {(about?.logo || about?.name || about?.bio) && (
         <header className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28">
           {about?.logo ? (
-            <div className="relative mx-auto mb-8 h-16 w-40 sm:h-20 sm:w-48">
+            <div className="relative mx-auto mb-8 h-24 w-24 sm:h-28 sm:w-28">
               <Image
-                src={urlFor(about.logo as never).width(400).height(200).fit("max").url()}
+                src={urlFor(about.logo as never).width(400).height(400).fit("max").url()}
                 alt={about?.name ? `${about.name} — לוגו` : "לוגו"}
                 fill
                 className="object-contain"
-                sizes="200px"
+                sizes="150px"
                 priority
               />
             </div>
