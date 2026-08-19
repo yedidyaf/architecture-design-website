@@ -154,8 +154,8 @@ export default function ContactFab() {
           }}
           aria-expanded={open}
           aria-label={open ? "סגור אפשרויות יצירת קשר" : "יצירת קשר"}
-          className={`absolute bottom-0 right-0 flex h-14 items-center justify-center gap-2 rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-all duration-500 ${BRAND_HOVER} hover:scale-105 active:scale-95 ${
-            expanded ? "w-auto px-5" : "w-14"
+          className={`absolute bottom-0 right-0 flex h-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-all duration-500 ${BRAND_HOVER} hover:scale-105 active:scale-95 ${
+            expanded ? "w-auto gap-2 px-5" : "w-14"
           }`}
         >
           <svg
@@ -165,7 +165,7 @@ export default function ContactFab() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`h-6 w-6 shrink-0 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+            className={`h-6 w-6 shrink-0 leading-none transition-transform duration-200 ${open ? "rotate-45" : "-translate-y-px"}`}
           >
             {open ? (
               <path d="M18 6 6 18M6 6l12 12" />
