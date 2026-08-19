@@ -10,8 +10,8 @@ const PHONE_SECONDARY_DISPLAY = "052-713-2117";
 const EMAIL_URL = "mailto:mirivlin@gmail.com";
 
 // Single brand tone used for every option — the icon distinguishes them, not the color.
-const BRAND_BG = "bg-[#5C4442]";
-const BRAND_HOVER = "hover:bg-[#4a3736]";
+const BRAND_BG = "bg-brand";
+const BRAND_HOVER = "hover:bg-brand-hover";
 
 const ROW_CLASS = `flex h-11 w-56 items-center gap-3 rounded-full ${BRAND_BG} px-4 text-sm font-medium text-white shadow-md transition-transform ${BRAND_HOVER} hover:scale-[1.02]`;
 const ICON_WRAP = "flex h-6 w-6 shrink-0 items-center justify-center";
@@ -138,9 +138,9 @@ export default function ContactFab() {
 
         {attentionOn ? (
           <>
-            <span className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-[#5C4442]/60" />
+            <span className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-brand/60" />
             <span
-              className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-[#5C4442]/60"
+              className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-brand/60"
               style={{animationDelay: "0.55s"}}
             />
           </>
