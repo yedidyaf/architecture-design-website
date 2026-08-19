@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import BeforeAfter from "@/components/BeforeAfter";
+import Gallery from "@/components/Gallery";
 import ContactFab from "@/components/ContactFab";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
@@ -62,21 +62,14 @@ export default async function Home() {
             <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-neutral-400 sm:mb-12">
               הגלריה שלי
             </h2>
-            <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-              {projects.map((p) => (
-                <figure key={p._id}>
-                  <BeforeAfter
-                    beforeSrc={urlFor(p.beforeImage as never).width(900).height(900).url()}
-                    afterSrc={urlFor(p.afterImage as never).width(900).height(900).url()}
-                  />
-                  {p.title ? (
-                    <figcaption className="mt-4 text-center text-lg font-medium text-neutral-800">
-                      {p.title}
-                    </figcaption>
-                  ) : null}
-                </figure>
-              ))}
-            </div>
+            <Gallery
+              projects={projects.map((p) => ({
+                id: p._id,
+                title: p.title,
+                beforeSrc: urlFor(p.beforeImage as never).width(900).height(900).url(),
+                afterSrc: urlFor(p.afterImage as never).width(900).height(900).url(),
+              }))}
+            />
           </>
         ) : (
           <p className="text-center text-neutral-400">פרויקטים יתווספו בקרוב</p>
