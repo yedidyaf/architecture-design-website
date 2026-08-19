@@ -49,7 +49,7 @@ export default async function Home() {
             </h1>
           ) : null}
           {about?.bio ? (
-            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-neutral-600 sm:text-lg">
+            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:text-lg">
               {about.bio}
             </p>
           ) : null}
@@ -59,7 +59,7 @@ export default async function Home() {
       <section className="mx-auto max-w-6xl px-6 pb-24 sm:pb-32">
         {projects.length > 0 ? (
           <>
-            <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-neutral-400 sm:mb-12">
+            <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-brand-ink sm:mb-12">
               הגלריה שלי
             </h2>
             <Gallery
@@ -72,7 +72,7 @@ export default async function Home() {
             />
           </>
         ) : (
-          <p className="text-center text-neutral-400">פרויקטים יתווספו בקרוב</p>
+          <p className="text-center text-brand-ink/70">פרויקטים יתווספו בקרוב</p>
         )}
       </section>
 
