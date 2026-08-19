@@ -1,13 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
-import Gallery from "@/components/Gallery";
 import ContactFab from "@/components/ContactFab";
+import Testimonials from "@/components/Testimonials";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
 type About = { name?: string; logo?: unknown; bio?: string };
-type Project = { _id: string; title?: string; beforeImage: unknown; afterImage: unknown };
-type Data = { about: About | null; projects: Project[] };
+type ProjectSummary = { _id: string; title: string; slug: string; coverImage: unknown };
+type Testimonial = { _id: string; clientName: string; quote: string };
+type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Testimonial[] };
 
 export const revalidate = 60;
 
@@ -20,10 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const { about, projects } = await client.fetch<Data>(
+  const { about, projects, testimonials } = await client.fetch<Data>(
     `{
       "about": *[_type == "about"][0]{name, logo, bio},
-      "projects": *[_type == "project" && defined(beforeImage) && defined(afterImage)] | order(order asc){_id, title, beforeImage, afterImage}
+      "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){_id, title, "slug": slug.current, coverImage},
+      "testimonials": *[_type == "testimonial"] | order(order asc){_id, clientName, quote}
     }`
   );
 
@@ -62,19 +65,31 @@ export default async function Home() {
             <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-brand-ink sm:mb-12">
               הגלריה שלי
             </h2>
-            <Gallery
-              projects={projects.map((p) => ({
-                id: p._id,
-                title: p.title,
-                beforeSrc: urlFor(p.beforeImage as never).width(900).height(900).url(),
-                afterSrc: urlFor(p.afterImage as never).width(900).height(900).url(),
-              }))}
-            />
+            <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
+              {projects.map((p) => (
+                <Link key={p._id} href={`/projects/${p.slug}`} className="group block">
+                  <div className="relative aspect-square w-full overflow-hidden rounded-md bg-neutral-100">
+                    <Image
+                      src={urlFor(p.coverImage as never).width(600).height(600).url()}
+                      alt={p.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                    />
+                  </div>
+                  <p className="mt-3 text-center text-sm font-medium text-brand-ink">
+                    {p.title}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </>
         ) : (
           <p className="text-center text-brand-ink/70">פרויקטים יתווספו בקרוב</p>
         )}
       </section>
+
+      <Testimonials testimonials={testimonials} />
 
       <ContactFab />
     </main>
