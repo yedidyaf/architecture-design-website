@@ -44,7 +44,7 @@ export default async function Home() {
             </div>
           ) : null}
           {about?.name ? (
-            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-brand sm:text-4xl">
               {about.name}
             </h1>
           ) : null}
