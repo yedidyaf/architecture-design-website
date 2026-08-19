@@ -56,16 +56,18 @@ export default function ContactFab() {
   }, [open]);
 
   return (
-    // Pinned on both horizontal edges (inset-x) so the box's width is always
-    // exactly 100vw minus the margins — never auto/shrink-to-fit — and the
-    // button anchor below is pushed flush right with margin-left:auto, a
-    // physical property that isn't affected by dir="rtl". Both the button and
-    // the menu live inside this single bounded box, so neither can end up
-    // positioned past the viewport edge.
-    <div ref={ref} className="fixed inset-x-4 bottom-4 z-50 sm:inset-x-8 sm:bottom-8">
-      <div className="relative ml-auto h-14 w-14">
+    // Plain physical offsets only (right/bottom) — no inset-x, no logical
+    // CSS properties (Tailwind's inset-x-* compiles to the "inset-inline"
+    // logical property, which some browsers/webviews don't support; an
+    // unsupported shorthand is silently dropped rather than falling back,
+    // leaving a fixed element unconstrained and positioned unpredictably).
+    // The box has only `right`+`bottom` set, so its width is the standard
+    // CSS2.1 shrink-to-fit value sized by its one child (the 56px button
+    // anchor) — universally supported, zero ambiguity.
+    <div ref={ref} className="fixed bottom-6 right-6 z-50 sm:bottom-8 sm:right-8">
+      <div className="relative h-14 w-14">
         <div
-          className={`absolute bottom-full right-0 mb-3 flex w-56 max-w-[calc(100vw-2rem)] origin-bottom-right flex-col gap-2 transition-all duration-200 ${
+          className={`absolute bottom-full right-0 mb-3 flex w-56 max-w-[calc(100vw-3rem)] origin-bottom-right flex-col gap-2 transition-all duration-200 ${
             open ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0"
           }`}
         >
