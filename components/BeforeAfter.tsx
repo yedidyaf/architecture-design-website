@@ -7,8 +7,8 @@ type Props = {
   afterSrc: string;
   beforeAlt?: string;
   afterAlt?: string;
-  /** Arms a one-shot auto-peek demo (before-image briefly shows, then fades back). */
-  peek?: boolean;
+  /** Bumps to a new value each time a peek round should fire (before-image briefly shows, then fades back). */
+  peekTrigger?: number;
   /** Stagger the peek's start across multiple cards. */
   peekDelayMs?: number;
   /** Whether the hint phase (peek + label) is still active; false hides both instantly. */
@@ -26,7 +26,7 @@ export default function BeforeAfter({
   afterSrc,
   beforeAlt = "לפני",
   afterAlt = "אחרי",
-  peek = false,
+  peekTrigger = 0,
   peekDelayMs = 0,
   hintActive = false,
   showHintLabel = false,
@@ -39,11 +39,11 @@ export default function BeforeAfter({
   const clear = () => {if (timer.current) {clearTimeout(timer.current); timer.current = null;}};
 
   useEffect(() => {
-    if (!peek) return;
+    if (peekTrigger === 0) return;
     const showT = setTimeout(() => setAutoPeek(true), peekDelayMs);
     const hideT = setTimeout(() => setAutoPeek(false), peekDelayMs + PEEK_VISIBLE_MS);
     return () => {clearTimeout(showT); clearTimeout(hideT);};
-  }, [peek, peekDelayMs]);
+  }, [peekTrigger, peekDelayMs]);
 
   const onDown = (e: React.PointerEvent) => {
     onFirstInteract?.();
@@ -87,13 +87,8 @@ export default function BeforeAfter({
         className={`object-cover transition-opacity duration-300 ${showBefore ? "opacity-100" : "opacity-0"}`}
         sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
       />
-      <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+      <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-brand/90 px-3 py-1 text-xs font-medium text-white shadow-md">
         {showBefore ? beforeAlt : afterAlt}
-      </span>
-      <span
-        className={`pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/45 px-2 py-0.5 text-[11px] text-white/90 backdrop-blur-sm transition-opacity duration-300 ${showBefore ? "opacity-0" : "opacity-100"}`}
-      >
-        החזק לפני
       </span>
       {showHintLabel ? (
         <div
@@ -102,7 +97,7 @@ export default function BeforeAfter({
           }`}
         >
           <span
-            className={`rounded-full bg-[#5C4442]/90 px-4 py-1.5 text-xs font-medium text-white shadow-md ${
+            className={`rounded-full bg-brand/90 px-4 py-1.5 text-xs font-medium text-white shadow-md ${
               hintActive ? "animate-hint-pulse" : ""
             }`}
           >

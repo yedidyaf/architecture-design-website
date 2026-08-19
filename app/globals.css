@@ -2,10 +2,12 @@
 
 :root {
   --background: #faf7f5;
-  --foreground: #1c1917;
   /* Brand accent — deep burgundy-red matching the logo. */
   --brand: #9f2b35;
   --brand-hover: #87252d;
+  /* Secondary brand tone — deep warm burgundy-brown, used for body text. */
+  --brand-ink: #4a2c30;
+  --foreground: var(--brand-ink);
 }
 
 @theme inline {
@@ -13,6 +15,7 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
+  --color-brand-ink: var(--brand-ink);
   --font-sans: var(--font-assistant);
 }
 
