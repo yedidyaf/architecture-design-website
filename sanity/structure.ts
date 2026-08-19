@@ -7,4 +7,5 @@ export const structure: StructureResolver = (S) =>
     .items([
       S.documentTypeListItem('project').title('פרויקטים'),
       S.documentTypeListItem('about').title('אודות ולוגו'),
+      S.documentTypeListItem('testimonial').title('המלצות'),
     ])
