@@ -13,11 +13,14 @@ const STAGGER_STEP_MS = 90;
 const STAGGER_MAX_MS = 360;
 
 export default function Gallery({projects}: {projects: GalleryProject[]}) {
-  // hintActive is true only for the brief window of each round (peek + pulsing
-  // label). interactedRef makes dismissal permanent-for-this-load and lets
-  // still-pending rounds bail out, even mid-sequence. Everything here is
-  // plain React state — nothing persisted, so a reload starts the cycle over.
+  // hintActive is true only for the brief window of each round (gates the
+  // auto-peek crossfade). labelVisible turns on with the first round and then
+  // stays on — a standing reminder on card #1 — until dismissed. interactedRef
+  // makes dismissal permanent-for-this-load and lets still-pending rounds bail
+  // out, even mid-sequence. Everything here is plain React state — nothing
+  // persisted, so a reload starts the cycle over.
   const [hintActive, setHintActive] = useState(false);
+  const [labelVisible, setLabelVisible] = useState(false);
   const [peekTrigger, setPeekTrigger] = useState(0);
   const interactedRef = useRef(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -29,6 +32,7 @@ export default function Gallery({projects}: {projects: GalleryProject[]}) {
         setTimeout(() => {
           if (interactedRef.current) return;
           setHintActive(true);
+          setLabelVisible(true);
           setPeekTrigger((n) => n + 1);
         }, startMs),
         setTimeout(() => {
@@ -47,6 +51,7 @@ export default function Gallery({projects}: {projects: GalleryProject[]}) {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
     setHintActive(false);
+    setLabelVisible(false);
   };
 
   return (
@@ -59,6 +64,7 @@ export default function Gallery({projects}: {projects: GalleryProject[]}) {
             peekTrigger={peekTrigger}
             peekDelayMs={Math.min(i * STAGGER_STEP_MS, STAGGER_MAX_MS)}
             hintActive={hintActive}
+            labelVisible={labelVisible}
             showHintLabel={i === 0}
             onFirstInteract={dismiss}
           />
