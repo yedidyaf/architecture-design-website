@@ -106,7 +106,7 @@ export default function BeforeAfter({
               hintActive ? "animate-hint-pulse" : ""
             }`}
           >
-            לחצו לגילוי
+            לחץ לגילוי
           </span>
         </div>
       ) : null}

@@ -35,9 +35,47 @@ const emailIcon = (
   </svg>
 );
 
+const ATTENTION_DELAY_MS = 30000;
+
 export default function ContactFab() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  // One-shot "notice me" cue for users who haven't discovered the button yet.
+  // Purely in-memory (React state) — resets on every reload, same as the
+  // gallery hint. interactedRef makes the dismissal permanent-for-this-load
+  // and lets the pending timers below bail out even mid-sequence.
+  const [attentionOn, setAttentionOn] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const interactedRef = useRef(false);
+  const cueTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    const armTimer = setTimeout(() => {
+      if (interactedRef.current) return;
+      setAttentionOn(true);
+      cueTimers.current.push(
+        setTimeout(() => setExpanded(true), 300),
+        setTimeout(() => setExpanded(false), 1900),
+        setTimeout(() => setExpanded(true), 2600),
+        setTimeout(() => setExpanded(false), 4200),
+        setTimeout(() => setAttentionOn(false), 5000)
+      );
+    }, ATTENTION_DELAY_MS);
+    return () => {
+      clearTimeout(armTimer);
+      cueTimers.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const dismissAttention = () => {
+    if (interactedRef.current) return;
+    interactedRef.current = true;
+    cueTimers.current.forEach(clearTimeout);
+    cueTimers.current = [];
+    setAttentionOn(false);
+    setExpanded(false);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -98,12 +136,27 @@ export default function ContactFab() {
           </a>
         </div>
 
+        {attentionOn ? (
+          <>
+            <span className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-[#5C4442]/60" />
+            <span
+              className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 animate-fab-ripple rounded-full border-2 border-[#5C4442]/60"
+              style={{animationDelay: "0.55s"}}
+            />
+          </>
+        ) : null}
+
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => {
+            dismissAttention();
+            setOpen((v) => !v);
+          }}
           aria-expanded={open}
           aria-label={open ? "סגור אפשרויות יצירת קשר" : "יצירת קשר"}
-          className={`flex h-14 w-14 items-center justify-center rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-transform ${BRAND_HOVER} hover:scale-105 active:scale-95`}
+          className={`absolute bottom-0 right-0 flex h-14 items-center justify-center gap-2 rounded-full ${BRAND_BG} text-white shadow-lg backdrop-blur transition-all duration-500 ${BRAND_HOVER} hover:scale-105 active:scale-95 ${
+            expanded ? "w-auto px-5" : "w-14"
+          }`}
         >
           <svg
             viewBox="0 0 24 24"
@@ -112,7 +165,7 @@ export default function ContactFab() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`h-6 w-6 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+            className={`h-6 w-6 shrink-0 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
           >
             {open ? (
               <path d="M18 6 6 18M6 6l12 12" />
@@ -120,6 +173,13 @@ export default function ContactFab() {
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             )}
           </svg>
+          <span
+            className={`overflow-hidden whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+              expanded ? "max-w-[6rem] opacity-100" : "max-w-0 opacity-0"
+            }`}
+          >
+            צור קשר
+          </span>
         </button>
       </div>
     </div>
