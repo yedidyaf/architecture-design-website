@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import ContactFab from "@/components/ContactFab";
+import ScrollToTop from "@/components/ScrollToTop";
 import Testimonials from "@/components/Testimonials";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
@@ -96,6 +97,7 @@ export default async function Home() {
       <Testimonials testimonials={testimonials} />
 
       <ContactFab />
+      <ScrollToTop />
     </main>
   );
 }
