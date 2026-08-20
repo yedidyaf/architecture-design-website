@@ -7,13 +7,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import {
-  WHATSAPP_URL,
-  PHONE_PRIMARY_URL,
-  PHONE_PRIMARY_DISPLAY,
-  EMAIL_URL,
-  EMAIL_DISPLAY,
-} from "@/lib/contact";
 
 type About = { name?: string; logo?: unknown };
 type ProjectDetail = { title?: string; body?: unknown[] };
@@ -43,9 +36,6 @@ export async function generateMetadata({
     title: project?.title ? `${project.title} | תיק עבודות` : "פרויקט",
   };
 }
-
-const CONTACT_PILL =
-  "inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-hover";
 
 const portableTextComponents: PortableTextComponents = {
   types: {
@@ -181,53 +171,31 @@ export default async function ProjectPage({
         <h1 className="mb-8 mt-6 text-3xl font-bold text-brand sm:text-4xl">{project.title}</h1>
         <PortableText value={project.body ?? []} components={portableTextComponents} />
 
-        <div className="mt-16 border-t border-brand/10 pt-10">
-          {nextProject ? (
-            <div className="text-center">
-              <Link
-                href={`/projects/${nextProject.slug}`}
-                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-medium text-white shadow-md transition-colors hover:bg-brand-hover"
+        {nextProject ? (
+          <div className="mt-16 border-t border-brand/10 pt-10 text-left">
+            <Link
+              href={`/projects/${nextProject.slug}`}
+              className="inline-flex items-center gap-2 rounded-full border border-brand/25 bg-brand/8 px-5 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-brand/15"
+            >
+              <span>{nextProject.title}</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4 shrink-0"
               >
-                <span>הכתבה הבאה: {nextProject.title}</span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4 shrink-0"
-                >
-                  <path d="M19 12H5" />
-                  <path d="M12 5l-7 7 7 7" />
-                </svg>
-              </Link>
-            </div>
-          ) : null}
-
-          <div className={nextProject ? "mt-12 text-center" : "text-center"}>
-            <h2 className="mb-6 text-xl font-bold text-brand-ink">מעוניינים בעיצוב? דברו איתי</h2>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={CONTACT_PILL}
-              >
-                וואטסאפ
-              </a>
-              <a href={PHONE_PRIMARY_URL} dir="ltr" className={CONTACT_PILL}>
-                {PHONE_PRIMARY_DISPLAY}
-              </a>
-              <a href={EMAIL_URL} dir="ltr" className={CONTACT_PILL}>
-                {EMAIL_DISPLAY}
-              </a>
-            </div>
+                <path d="M19 12H5" />
+                <path d="M12 5l-7 7 7 7" />
+              </svg>
+            </Link>
           </div>
-        </div>
+        ) : null}
       </div>
 
-      <ScrollToTop />
+      <ScrollToTop variant="article" />
     </main>
   );
 }
