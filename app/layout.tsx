@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Assistant } from "next/font/google";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const assistant = Assistant({
@@ -24,7 +25,10 @@ export default function RootLayout({
       dir="rtl"
       className={`${assistant.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

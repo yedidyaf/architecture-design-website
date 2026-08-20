@@ -67,7 +67,11 @@ export default async function Home() {
             </h2>
             <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
               {projects.map((p) => (
-                <Link key={p._id} href={`/projects/${p.slug}`} className="group block">
+                <Link
+                  key={p._id}
+                  href={`/projects/${p.slug}`}
+                  className="group block rounded-lg border border-brand/35 p-2 transition-colors duration-300 hover:border-brand/50"
+                >
                   <div className="relative aspect-square w-full overflow-hidden rounded-md bg-neutral-100">
                     <Image
                       src={urlFor(p.coverImage as never).width(600).height(600).url()}
