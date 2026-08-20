@@ -11,8 +11,8 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {testimonials.map((t) => (
           <blockquote key={t._id} className="rounded-md bg-white/50 p-6 shadow-sm">
-            <p className="text-base leading-relaxed text-brand-ink">&ldquo;{t.quote}&rdquo;</p>
-            <footer className="mt-4 text-sm font-medium text-brand">{t.clientName}</footer>
+            <p className="italic leading-relaxed text-brand/75">&ldquo;{t.quote}&rdquo;</p>
+            <footer className="mt-4 text-xs font-normal text-brand-ink">{t.clientName}</footer>
           </blockquote>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BeforeAfter from "@/components/BeforeAfter";
@@ -6,7 +7,9 @@ import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
+type About = { name?: string; logo?: unknown };
 type ProjectDetail = { title?: string; body?: unknown[] };
+type Data = { about: About | null; project: ProjectDetail | null };
 
 export const revalidate = 60;
 
@@ -59,12 +62,13 @@ const portableTextComponents: PortableTextComponents = {
           {value.label ? (
             <p className="mb-2 text-center text-sm italic text-brand-ink">{value.label}</p>
           ) : null}
-          <div className="mx-auto max-w-md">
-            <BeforeAfter
-              beforeSrc={urlFor(value.beforeImage).width(900).height(900).url()}
-              afterSrc={urlFor(value.afterImage).width(900).height(900).url()}
-            />
-          </div>
+          {/* No extra max-width wrapper here — BeforeAfter is already w-full,
+              so it fills the same column as contentImage's plain w-full <img>
+              and the surrounding text, instead of being capped narrower. */}
+          <BeforeAfter
+            beforeSrc={urlFor(value.beforeImage).width(900).height(900).url()}
+            afterSrc={urlFor(value.afterImage).width(900).height(900).url()}
+          />
         </div>
       );
     },
@@ -102,15 +106,37 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = await client.fetch<ProjectDetail | null>(
-    `*[_type == "project" && slug.current == $slug][0]{title, body}`,
+  const { about, project } = await client.fetch<Data>(
+    `{
+      "about": *[_type == "about"][0]{name, logo},
+      "project": *[_type == "project" && slug.current == $slug][0]{title, body}
+    }`,
     { slug }
   );
 
   if (!project) notFound();
 
   return (
-    <main className="flex-1 px-6 pb-24 pt-16 sm:pt-20">
+    <main className="flex-1 px-6 pb-16 pt-10 sm:pt-14">
+      {about?.logo || about?.name ? (
+        <Link
+          href="/"
+          className="mb-10 flex items-center justify-center gap-2 text-brand-ink"
+        >
+          {about?.logo ? (
+            <span className="relative h-8 w-8 shrink-0">
+              <Image
+                src={urlFor(about.logo as never).width(80).height(80).fit("max").url()}
+                alt=""
+                fill
+                className="object-contain"
+              />
+            </span>
+          ) : null}
+          {about?.name ? <span className="text-sm font-bold">{about.name}</span> : null}
+        </Link>
+      ) : null}
+
       <div className="mx-auto max-w-[65ch]">
         <Link href="/" className="text-sm font-medium text-brand hover:text-brand-hover">
           ← חזרה לדף הבית
