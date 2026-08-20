@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import BeforeAfter from "@/components/BeforeAfter";
+import BeforeAfterHint from "@/components/BeforeAfterHint";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
@@ -62,10 +62,11 @@ const portableTextComponents: PortableTextComponents = {
           {value.label ? (
             <p className="mb-2 text-center text-sm italic text-brand-ink">{value.label}</p>
           ) : null}
-          {/* No extra max-width wrapper here — BeforeAfter is already w-full,
-              so it fills the same column as contentImage's plain w-full <img>
-              and the surrounding text, instead of being capped narrower. */}
-          <BeforeAfter
+          {/* No extra max-width wrapper here — BeforeAfterHint (like
+              BeforeAfter itself) is already w-full, so it fills the same
+              column as contentImage's plain w-full <img> and the surrounding
+              text, instead of being capped narrower. */}
+          <BeforeAfterHint
             beforeSrc={urlFor(value.beforeImage).width(900).height(900).url()}
             afterSrc={urlFor(value.afterImage).width(900).height(900).url()}
           />
@@ -119,10 +120,7 @@ export default async function ProjectPage({
   return (
     <main className="flex-1 px-6 pb-16 pt-10 sm:pt-14">
       {about?.logo || about?.name ? (
-        <Link
-          href="/"
-          className="mb-10 flex items-center justify-center gap-2 text-brand-ink"
-        >
+        <Link href="/" className="mb-10 flex items-center justify-center gap-2">
           {about?.logo ? (
             <span className="relative h-8 w-8 shrink-0">
               <Image
@@ -133,13 +131,28 @@ export default async function ProjectPage({
               />
             </span>
           ) : null}
-          {about?.name ? <span className="text-sm font-bold">{about.name}</span> : null}
+          {about?.name ? <span className="text-sm font-bold text-brand">{about.name}</span> : null}
         </Link>
       ) : null}
 
       <div className="mx-auto max-w-[65ch]">
-        <Link href="/" className="text-sm font-medium text-brand hover:text-brand-hover">
-          ← חזרה לדף הבית
+        <Link
+          href="/"
+          aria-label="חזרה לדף הבית"
+          className="inline-flex text-brand transition-colors hover:text-brand-hover"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-5 w-5"
+          >
+            <path d="M5 12h14" />
+            <path d="M12 5l7 7-7 7" />
+          </svg>
         </Link>
         <h1 className="mb-8 mt-6 text-3xl font-bold text-brand sm:text-4xl">{project.title}</h1>
         <PortableText value={project.body ?? []} components={portableTextComponents} />
