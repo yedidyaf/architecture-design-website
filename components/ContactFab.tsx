@@ -1,13 +1,13 @@
 "use client";
 import {useEffect, useRef, useState} from "react";
-
-// Edit these to update the contact details shown in the floating button.
-const WHATSAPP_URL = "https://wa.me/972546563464";
-const PHONE_PRIMARY_URL = "tel:+972546563464";
-const PHONE_PRIMARY_DISPLAY = "054-656-3464";
-const PHONE_SECONDARY_URL = "tel:+972527132117";
-const PHONE_SECONDARY_DISPLAY = "052-713-2117";
-const EMAIL_URL = "mailto:mirivlin@gmail.com";
+import {
+  WHATSAPP_URL,
+  PHONE_PRIMARY_URL,
+  PHONE_PRIMARY_DISPLAY,
+  PHONE_SECONDARY_URL,
+  PHONE_SECONDARY_DISPLAY,
+  EMAIL_URL,
+} from "@/lib/contact";
 
 // Single brand tone used for every option — the icon distinguishes them, not the color.
 const BRAND_BG = "bg-brand";

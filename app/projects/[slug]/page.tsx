@@ -3,13 +3,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BeforeAfterHint from "@/components/BeforeAfterHint";
+import ScrollToTop from "@/components/ScrollToTop";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+import {
+  WHATSAPP_URL,
+  PHONE_PRIMARY_URL,
+  PHONE_PRIMARY_DISPLAY,
+  EMAIL_URL,
+  EMAIL_DISPLAY,
+} from "@/lib/contact";
 
 type About = { name?: string; logo?: unknown };
 type ProjectDetail = { title?: string; body?: unknown[] };
-type Data = { about: About | null; project: ProjectDetail | null };
+type ProjectNavItem = { slug: string; title: string };
+type Data = { about: About | null; project: ProjectDetail | null; allProjects: ProjectNavItem[] };
 
 export const revalidate = 60;
 
@@ -34,6 +43,9 @@ export async function generateMetadata({
     title: project?.title ? `${project.title} | תיק עבודות` : "פרויקט",
   };
 }
+
+const CONTACT_PILL =
+  "inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-hover";
 
 const portableTextComponents: PortableTextComponents = {
   types: {
@@ -107,15 +119,27 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { about, project } = await client.fetch<Data>(
+  const { about, project, allProjects } = await client.fetch<Data>(
     `{
       "about": *[_type == "about"][0]{name, logo},
-      "project": *[_type == "project" && slug.current == $slug][0]{title, body}
+      "project": *[_type == "project" && slug.current == $slug][0]{title, body},
+      "allProjects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){title, "slug": slug.current}
     }`,
     { slug }
   );
 
   if (!project) notFound();
+
+  // "Next" wraps around to the first project after the last, so there's
+  // always a next article — same order as the homepage gallery.
+  let nextProject: ProjectNavItem | null = null;
+  if (allProjects.length > 1) {
+    const currentIndex = allProjects.findIndex((p) => p.slug === slug);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % allProjects.length;
+    nextProject = allProjects[nextIndex];
+  } else if (allProjects.length === 1 && allProjects[0].slug !== slug) {
+    nextProject = allProjects[0];
+  }
 
   return (
     <main className="flex-1 px-6 pb-16 pt-10 sm:pt-14">
@@ -156,7 +180,54 @@ export default async function ProjectPage({
         </Link>
         <h1 className="mb-8 mt-6 text-3xl font-bold text-brand sm:text-4xl">{project.title}</h1>
         <PortableText value={project.body ?? []} components={portableTextComponents} />
+
+        <div className="mt-16 border-t border-brand/10 pt-10">
+          {nextProject ? (
+            <div className="text-center">
+              <Link
+                href={`/projects/${nextProject.slug}`}
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-medium text-white shadow-md transition-colors hover:bg-brand-hover"
+              >
+                <span>הכתבה הבאה: {nextProject.title}</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4 shrink-0"
+                >
+                  <path d="M19 12H5" />
+                  <path d="M12 5l-7 7 7 7" />
+                </svg>
+              </Link>
+            </div>
+          ) : null}
+
+          <div className={nextProject ? "mt-12 text-center" : "text-center"}>
+            <h2 className="mb-6 text-xl font-bold text-brand-ink">מעוניינים בעיצוב? דברו איתי</h2>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={CONTACT_PILL}
+              >
+                וואטסאפ
+              </a>
+              <a href={PHONE_PRIMARY_URL} dir="ltr" className={CONTACT_PILL}>
+                {PHONE_PRIMARY_DISPLAY}
+              </a>
+              <a href={EMAIL_URL} dir="ltr" className={CONTACT_PILL}>
+                {EMAIL_DISPLAY}
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <ScrollToTop />
     </main>
   );
 }
