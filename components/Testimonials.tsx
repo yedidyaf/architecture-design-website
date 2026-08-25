@@ -6,7 +6,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
   return (
     <section className="mx-auto max-w-4xl px-6 pb-24 sm:pb-32">
       <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-brand-ink sm:mb-12">
-        מה הלקוחות אומרים
+        מהלקוחות
       </h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {testimonials.map((t) => (
