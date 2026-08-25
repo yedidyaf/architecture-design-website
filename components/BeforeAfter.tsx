@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import Image from "next/image";
 
 type Props = {
@@ -13,11 +13,11 @@ type Props = {
   peekDelayMs?: number;
   /** Gates the auto-peek crossfade during each hint round; false hides it instantly. */
   hintActive?: boolean;
-  /** Whether the pulsing "tap to reveal" label should be shown (persists until dismissed). */
+  /** Whether the pulsing "tap to toggle" label should be shown (persists until dismissed). */
   labelVisible?: boolean;
-  /** Show the pulsing "tap to reveal" label on this card. */
+  /** Show the pulsing "tap to toggle" label on this card. */
   showHintLabel?: boolean;
-  /** Fired on the very first pointer-down, so a parent can dismiss the hint site-wide. */
+  /** Fired on the very first tap/click, so a parent can dismiss the hint site-wide. */
   onFirstInteract?: () => void;
 };
 
@@ -35,11 +35,8 @@ export default function BeforeAfter({
   showHintLabel = false,
   onFirstInteract,
 }: Props) {
-  const [revealed, setRevealed] = useState(false);
+  const [toggled, setToggled] = useState(false);
   const [autoPeek, setAutoPeek] = useState(false);
-  const start = useRef<{x: number; y: number} | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clear = () => {if (timer.current) {clearTimeout(timer.current); timer.current = null;}};
 
   useEffect(() => {
     if (peekTrigger === 0) return;
@@ -48,30 +45,26 @@ export default function BeforeAfter({
     return () => {clearTimeout(showT); clearTimeout(hideT);};
   }, [peekTrigger, peekDelayMs]);
 
-  const onDown = (e: React.PointerEvent) => {
+  const handleClick = () => {
     onFirstInteract?.();
-    start.current = {x: e.clientX, y: e.clientY};
-    clear();
-    timer.current = setTimeout(() => setRevealed(true), 120);
+    setToggled((v) => !v);
   };
-  const onMove = (e: React.PointerEvent) => {
-    if (!start.current) return;
-    if (Math.abs(e.clientX - start.current.x) > 10 || Math.abs(e.clientY - start.current.y) > 10) {
-      clear(); setRevealed(false); start.current = null;
-    }
-  };
-  const end = () => {clear(); setRevealed(false); start.current = null;};
 
-  const showBefore = revealed || (autoPeek && hintActive);
+  const showBefore = toggled || (autoPeek && hintActive);
 
   return (
     <div
-      className="group relative aspect-square w-full select-none overflow-hidden rounded-md bg-neutral-100"
-      onPointerDown={onDown}
-      onPointerMove={onMove}
-      onPointerUp={end}
-      onPointerLeave={end}
-      onPointerCancel={end}
+      role="button"
+      tabIndex={0}
+      aria-pressed={toggled}
+      className="group relative aspect-square w-full cursor-pointer select-none overflow-hidden rounded-md bg-neutral-100"
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       onContextMenu={(e) => e.preventDefault()}
     >
       <Image
@@ -94,6 +87,7 @@ export default function BeforeAfter({
         className="pointer-events-none absolute right-3 top-3 rounded-full bg-brand/55 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.45)]"
       >
         {showBefore ? beforeAlt : afterAlt}
+        <span className="mr-1.5 font-normal text-white/70">· לחץ להחלפה</span>
       </span>
       {showHintLabel ? (
         <div
@@ -106,7 +100,7 @@ export default function BeforeAfter({
               labelVisible ? "animate-hint-pulse" : ""
             }`}
           >
-            לחץ לגילוי
+            לחץ להחלפה
           </span>
         </div>
       ) : null}

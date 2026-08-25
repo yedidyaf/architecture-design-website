@@ -10,7 +10,7 @@ type Props = {
 };
 
 // Fires the SAME hint system BeforeAfter already supports for the homepage
-// gallery (peek crossfade + pulsing "לחץ לגילוי" label) once — but only once
+// gallery (peek crossfade + pulsing "לחץ להחלפה" label) once — but only once
 // this block actually scrolls into view, and only if the user hasn't already
 // interacted with it. In-memory only (no localStorage), same pattern as the
 // gallery's hint.

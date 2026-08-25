@@ -175,7 +175,7 @@ export default async function ProjectPage({
           <div className="mt-16 border-t border-brand/10 pt-10 text-left">
             <Link
               href={`/projects/${nextProject.slug}`}
-              className="inline-flex items-center gap-2 rounded-full border border-brand/25 bg-brand/8 px-5 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-brand/15"
+              className="inline-flex items-center gap-2 text-sm font-medium text-brand transition-colors hover:text-brand-hover hover:underline underline-offset-4"
             >
               <span>{nextProject.title}</span>
               <svg
