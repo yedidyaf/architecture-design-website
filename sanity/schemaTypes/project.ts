@@ -49,51 +49,8 @@ export const project = defineType({
             ],
           },
         }),
-        defineArrayMember({
-          type: 'object',
-          name: 'contentImage',
-          title: 'תמונה',
-          fields: [
-            defineField({
-              name: 'image',
-              title: 'תמונה',
-              type: 'image',
-              options: {hotspot: true},
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({name: 'caption', title: 'כיתוב', type: 'string'}),
-          ],
-          preview: {
-            select: {media: 'image', title: 'caption'},
-            prepare: ({media, title}) => ({title: title || 'תמונה', media}),
-          },
-        }),
-        defineArrayMember({
-          type: 'object',
-          name: 'beforeAfter',
-          title: 'לפני / אחרי',
-          fields: [
-            defineField({
-              name: 'beforeImage',
-              title: 'לפני',
-              type: 'image',
-              options: {hotspot: true},
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'afterImage',
-              title: 'אחרי',
-              type: 'image',
-              options: {hotspot: true},
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({name: 'label', title: 'תווית (אופציונלי)', type: 'string'}),
-          ],
-          preview: {
-            select: {media: 'afterImage', title: 'label'},
-            prepare: ({media, title}) => ({title: title || 'לפני / אחרי', media}),
-          },
-        }),
+        defineArrayMember({type: 'contentImage'}),
+        defineArrayMember({type: 'beforeAfter'}),
       ],
     }),
   ],
