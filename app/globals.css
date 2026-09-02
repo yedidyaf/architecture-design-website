@@ -17,6 +17,8 @@
   --color-brand-hover: var(--brand-hover);
   --color-brand-ink: var(--brand-ink);
   --font-sans: var(--font-assistant);
+  /* Display face reserved for the brand name "מירי פרידלנד" only. */
+  --font-brand-name: var(--font-spray-paint), var(--font-assistant), sans-serif;
 }
 
 body {

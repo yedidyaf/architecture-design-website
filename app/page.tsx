@@ -35,20 +35,23 @@ export default async function Home() {
     <main className="flex-1">
       {(about?.logo || about?.name || about?.bio) && (
         <header className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28">
+          {/* Hero mark is roughly double the previous 96/112px box. max-w-full
+              keeps it inside the px-6 gutters on narrow phones, and
+              object-contain keeps it uncropped. */}
           {about?.logo ? (
-            <div className="relative mx-auto mb-8 h-24 w-24 sm:h-28 sm:w-28">
+            <div className="relative mx-auto mb-8 h-48 w-48 max-w-full sm:h-56 sm:w-56">
               <Image
-                src={urlFor(about.logo as never).width(400).height(400).fit("max").url()}
+                src={urlFor(about.logo as never).width(800).height(800).fit("max").url()}
                 alt={about?.name ? `${about.name} — לוגו` : "לוגו"}
                 fill
                 className="object-contain"
-                sizes="150px"
+                sizes="(max-width: 640px) 192px, 224px"
                 priority
               />
             </div>
           ) : null}
           {about?.name ? (
-            <h1 className="text-3xl font-bold tracking-tight text-brand sm:text-4xl">
+            <h1 className="font-brand-name text-4xl tracking-tight text-brand sm:text-5xl">
               {about.name}
             </h1>
           ) : null}
