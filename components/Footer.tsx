@@ -28,7 +28,7 @@ export default function Footer() {
         </a>
       </p>
       <p className="text-xs text-brand-ink/60">
-        © 2026 מירי פרידלנד · עוצב ופותח על ידי ידידיה פרידלנד
+        © 2026 מירי פרידלנד · עוצב ופותח על ידי י.פ. בניית אתרים
       </p>
     </footer>
   );

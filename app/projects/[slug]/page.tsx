@@ -134,18 +134,23 @@ export default async function ProjectPage({
   return (
     <main className="flex-1 px-6 pb-16 pt-10 sm:pt-14">
       {about?.logo || about?.name ? (
-        <Link href="/" className="mb-10 flex items-center justify-center gap-2">
+        <Link href="/" className="mb-10 flex items-center justify-center gap-3">
+          {/* Scaled up alongside the hero mark (32px → 64px) while the header
+              itself stays slim — it's still a single centered row. */}
           {about?.logo ? (
-            <span className="relative h-8 w-8 shrink-0">
+            <span className="relative h-16 w-16 shrink-0">
               <Image
-                src={urlFor(about.logo as never).width(80).height(80).fit("max").url()}
+                src={urlFor(about.logo as never).width(160).height(160).fit("max").url()}
                 alt=""
                 fill
                 className="object-contain"
+                sizes="64px"
               />
             </span>
           ) : null}
-          {about?.name ? <span className="text-sm font-bold text-brand">{about.name}</span> : null}
+          {about?.name ? (
+            <span className="font-brand-name text-xl text-brand sm:text-2xl">{about.name}</span>
+          ) : null}
         </Link>
       ) : null}
 
