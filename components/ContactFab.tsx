@@ -8,6 +8,7 @@ import {
   PHONE_SECONDARY_DISPLAY,
   EMAIL_URL,
 } from "@/lib/contact";
+import useFooterInView from "./useFooterInView";
 
 // Single brand tone used for every option — the icon distinguishes them, not the color.
 const BRAND_BG = "bg-brand";
@@ -40,6 +41,13 @@ const ATTENTION_DELAY_MS = 30000;
 export default function ContactFab() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const footerInView = useFooterInView();
+
+  // Fade away (and fold the menu) while the footer is on screen so the button
+  // never sits on top of the footer's contact links / copyright line.
+  useEffect(() => {
+    if (footerInView) setOpen(false);
+  }, [footerInView]);
 
   // One-shot "notice me" cue for users who haven't discovered the button yet.
   // Purely in-memory (React state) — resets on every reload, same as the
@@ -102,7 +110,13 @@ export default function ContactFab() {
     // The box has only `right`+`bottom` set, so its width is the standard
     // CSS2.1 shrink-to-fit value sized by its one child (the 56px button
     // anchor) — universally supported, zero ambiguity.
-    <div ref={ref} className="fixed bottom-6 right-6 z-50 sm:bottom-8 sm:right-8">
+    <div
+      ref={ref}
+      inert={footerInView}
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 sm:bottom-8 sm:right-8 ${
+        footerInView ? "pointer-events-none translate-y-4 opacity-0" : "translate-y-0 opacity-100"
+      }`}
+    >
       <div className="relative h-14 w-14">
         <div
           className={`absolute bottom-full right-0 mb-3 flex w-56 max-w-[calc(100vw-3rem)] origin-bottom-right flex-col gap-2 transition-all duration-200 ${

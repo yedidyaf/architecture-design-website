@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import useFooterInView from "./useFooterInView";
 
 const SHOW_AFTER_PX = 400;
 
@@ -14,10 +15,13 @@ type Props = {
 };
 
 export default function ScrollToTop({ variant = "default" }: Props) {
-  const [visible, setVisible] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const footerInView = useFooterInView();
+  // Same rule as ContactFab: hidden while the footer is on screen.
+  const visible = scrolled && !footerInView;
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > SHOW_AFTER_PX);
+    const onScroll = () => setScrolled(window.scrollY > SHOW_AFTER_PX);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -34,6 +38,7 @@ export default function ScrollToTop({ variant = "default" }: Props) {
     // toward the vertical middle instead of the very bottom.
     <button
       type="button"
+      inert={!visible}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="חזרה לראש העמוד"
       className={`fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-brand/55 text-white shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-brand/75 left-6 bottom-6 sm:left-8 sm:bottom-8 ${
