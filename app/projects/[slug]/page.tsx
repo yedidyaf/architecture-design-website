@@ -15,6 +15,17 @@ type Data = { about: About | null; project: ProjectDetail | null; allProjects: P
 
 export const revalidate = 60;
 
+// Non-ASCII slugs can reach us percent-encoded; decode defensively so the
+// GROQ match runs against the raw stored value. Malformed escapes fall back
+// to the param as-is.
+function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 export async function generateStaticParams() {
   const slugs = await client.fetch<string[]>(
     `*[_type == "project" && defined(slug.current)].slug.current`
@@ -28,9 +39,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const decoded = decodeSlug(slug);
   const project = await client.fetch<{ title?: string } | null>(
     `*[_type == "project" && slug.current == $slug][0]{title}`,
-    { slug }
+    { slug: decoded }
   );
   return {
     title: project?.title ? `${project.title} | תיק עבודות` : "פרויקט",
@@ -109,13 +121,14 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const decoded = decodeSlug(slug);
   const { about, project, allProjects } = await client.fetch<Data>(
     `{
       "about": *[_type == "about"][0]{name, logo},
       "project": *[_type == "project" && slug.current == $slug][0]{title, body},
       "allProjects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){title, "slug": slug.current}
     }`,
-    { slug }
+    { slug: decoded }
   );
 
   if (!project) notFound();
@@ -124,10 +137,10 @@ export default async function ProjectPage({
   // always a next article — same order as the homepage gallery.
   let nextProject: ProjectNavItem | null = null;
   if (allProjects.length > 1) {
-    const currentIndex = allProjects.findIndex((p) => p.slug === slug);
+    const currentIndex = allProjects.findIndex((p) => p.slug === decoded);
     const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % allProjects.length;
     nextProject = allProjects[nextIndex];
-  } else if (allProjects.length === 1 && allProjects[0].slug !== slug) {
+  } else if (allProjects.length === 1 && allProjects[0].slug !== decoded) {
     nextProject = allProjects[0];
   }
 

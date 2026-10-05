@@ -1,5 +1,57 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
+// Hebrew → Latin transliteration for slugs. Hebrew in a URL path gets
+// percent-encoded and the round-trip back to `slug.current == $slug` is
+// fragile, so slugs are kept pure ASCII. Without niqqud ב/פ are ambiguous
+// (b/v, p/f); we use b and p, and f for final ף.
+const HEBREW_TO_LATIN: Record<string, string> = {
+  'א': 'a',
+  'ב': 'b',
+  'ג': 'g',
+  'ד': 'd',
+  'ה': 'h',
+  'ו': 'v',
+  'ז': 'z',
+  'ח': 'ch',
+  'ט': 't',
+  'י': 'y',
+  'כ': 'k',
+  'ך': 'k',
+  'ל': 'l',
+  'מ': 'm',
+  'ם': 'm',
+  'נ': 'n',
+  'ן': 'n',
+  'ס': 's',
+  'ע': '',
+  'פ': 'p',
+  'ף': 'f',
+  'צ': 'tz',
+  'ץ': 'tz',
+  'ק': 'k',
+  'ר': 'r',
+  'ש': 'sh',
+  'ת': 't',
+}
+
+function slugifyTitle(input: string): string {
+  const slug = input
+    // NFKD splits Latin accents into combining marks; those and Hebrew
+    // niqqud/cantillation are dropped.
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f\u0591-\u05C7]/g, '')
+    .replace(/[\u05D0-\u05EA]/g, (ch) => HEBREW_TO_LATIN[ch] ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96)
+    .replace(/-+$/g, '')
+  return slug || `project-${Date.now().toString(36)}`
+}
+
 export const project = defineType({
   name: 'project',
   title: 'פרויקט',
@@ -17,16 +69,9 @@ export const project = defineType({
       type: 'slug',
       options: {
         source: 'title',
-        // Sanity's default slugify strips non-Latin characters, so a Hebrew
-        // title would "Generate" into an empty slug. Keep the Hebrew block
-        // (U+0590..U+05FF) alongside lowercase Latin and digits instead.
-        slugify: (input) =>
-          input
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^\u0590-\u05FFa-z0-9-]/g, '')
-            .slice(0, 96),
+        // Transliterate Hebrew to Latin so Generate always yields a non-empty,
+        // ASCII-only slug (see slugifyTitle above).
+        slugify: slugifyTitle,
         // The default uniqueness check queries the dataset on every keystroke;
         // when that request hangs it destabilizes the whole form. Slugs are
         // authored by hand here, so skip the network round-trip.
