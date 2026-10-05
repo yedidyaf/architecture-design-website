@@ -6,7 +6,9 @@ import BeforeAfterHint from "@/components/BeforeAfterHint";
 import ScrollToTop from "@/components/ScrollToTop";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
+import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "@/sanity/lib/image";
+import { OG_IMAGE, SITE_NAME } from "@/lib/site";
 
 type About = { name?: string; logo?: unknown };
 type ProjectDetail = { title?: string; body?: unknown[] };
@@ -40,12 +42,44 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const decoded = decodeSlug(slug);
-  const project = await client.fetch<{ title?: string } | null>(
-    `*[_type == "project" && slug.current == $slug][0]{title}`,
+  const project = await client.fetch<{ title?: string; coverImage?: SanityImageSource } | null>(
+    `*[_type == "project" && slug.current == $slug][0]{title, coverImage}`,
     { slug: decoded }
   );
+  // The root layout's title template appends " | מירי פרידלנד".
+  const title = project?.title || "פרויקט";
+  // No description field on projects, so pair the title with a generic suffix.
+  const description = `${title}. אדריכלות ועיצוב פנים — ${SITE_NAME}`;
+  const url = `/projects/${slug}`;
+  const image = project?.coverImage
+    ? {
+        url: urlFor(project.coverImage).width(1200).height(630).fit("crop").format("jpg").url(),
+        width: 1200,
+        height: 630,
+        alt: title,
+      }
+    : OG_IMAGE;
+  // Metadata merges shallowly: these openGraph/twitter objects replace the
+  // root ones wholesale, so they repeat siteName/locale/type.
   return {
-    title: project?.title ? `${project.title} | תיק עבודות` : "פרויקט",
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${title} | ${SITE_NAME}`,
+      description,
+      url,
+      siteName: SITE_NAME,
+      locale: "he_IL",
+      type: "article",
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | ${SITE_NAME}`,
+      description,
+      images: [image],
+    },
   };
 }
 
