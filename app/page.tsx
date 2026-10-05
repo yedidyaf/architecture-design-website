@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import type { Metadata } from "next";
 import ContactFab from "@/components/ContactFab";
 import ScrollToTop from "@/components/ScrollToTop";
 import Testimonials from "@/components/Testimonials";
@@ -14,13 +14,11 @@ type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Tes
 
 export const revalidate = 60;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const about = await client.fetch<About | null>(`*[_type == "about"][0]{name, bio}`);
-  return {
-    title: about?.name || "תיק עבודות | אדריכלות",
-    description: about?.bio || "תיק עבודות אדריכלות — פרויקטים נבחרים",
-  };
-}
+// Title, description and share tags come from the root layout. The canonical
+// lives here, not in the layout, so other pages don't inherit "/" as theirs.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function Home() {
   const { about, projects, testimonials } = await client.fetch<Data>(
