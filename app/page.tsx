@@ -4,11 +4,20 @@ import Link from "next/link";
 import ContactFab from "@/components/ContactFab";
 import ScrollToTop from "@/components/ScrollToTop";
 import Testimonials from "@/components/Testimonials";
+import { buildExcerpt } from "@/lib/excerpt";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
 type About = { name?: string; logo?: unknown; bio?: string };
-type ProjectSummary = { _id: string; title: string; slug: string; coverImage: unknown };
+type ProjectSummary = {
+  _id: string;
+  title: string;
+  slug: string;
+  coverImage: unknown;
+  // Plain text of the first few paragraph blocks; the excerpt uses the first
+  // non-empty one.
+  paragraphs: (string | null)[] | null;
+};
 type Testimonial = { _id: string; clientName: string; quote: string };
 type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Testimonial[] };
 
@@ -24,7 +33,10 @@ export default async function Home() {
   const { about, projects, testimonials } = await client.fetch<Data>(
     `{
       "about": *[_type == "about"][0]{name, logo, bio},
-      "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){_id, title, "slug": slug.current, coverImage},
+      "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){
+        _id, title, "slug": slug.current, coverImage,
+        "paragraphs": body[_type == "block" && style == "normal" && !defined(listItem)][0...3]{"text": pt::text(@)}.text
+      },
       "testimonials": *[_type == "testimonial"] | order(order asc){_id, clientName, quote}
     }`
   );
@@ -68,26 +80,37 @@ export default async function Home() {
               הגלריה שלי
             </h2>
             <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
-              {projects.map((p) => (
-                <Link
-                  key={p._id}
-                  href={`/projects/${p.slug}`}
-                  className="group block rounded-lg border border-brand/35 p-2 transition-colors duration-300 hover:border-brand/50"
-                >
-                  <div className="relative aspect-square w-full overflow-hidden rounded-md bg-neutral-100">
-                    <Image
-                      src={urlFor(p.coverImage as never).width(600).height(600).url()}
-                      alt={p.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-                    />
-                  </div>
-                  <p className="mt-3 text-center text-sm font-medium text-brand-ink">
-                    {p.title}
-                  </p>
-                </Link>
-              ))}
+              {projects.map((p) => {
+                const excerpt = buildExcerpt(p.paragraphs);
+                return (
+                  <Link
+                    key={p._id}
+                    href={`/projects/${p.slug}`}
+                    className="group block rounded-lg border border-brand/35 p-2 transition-colors duration-300 hover:border-brand/50"
+                  >
+                    <div className="relative aspect-square w-full overflow-hidden rounded-md bg-neutral-100">
+                      <Image
+                        src={urlFor(p.coverImage as never).width(600).height(600).url()}
+                        alt={p.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                      />
+                    </div>
+                    <p className="mt-3 text-center text-sm font-medium text-brand-ink">
+                      {p.title}
+                    </p>
+                    {/* Omitted entirely when there's no paragraph. Grid items
+                        stretch to the tallest card in the row, so rows stay
+                        even either way. */}
+                    {excerpt ? (
+                      <p className="mt-1 line-clamp-2 text-center text-xs leading-relaxed text-brand-ink/70">
+                        {excerpt}
+                      </p>
+                    ) : null}
+                  </Link>
+                );
+              })}
             </div>
           </>
         ) : (
