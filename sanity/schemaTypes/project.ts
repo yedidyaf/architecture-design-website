@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {BodyInput} from '../components/BodyInput'
 
 // Hebrew → Latin transliteration for slugs. Hebrew in a URL path gets
 // percent-encoded and the round-trip back to `slug.current == $slug` is
@@ -91,6 +92,9 @@ export const project = defineType({
       name: 'body',
       title: 'תוכן הפרויקט',
       type: 'array',
+      // Stops the editor's selection echo from closing a block's edit dialog
+      // on every keystroke / upload (see BodyInput).
+      components: {input: BodyInput},
       of: [
         defineArrayMember({
           type: 'block',
