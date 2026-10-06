@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { SITE_FOOTER_ID } from "@/lib/site";
 
 const SHOW_AFTER_PX = 400;
 // Clear space kept between the button and the footer's top edge when lifted.
-const FOOTER_GAP_PX = 12;
+const FOOTER_GAP_PX = 16;
 
 type Props = {
   /**
@@ -32,7 +33,7 @@ export default function ScrollToTop({ variant = "default" }: Props) {
       frame = 0;
       setVisible(window.scrollY > SHOW_AFTER_PX);
       const el = ref.current;
-      const footer = document.querySelector("footer");
+      const footer = document.getElementById(SITE_FOOTER_ID);
       if (!el || !footer) return;
       // Button bottom edge with no lift applied.
       const restBottom = el.getBoundingClientRect().bottom + lift;

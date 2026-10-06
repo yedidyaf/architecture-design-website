@@ -5,6 +5,7 @@ import {
   EMAIL_URL,
   EMAIL_DISPLAY,
 } from "@/lib/contact";
+import { SITE_FOOTER_ID } from "@/lib/site";
 
 // Plain inline text links separated by middots, conventional footer style —
 // no button chrome, just muted brand-colored text that darkens on hover.
@@ -13,7 +14,7 @@ const SEPARATOR = <span className="mx-2 text-brand-ink/30">·</span>;
 
 export default function Footer() {
   return (
-    <footer className="border-t border-brand/10 px-6 py-8 text-center">
+    <footer id={SITE_FOOTER_ID} className="border-t border-brand/10 px-6 py-8 text-center">
       <p className="mb-6 text-sm">
         <a href={EMAIL_URL} dir="ltr" className={CONTACT_LINK}>
           {EMAIL_DISPLAY}
