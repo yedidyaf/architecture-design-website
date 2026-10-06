@@ -44,29 +44,31 @@ export default async function Home() {
   return (
     <main className="flex-1">
       {(about?.logo || about?.name || about?.bio) && (
-        <header className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28">
-          {/* Hero mark is roughly double the previous 96/112px box. max-w-full
-              keeps it inside the px-6 gutters on narrow phones, and
+        <header className="mx-auto max-w-3xl px-6 pb-14 pt-16 text-center sm:pb-12 sm:pt-14">
+          {/* Mobile: 168px mark, a light trim that keeps it clearly the hero.
+              Wider screens: a compact 144px mark and tighter padding so the
+              top of the gallery peeks above the fold as a cue to scroll.
+              max-w-full keeps it inside the px-6 gutters on narrow phones, and
               object-contain keeps it uncropped. */}
           {about?.logo ? (
-            <div className="relative mx-auto mb-8 h-48 w-48 max-w-full sm:h-56 sm:w-56">
+            <div className="relative mx-auto mb-6 h-42 w-42 max-w-full sm:mb-5 sm:h-36 sm:w-36">
               <Image
                 src={urlFor(about.logo as never).width(800).height(800).fit("max").url()}
                 alt={about?.name ? `${about.name} — לוגו` : "לוגו"}
                 fill
                 className="object-contain"
-                sizes="(max-width: 640px) 192px, 224px"
+                sizes="(max-width: 640px) 168px, 144px"
                 priority
               />
             </div>
           ) : null}
           {about?.name ? (
-            <h1 className="brand-name font-brand-name text-5xl text-brand sm:text-7xl">
+            <h1 className="brand-name font-brand-name text-[2.625rem] text-brand sm:text-5xl">
               {about.name}
             </h1>
           ) : null}
           {about?.bio ? (
-            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:text-lg">
+            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
               {about.bio}
             </p>
           ) : null}
