@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
-import useFooterInView from "./useFooterInView";
+import { useEffect, useRef, useState } from "react";
 
 const SHOW_AFTER_PX = 400;
+// Clear space kept between the button and the footer's top edge when lifted.
+const FOOTER_GAP_PX = 12;
 
 type Props = {
   /**
@@ -15,16 +16,41 @@ type Props = {
 };
 
 export default function ScrollToTop({ variant = "default" }: Props) {
-  const [scrolled, setScrolled] = useState(false);
-  const footerInView = useFooterInView();
-  // Same rule as ContactFab: hidden while the footer is on screen.
-  const visible = scrolled && !footerInView;
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > SHOW_AFTER_PX);
-    onScroll();
+    // Unlike ContactFab (which hides over the footer), this button stays
+    // usable at the bottom of the page: it is lifted by exactly as much as
+    // the footer would otherwise cover it, so it rests just above the footer.
+    // The lift is a pure function of scroll position, so it tracks the footer
+    // 1:1 while scrolling (no lag, no jump) and eases back down on its own.
+    // Written straight to the element's style to avoid a re-render per frame.
+    let lift = 0;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      setVisible(window.scrollY > SHOW_AFTER_PX);
+      const el = ref.current;
+      const footer = document.querySelector("footer");
+      if (!el || !footer) return;
+      // Button bottom edge with no lift applied.
+      const restBottom = el.getBoundingClientRect().bottom + lift;
+      const footerTop = footer.getBoundingClientRect().top;
+      lift = Math.max(0, restBottom - (footerTop - FOOTER_GAP_PX));
+      el.style.transform = lift ? `translateY(${-lift}px)` : "";
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   return (
@@ -38,10 +64,11 @@ export default function ScrollToTop({ variant = "default" }: Props) {
     // toward the vertical middle instead of the very bottom.
     <button
       type="button"
+      ref={ref}
       inert={!visible}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="חזרה לראש העמוד"
-      className={`fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-brand/55 text-white shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-brand/75 left-6 bottom-6 sm:left-8 sm:bottom-8 ${
+      className={`fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-brand/55 text-white shadow-md backdrop-blur-sm transition-[opacity,scale,background-color] duration-300 hover:bg-brand/75 left-6 bottom-6 sm:left-8 sm:bottom-8 ${
         variant === "article"
           ? "lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%_-_min(65ch,100vw_-_3rem)/2_-_4rem)]"
           : ""
