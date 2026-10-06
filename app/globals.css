@@ -18,7 +18,7 @@
   --color-brand-ink: var(--brand-ink);
   --font-sans: var(--font-assistant);
   /* Display face reserved for the brand name "מירי פרידלנד" only. */
-  --font-brand-name: var(--font-spray-paint), var(--font-assistant), sans-serif;
+  --font-brand-name: var(--font-amatic), var(--font-assistant), sans-serif;
 }
 
 body {
@@ -35,6 +35,17 @@ body {
     scale: 1.06;
     opacity: 0.85;
   }
+}
+
+/* Brand name "מירי פרידלנד": Amatic SC bold, thickened with a same-colour stroke.
+   Letter-spacing adds trailing space after the last glyph (the start side in
+   RTL), so an equal padding on the opposite side keeps the name optically centred. */
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding-inline-start: 0.18em;
+  -webkit-text-stroke: 0.7px var(--brand);
+  paint-order: stroke fill;
 }
 
 .animate-hint-pulse {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Assistant, Rubik_Spray_Paint } from "next/font/google";
+import { Amatic_SC, Assistant } from "next/font/google";
 import Footer from "@/components/Footer";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -11,11 +11,11 @@ const assistant = Assistant({
 });
 
 // Decorative display face used ONLY for the brand name "מירי פרידלנד".
-// Hebrew glyphs come from the "hebrew" subset; the family ships a single 400 weight.
-const rubikSprayPaint = Rubik_Spray_Paint({
-  variable: "--font-spray-paint",
+// Hebrew glyphs come from the "hebrew" subset; bold (700) is the weight used.
+const amaticSC = Amatic_SC({
+  variable: "--font-amatic",
   subsets: ["hebrew", "latin"],
-  weight: ["400"],
+  weight: ["700"],
 });
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${assistant.variable} ${rubikSprayPaint.variable} h-full antialiased`}
+      className={`${assistant.variable} ${amaticSC.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         {children}
