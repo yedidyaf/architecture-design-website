@@ -69,7 +69,7 @@ export default function ScrollToTop({ variant = "default" }: Props) {
       inert={!visible}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="חזרה לראש העמוד"
-      className={`fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-brand/55 text-white shadow-md backdrop-blur-sm transition-[opacity,scale,background-color] duration-300 hover:bg-brand/75 left-6 bottom-6 sm:left-8 sm:bottom-8 ${
+      className={`fixed z-40 flex h-11 w-11 items-center justify-center text-brand/45 transition-[opacity,scale,color] duration-300 hover:text-brand focus-visible:text-brand focus-visible:outline-none left-6 bottom-6 sm:left-8 sm:bottom-8 ${
         variant === "article"
           ? "lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%_-_min(65ch,100vw_-_3rem)/2_-_4rem)]"
           : ""
@@ -86,7 +86,7 @@ export default function ScrollToTop({ variant = "default" }: Props) {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="h-5 w-5 drop-shadow-sm"
+        className="h-6 w-6"
       >
         <path d="M12 19V5" />
         <path d="M5 12l7-7 7 7" />

@@ -38,12 +38,13 @@ body {
 }
 
 /* Brand name "מירי פרידלנד": Amatic SC bold, thickened with a same-colour stroke.
-   Letter-spacing adds trailing space after the last glyph (the start side in
-   RTL), so an equal padding on the opposite side keeps the name optically centred. */
+   Letter-spacing adds a trailing gap after the last glyph that shifts the ink
+   off-centre; an equal padding on the inline-end side balances it (measured in
+   Chromium: ink centre within ~1px of the container centre, RTL). */
 .brand-name {
   font-weight: 700;
   letter-spacing: 0.18em;
-  padding-inline-start: 0.18em;
+  padding-inline-end: 0.18em;
   -webkit-text-stroke: 0.7px var(--brand);
   paint-order: stroke fill;
 }
