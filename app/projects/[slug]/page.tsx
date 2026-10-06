@@ -196,7 +196,7 @@ export default async function ProjectPage({
             </span>
           ) : null}
           {about?.name ? (
-            <span className="font-brand-name text-xl text-brand sm:text-2xl">{about.name}</span>
+            <span className="brand-name font-brand-name whitespace-nowrap text-3xl leading-none text-brand sm:text-4xl">{about.name}</span>
           ) : null}
         </Link>
       ) : null}
