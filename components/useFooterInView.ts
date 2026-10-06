@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { SITE_FOOTER_ID } from "@/lib/site";
 
 // Height of the band at the bottom of the viewport the floating buttons occupy
 // (button size + bottom offset + a little breathing room). The footer counts as
@@ -16,7 +17,7 @@ export default function useFooterInView(): boolean {
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const footer = document.querySelector("footer");
+    const footer = document.getElementById(SITE_FOOTER_ID);
     if (!footer || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),

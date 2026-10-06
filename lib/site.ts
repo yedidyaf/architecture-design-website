@@ -13,3 +13,8 @@ export const OG_IMAGE = {
   height: 630,
   alt: "מירי פרידלנד — אדריכלית ומעצבת פנים",
 };
+
+// id of the site-wide <footer> in components/Footer.tsx. Floating buttons look
+// it up by id because other components (testimonial cards) render their own
+// <footer> elements, so a bare "footer" selector can match the wrong one.
+export const SITE_FOOTER_ID = "site-footer";
