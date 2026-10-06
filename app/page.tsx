@@ -44,7 +44,7 @@ export default async function Home() {
   return (
     <main className="flex-1">
       {(about?.logo || about?.name || about?.bio) && (
-        <header className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28">
+        <header className="mx-auto max-w-3xl px-6 pb-8 pt-20 text-center sm:pb-10 sm:pt-28">
           {/* Hero mark is roughly double the previous 96/112px box. max-w-full
               keeps it inside the px-6 gutters on narrow phones, and
               object-contain keeps it uncropped. */}
@@ -75,11 +75,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-6xl px-6 pb-24 sm:pb-32">
         {projects.length > 0 ? (
-          <>
-            <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.2em] text-brand-ink sm:mb-12">
-              הגלריה שלי
-            </h2>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
               {projects.map((p) => {
                 const excerpt = buildExcerpt(p.paragraphs);
                 return (
@@ -111,8 +107,7 @@ export default async function Home() {
                   </Link>
                 );
               })}
-            </div>
-          </>
+          </div>
         ) : (
           <p className="text-center text-brand-ink/70">פרויקטים יתווספו בקרוב</p>
         )}
