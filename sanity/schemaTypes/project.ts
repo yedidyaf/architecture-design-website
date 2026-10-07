@@ -61,12 +61,14 @@ export const project = defineType({
     defineField({
       name: 'title',
       title: 'שם הפרויקט',
+      description: 'שם הפרויקט — יוצג ברשת בעמוד הראשי ובראש עמוד הפרויקט.',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'קישור (Slug)',
+      description: 'כתובת העמוד באתר. מלא קודם את שם הפרויקט, ואז לחץ על Generate.',
       type: 'slug',
       options: {
         source: 'title',
@@ -83,14 +85,21 @@ export const project = defineType({
     defineField({
       name: 'coverImage',
       title: 'תמונת שער',
+      description: 'תמונת השער שתוצג בריבוע ברשת בעמוד הראשי.',
       type: 'image',
       options: {hotspot: true},
       validation: (Rule) => Rule.required(),
     }),
-    defineField({name: 'order', title: 'סדר תצוגה', type: 'number'}),
+    defineField({
+      name: 'order',
+      title: 'סדר תצוגה',
+      description: 'מספר שקובע את סדר ההצגה ברשת (מספר קטן יותר = מוצג קודם).',
+      type: 'number',
+    }),
     defineField({
       name: 'body',
       title: 'תוכן הפרויקט',
+      description: 'תוכן עמוד הפרויקט: אפשר להוסיף טקסט, תמונות ובלוקים של לפני/אחרי, בכל סדר שתרצה.',
       type: 'array',
       // Stops the editor's selection echo from closing a block's edit dialog
       // on every keystroke / upload (see BodyInput).
