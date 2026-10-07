@@ -1,0 +1,14 @@
+/*
+ * RTL polish for the embedded Sanity Studio (sanity v5).
+ *
+ * Studio's field header pins the floating field-actions card (comment button
+ * + "..." menu) to `right: 0`. In RTL the field label starts on the right, so
+ * the card sits on top of the label's first words. Move the card to the left
+ * edge instead. Selectors use Sanity's own data-* attributes (not hashed
+ * styled-components classes) and only apply under dir="rtl", so a Studio
+ * upgrade that renames them simply makes this a no-op.
+ */
+[dir='rtl'] [data-ui='fieldHeaderContentBox'] ~ [data-has-actions][data-actions-visible] {
+  right: auto;
+  left: 0;
+}

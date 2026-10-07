@@ -9,6 +9,7 @@
 
 import { NextStudio } from 'next-sanity/studio'
 import config from '../../../sanity.config'
+import './studio-rtl.css'
 
 export const dynamic = 'force-static'
 

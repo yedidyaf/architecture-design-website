@@ -5,8 +5,23 @@ export const about = defineType({
   title: 'אודות ולוגו',
   type: 'document',
   fields: [
-    defineField({name: 'name', title: 'שם', type: 'string'}),
-    defineField({name: 'logo', title: 'לוגו', type: 'image'}),
-    defineField({name: 'bio', title: 'טקסט אודות', type: 'text'}),
+    defineField({
+      name: 'name',
+      title: 'שם',
+      description: 'השם שמוצג באתר.',
+      type: 'string',
+    }),
+    defineField({
+      name: 'logo',
+      title: 'לוגו',
+      description: 'הלוגו שמוצג בראש האתר.',
+      type: 'image',
+    }),
+    defineField({
+      name: 'bio',
+      title: 'טקסט אודות',
+      description: 'טקסט אודות או סלוגן קצר.',
+      type: 'text',
+    }),
   ],
 })
