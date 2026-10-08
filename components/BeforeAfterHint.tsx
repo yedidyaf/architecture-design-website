@@ -7,16 +7,17 @@ type Props = {
   afterSrc: string;
   beforeAlt?: string;
   afterAlt?: string;
+  aspectRatio?: number;
 };
 
 // Fires the SAME hint system BeforeAfter already supports for the homepage
-// gallery (peek crossfade + pulsing "לחץ להחלפה" label) once — but only once
+// gallery (peek crossfade + pulsing swap icon) once — but only once
 // this block actually scrolls into view, and only if the user hasn't already
 // interacted with it. In-memory only (no localStorage), same pattern as the
 // gallery's hint.
 const ARM_DELAY_MS = 700;
 
-export default function BeforeAfterHint({ beforeSrc, afterSrc, beforeAlt, afterAlt }: Props) {
+export default function BeforeAfterHint({ beforeSrc, afterSrc, beforeAlt, afterAlt, aspectRatio }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hintActive, setHintActive] = useState(false);
   const [labelVisible, setLabelVisible] = useState(false);
@@ -67,6 +68,7 @@ export default function BeforeAfterHint({ beforeSrc, afterSrc, beforeAlt, afterA
         afterSrc={afterSrc}
         beforeAlt={beforeAlt}
         afterAlt={afterAlt}
+        aspectRatio={aspectRatio}
         peekTrigger={peekTrigger}
         hintActive={hintActive}
         labelVisible={labelVisible}

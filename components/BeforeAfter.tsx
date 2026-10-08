@@ -13,15 +13,36 @@ type Props = {
   peekDelayMs?: number;
   /** Gates the auto-peek crossfade during each hint round; false hides it instantly. */
   hintActive?: boolean;
-  /** Whether the pulsing "tap to toggle" label should be shown (persists until dismissed). */
+  /** Whether the pulsing "tap to toggle" icon should be shown (persists until dismissed). */
   labelVisible?: boolean;
-  /** Show the pulsing "tap to toggle" label on this card. */
+  /** Show the pulsing "tap to toggle" icon on this card. */
   showHintLabel?: boolean;
+  /** Width / height of the image pair; the box matches it so nothing is cropped. Defaults to square. */
+  aspectRatio?: number;
   /** Fired on the very first tap/click, so a parent can dismiss the hint site-wide. */
   onFirstInteract?: () => void;
 };
 
 const PEEK_VISIBLE_MS = 1100;
+
+function SwapIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M7 4L3 8l4 4" />
+      <path d="M3 8h14" />
+      <path d="M17 12l4 4-4 4" />
+      <path d="M21 16H7" />
+    </svg>
+  );
+}
 
 export default function BeforeAfter({
   beforeSrc,
@@ -33,6 +54,7 @@ export default function BeforeAfter({
   hintActive = false,
   labelVisible = false,
   showHintLabel = false,
+  aspectRatio = 1,
   onFirstInteract,
 }: Props) {
   const [toggled, setToggled] = useState(false);
@@ -57,7 +79,9 @@ export default function BeforeAfter({
       role="button"
       tabIndex={0}
       aria-pressed={toggled}
-      className="group relative aspect-square w-full cursor-pointer select-none overflow-hidden rounded-md bg-neutral-100"
+      aria-label="לחץ להחלפה בין לפני לאחרי"
+      style={{ aspectRatio }}
+      className="group relative w-full cursor-pointer select-none overflow-hidden rounded-md bg-neutral-100"
       onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -72,22 +96,28 @@ export default function BeforeAfter({
         alt={afterAlt}
         fill
         draggable={false}
-        className="object-cover"
-        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+        className="object-contain"
+        sizes="(max-width:768px) 100vw, 65ch"
       />
       <Image
         src={beforeSrc}
         alt={beforeAlt}
         fill
         draggable={false}
-        className={`object-cover transition-opacity duration-300 ${showBefore ? "opacity-100" : "opacity-0"}`}
-        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+        className={`object-contain transition-opacity duration-300 ${showBefore ? "opacity-100" : "opacity-0"}`}
+        sizes="(max-width:768px) 100vw, 65ch"
       />
       <span
         className="pointer-events-none absolute right-3 top-3 rounded-full bg-brand/55 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.45)]"
       >
         {showBefore ? beforeAlt : afterAlt}
-        <span className="mr-1.5 font-normal text-white/70">· לחץ להחלפה</span>
+      </span>
+      {/* Subtle "tap to swap" affordance — icon only, no text. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-brand/80 shadow-sm backdrop-blur-sm"
+      >
+        <SwapIcon className="h-4 w-4" />
       </span>
       {showHintLabel ? (
         <div
@@ -96,11 +126,12 @@ export default function BeforeAfter({
           }`}
         >
           <span
-            className={`rounded-full bg-brand/90 px-4 py-1.5 text-xs font-medium text-white shadow-md ${
+            aria-hidden="true"
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-brand/80 text-white shadow-md ${
               labelVisible ? "animate-hint-pulse" : ""
             }`}
           >
-            לחץ להחלפה
+            <SwapIcon className="h-6 w-6" />
           </span>
         </div>
       ) : null}
