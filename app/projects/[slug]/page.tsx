@@ -8,10 +8,18 @@ import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable
 import { client } from "@/sanity/lib/client";
 import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "@/sanity/lib/image";
+import { getImageAspectRatio } from "@/lib/image-ratio";
 import { OG_IMAGE, SITE_NAME } from "@/lib/site";
 
 type About = { name?: string; logo?: unknown };
-type ProjectDetail = { title?: string; body?: unknown[] };
+type TextAlign = "right" | "center" | "justify";
+type ProjectDetail = { title?: string; body?: unknown[]; textAlign?: TextAlign };
+
+const TEXT_ALIGN_CLASS: Record<TextAlign, string> = {
+  right: "text-right",
+  center: "text-center",
+  justify: "text-justify",
+};
 type ProjectNavItem = { slug: string; title: string };
 type Data = { about: About | null; project: ProjectDetail | null; allProjects: ProjectNavItem[] };
 
@@ -107,17 +115,20 @@ const portableTextComponents: PortableTextComponents = {
       if (!value?.beforeImage || !value?.afterImage) return null;
       return (
         <div className="my-8">
-          {value.label ? (
-            <p className="mb-2 text-center text-sm italic text-brand-ink">{value.label}</p>
-          ) : null}
           {/* No extra max-width wrapper here — BeforeAfterHint (like
               BeforeAfter itself) is already w-full, so it fills the same
               column as contentImage's plain w-full <img> and the surrounding
               text, instead of being capped narrower. */}
           <BeforeAfterHint
-            beforeSrc={urlFor(value.beforeImage).width(900).height(900).url()}
-            afterSrc={urlFor(value.afterImage).width(900).height(900).url()}
+            beforeSrc={urlFor(value.beforeImage).width(1400).auto("format").url()}
+            afterSrc={urlFor(value.afterImage).width(1400).auto("format").url()}
+            aspectRatio={
+              getImageAspectRatio(value.afterImage) ?? getImageAspectRatio(value.beforeImage)
+            }
           />
+          {value.label ? (
+            <p className="mt-2 text-center text-sm italic text-brand-ink">{value.label}</p>
+          ) : null}
         </div>
       );
     },
@@ -159,7 +170,7 @@ export default async function ProjectPage({
   const { about, project, allProjects } = await client.fetch<Data>(
     `{
       "about": *[_type == "about"][0]{name, logo},
-      "project": *[_type == "project" && slug.current == $slug][0]{title, body},
+      "project": *[_type == "project" && slug.current == $slug][0]{title, body, textAlign},
       "allProjects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){title, "slug": slug.current}
     }`,
     { slug: decoded }
@@ -221,7 +232,9 @@ export default async function ProjectPage({
           </svg>
         </Link>
         <h1 className="mb-8 mt-6 text-3xl font-bold text-brand sm:text-4xl">{project.title}</h1>
-        <PortableText value={project.body ?? []} components={portableTextComponents} />
+        <div className={TEXT_ALIGN_CLASS[project.textAlign ?? "right"] ?? TEXT_ALIGN_CLASS.right}>
+          <PortableText value={project.body ?? []} components={portableTextComponents} />
+        </div>
 
         {nextProject ? (
           <div className="mt-16 border-t border-brand/10 pt-10 text-left">

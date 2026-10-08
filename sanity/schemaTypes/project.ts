@@ -97,6 +97,21 @@ export const project = defineType({
       type: 'number',
     }),
     defineField({
+      name: 'textAlign',
+      title: 'יישור טקסט',
+      description: 'בחר את יישור הטקסט בעמוד הפרויקט. משפיע רק על הטקסט — תמונות ובלוקי לפני/אחרי נשארים במרכז.',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'ימין (ברירת מחדל)', value: 'right'},
+          {title: 'ממורכז', value: 'center'},
+          {title: 'מלא (justify)', value: 'justify'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'right',
+    }),
+    defineField({
       name: 'body',
       title: 'תוכן הפרויקט',
       description: 'תוכן עמוד הפרויקט: אפשר להוסיף טקסט, תמונות ובלוקים של לפני/אחרי, בכל סדר שתרצה.',
