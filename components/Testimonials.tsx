@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent } from "rea
 
 type Testimonial = { _id: string; clientName: string; quote: string };
 
-const ROTATE_MS = 5000;
+const ROTATE_MS = 8000;
 const FADE_MS = 500;
 // After a manual interaction (arrow, dot, swipe) auto-advance stays off until
 // the visitor has left the carousel alone for this long.

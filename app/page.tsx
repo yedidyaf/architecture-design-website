@@ -7,8 +7,11 @@ import Testimonials from "@/components/Testimonials";
 import { buildExcerpt } from "@/lib/excerpt";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 
-type About = { name?: string; logo?: unknown; bio?: string };
+// `bio` used to be a plain string; documents saved before the switch to
+// Portable Text still return one until they are re-entered in Studio.
+type About = { name?: string; logo?: unknown; bio?: string | Parameters<typeof PortableText>[0]["value"] };
 type ProjectSummary = {
   _id: string;
   title: string;
@@ -22,6 +25,16 @@ type Testimonial = { _id: string; clientName: string; quote: string };
 type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Testimonial[] };
 
 export const revalidate = 60;
+
+const bioComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => <p className="[&:not(:first-child)]:mt-4">{children}</p>,
+  },
+  marks: {
+    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+    em: ({ children }) => <em className="italic">{children}</em>,
+  },
+};
 
 // Title, description and share tags come from the root layout. The canonical
 // lives here, not in the layout, so other pages don't inherit "/" as theirs.
@@ -43,7 +56,7 @@ export default async function Home() {
 
   return (
     <main className="flex-1">
-      {(about?.logo || about?.name || about?.bio) && (
+      {(about?.logo || about?.name || (Array.isArray(about?.bio) ? about.bio.length > 0 : about?.bio)) && (
         <header className="mx-auto max-w-3xl px-6 pb-8 pt-16 text-center sm:pb-6 sm:pt-14">
           {/* Mobile: 168px mark, a light trim that keeps it clearly the hero.
               Wider screens: a compact 144px mark and tighter padding so the
@@ -67,8 +80,12 @@ export default async function Home() {
               {about.name}
             </h1>
           ) : null}
-          {about?.bio ? (
-            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
+          {Array.isArray(about?.bio) && about.bio.length > 0 ? (
+            <div className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
+              <PortableText value={about.bio} components={bioComponents} />
+            </div>
+          ) : typeof about?.bio === "string" && about.bio ? (
+            <p className="mx-auto mt-6 max-w-xl whitespace-pre-line text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
               {about.bio}
             </p>
           ) : null}
