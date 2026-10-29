@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import AboutOverlay from "@/components/AboutOverlay";
+import AboutOverlay, { type BioAlign } from "@/components/AboutOverlay";
 import ContactFab from "@/components/ContactFab";
 import ScrollToTop from "@/components/ScrollToTop";
 import Testimonials from "@/components/Testimonials";
@@ -12,7 +12,7 @@ import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable
 
 // `bio` used to be a plain string; documents saved before the switch to
 // Portable Text still return one until they are re-entered in Studio.
-type About = { name?: string; logo?: unknown; tagline?: string; bio?: string | Parameters<typeof PortableText>[0]["value"] };
+type About = { name?: string; logo?: unknown; tagline?: string; bioAlign?: BioAlign; bio?: string | Parameters<typeof PortableText>[0]["value"] };
 type ProjectSummary = {
   _id: string;
   title: string;
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const { about, projects, testimonials } = await client.fetch<Data>(
     `{
-      "about": *[_type == "about"][0]{name, logo, tagline, bio},
+      "about": *[_type == "about"][0]{name, logo, tagline, bio, bioAlign},
       "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){
         _id, title, "slug": slug.current, coverImage,
         "paragraphs": body[_type == "block" && style == "normal" && !defined(listItem)][0...3]{"text": pt::text(@)}.text
@@ -89,7 +89,7 @@ export default async function Home() {
             </p>
           ) : null}
           {hasBio ? (
-            <AboutOverlay>
+            <AboutOverlay align={about?.bioAlign}>
               {Array.isArray(about?.bio) ? (
                 <PortableText value={about.bio} components={bioComponents} />
               ) : (
