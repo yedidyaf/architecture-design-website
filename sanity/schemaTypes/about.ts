@@ -18,10 +18,16 @@ export const about = defineType({
       type: 'image',
     }),
     defineField({
+      name: 'tagline',
+      title: 'משפט קצר (מתחת ללוגו)',
+      description: 'משפט קצר אחד שמוצג מתחת ללוגו ולשם בראש האתר. טקסט רגיל, ללא עיצוב.',
+      type: 'string',
+    }),
+    defineField({
       name: 'bio',
-      title: 'טקסט אודות',
+      title: 'אודות (טקסט מלא)',
       description:
-        'טקסט אודות או סלוגן קצר. אפשר להדגיש (מודגש / נטוי), להוסיף פסקאות (Enter) ושורה חדשה בתוך פסקה (Shift+Enter).',
+        'סיפור האודות המלא, שנפתח בחלון נפרד בלחיצה על "קצת עליי". אפשר להדגיש (מודגש / נטוי), להוסיף פסקאות (Enter) ושורה חדשה בתוך פסקה (Shift+Enter).',
       type: 'array',
       of: [
         defineArrayMember({
