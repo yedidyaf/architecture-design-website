@@ -84,8 +84,8 @@ export default async function Home() {
             </h1>
           ) : null}
           {about?.tagline ? (
-            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink/90 sm:mt-4 sm:text-lg">
-              {about.tagline}
+            <p className="mx-auto mt-6 max-w-xl whitespace-pre-line text-balance text-base leading-relaxed text-brand-ink/90 sm:mt-4 sm:text-lg">
+              {about.tagline.trim()}
             </p>
           ) : null}
           {hasBio ? (

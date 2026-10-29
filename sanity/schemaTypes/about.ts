@@ -20,8 +20,18 @@ export const about = defineType({
     defineField({
       name: 'tagline',
       title: 'משפט קצר (מתחת ללוגו)',
-      description: 'משפט קצר אחד שמוצג מתחת ללוגו ולשם בראש האתר. טקסט רגיל, ללא עיצוב.',
-      type: 'string',
+      description:
+        'טקסט קצר שמוצג מתחת ללוגו ולשם בראש האתר, עד שתי שורות. Enter מתחיל שורה חדשה. טקסט רגיל, ללא עיצוב.',
+      // `text` stores a plain string like the old `string` type, so existing
+      // values carry over; it just allows line breaks.
+      type: 'text',
+      rows: 2,
+      validation: (rule) =>
+        rule.custom((value) =>
+          typeof value === 'string' && value.trim().split('\n').length > 2
+            ? 'מומלץ עד שתי שורות'
+            : true,
+        ).warning(),
     }),
     defineField({
       name: 'bio',
