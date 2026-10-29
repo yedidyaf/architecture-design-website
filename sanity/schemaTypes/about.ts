@@ -45,5 +45,21 @@ export const about = defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'bioAlign',
+      title: 'יישור טקסט האודות',
+      description: 'איך הטקסט המלא מיושר בחלון "קצת עליי".',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'מיושר לימין', value: 'right'},
+          {title: 'ממורכז', value: 'center'},
+          {title: 'מיושר לשני הצדדים', value: 'justify'},
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+      },
+      initialValue: 'right',
+    }),
   ],
 })
