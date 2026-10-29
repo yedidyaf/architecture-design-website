@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import AboutOverlay from "@/components/AboutOverlay";
 import ContactFab from "@/components/ContactFab";
 import ScrollToTop from "@/components/ScrollToTop";
 import Testimonials from "@/components/Testimonials";
@@ -11,7 +12,7 @@ import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable
 
 // `bio` used to be a plain string; documents saved before the switch to
 // Portable Text still return one until they are re-entered in Studio.
-type About = { name?: string; logo?: unknown; bio?: string | Parameters<typeof PortableText>[0]["value"] };
+type About = { name?: string; logo?: unknown; tagline?: string; bio?: string | Parameters<typeof PortableText>[0]["value"] };
 type ProjectSummary = {
   _id: string;
   title: string;
@@ -28,7 +29,7 @@ export const revalidate = 60;
 
 const bioComponents: PortableTextComponents = {
   block: {
-    normal: ({ children }) => <p className="[&:not(:first-child)]:mt-4">{children}</p>,
+    normal: ({ children }) => <p className="[&:not(:first-child)]:mt-5">{children}</p>,
   },
   marks: {
     strong: ({ children }) => <strong className="font-bold">{children}</strong>,
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const { about, projects, testimonials } = await client.fetch<Data>(
     `{
-      "about": *[_type == "about"][0]{name, logo, bio},
+      "about": *[_type == "about"][0]{name, logo, tagline, bio},
       "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){
         _id, title, "slug": slug.current, coverImage,
         "paragraphs": body[_type == "block" && style == "normal" && !defined(listItem)][0...3]{"text": pt::text(@)}.text
@@ -54,9 +55,11 @@ export default async function Home() {
     }`
   );
 
+  const hasBio = Array.isArray(about?.bio) ? about.bio.length > 0 : Boolean(about?.bio);
+
   return (
     <main className="flex-1">
-      {(about?.logo || about?.name || (Array.isArray(about?.bio) ? about.bio.length > 0 : about?.bio)) && (
+      {(about?.logo || about?.name || about?.tagline || hasBio) && (
         <header className="mx-auto max-w-3xl px-6 pb-8 pt-16 text-center sm:pb-6 sm:pt-14">
           {/* Mobile: 168px mark, a light trim that keeps it clearly the hero.
               Wider screens: a compact 144px mark and tighter padding so the
@@ -80,14 +83,19 @@ export default async function Home() {
               {about.name}
             </h1>
           ) : null}
-          {Array.isArray(about?.bio) && about.bio.length > 0 ? (
-            <div className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
-              <PortableText value={about.bio} components={bioComponents} />
-            </div>
-          ) : typeof about?.bio === "string" && about.bio ? (
-            <p className="mx-auto mt-6 max-w-xl whitespace-pre-line text-balance text-base leading-relaxed text-brand-ink sm:mt-4 sm:text-lg">
-              {about.bio}
+          {about?.tagline ? (
+            <p className="mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-brand-ink/90 sm:mt-4 sm:text-lg">
+              {about.tagline}
             </p>
+          ) : null}
+          {hasBio ? (
+            <AboutOverlay>
+              {Array.isArray(about?.bio) ? (
+                <PortableText value={about.bio} components={bioComponents} />
+              ) : (
+                <p className="whitespace-pre-line">{about?.bio as string}</p>
+              )}
+            </AboutOverlay>
           ) : null}
         </header>
       )}
