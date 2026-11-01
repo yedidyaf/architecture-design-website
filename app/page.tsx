@@ -105,18 +105,33 @@ export default async function Home() {
           <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4">
               {projects.map((p) => {
                 const excerpt = buildExcerpt(p.paragraphs);
+                const coverSrc = urlFor(p.coverImage as never).width(800).fit("max").url();
                 return (
                   <Link
                     key={p._id}
                     href={`/projects/${p.slug}`}
                     className="group block rounded-lg border border-brand/35 p-2 transition-colors duration-300 hover:border-brand/50"
                   >
-                    <div className="relative aspect-square w-full overflow-hidden rounded-md bg-neutral-100">
+                    {/* Square cell, never cropped: the cover is contained, and a
+                        blurred, cream-tinted copy of it fills the letterbox
+                        (same approach as BeforeAfter). fit("max") with no height
+                        stops Sanity from cropping to a square server-side. */}
+                    <div className="relative aspect-square w-full overflow-hidden rounded-md bg-[#FAF7F5]">
                       <Image
-                        src={urlFor(p.coverImage as never).width(600).height(600).url()}
+                        src={coverSrc}
+                        alt=""
+                        aria-hidden="true"
+                        fill
+                        quality={40}
+                        className="scale-125 object-cover blur-[24px]"
+                        sizes="(max-width:640px) 25vw, (max-width:1024px) 17vw, 13vw"
+                      />
+                      <div className="absolute inset-0 bg-[#FAF7F5]/55" />
+                      <Image
+                        src={coverSrc}
                         alt={p.title}
                         fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="object-contain transition-transform duration-300 group-hover:scale-105"
                         sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
                       />
                     </div>
