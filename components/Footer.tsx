@@ -6,7 +6,6 @@ import {
   EMAIL_DISPLAY,
 } from "@/lib/contact";
 import { SITE_FOOTER_ID } from "@/lib/site";
-import VisitorCounter from "./VisitorCounter";
 
 // Plain inline text links separated by middots, conventional footer style —
 // no button chrome, just muted brand-colored text that darkens on hover.
@@ -29,7 +28,6 @@ export default function Footer() {
           וואטסאפ
         </a>
       </p>
-      <VisitorCounter />
       <p className="text-xs text-brand-ink/60">
         © 2026 מירי פרידלנד · עוצב ופותח על ידי י.פ. בניית אתרים
       </p>
