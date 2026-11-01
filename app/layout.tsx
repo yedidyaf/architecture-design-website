@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Amatic_SC, Assistant } from "next/font/google";
 import Footer from "@/components/Footer";
 import UnderConstructionBanner from "@/components/UnderConstructionBanner";
@@ -69,6 +70,7 @@ export default function RootLayout({
         <UnderConstructionBanner />
         {children}
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
