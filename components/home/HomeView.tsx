@@ -129,7 +129,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
       </div>
 
       {/* The arrow slot (padding on the inner, right side) keeps the gap
-          between the tiles and the text free for the scroll-to-top button.
+          between the tiles and the text as breathing room (see layout.ts).
           pointer-events-none: the aside spans the whole gutter, which the
           testimonials row overlaps; only the projects column itself takes
           the pointer. */}
