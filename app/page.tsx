@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import ContactFab from "@/components/ContactFab";
-import ScrollToTop from "@/components/ScrollToTop";
 import HomeView, { type BioAlign } from "@/components/home/HomeView";
 import type { HomeProject } from "@/components/home/types";
 import { client } from "@/sanity/lib/client";
@@ -94,7 +93,6 @@ export default async function Home() {
         testimonials={testimonials}
       />
       <ContactFab />
-      <ScrollToTop variant="home" />
     </>
   );
 }

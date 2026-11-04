@@ -124,3 +124,23 @@ CONSTRAINTS
 - Verify in a headless browser (mobile + desktop): magnifier icon on content images and before/after; clicking opens the lightbox; wheel/pinch/buttons zoom; before/after has a working "החלף" in the lightbox; close via ✕/Escape/backdrop. Screenshot an open lightbox for a content image and for a before/after.
 - Push the branch and print the branch name + compare URL.
 - You can't reach Sanity from the sandbox — verify by code + tsc + mock images.
+
+---
+
+UPDATE: REMOVE THE SCROLL-TO-TOP BUTTON
+
+CONTEXT
+Next.js 16 + Tailwind homepage, RTL Hebrew, on Vercel. There is a floating "scroll to top" up-arrow button (component ScrollToTop.tsx, used on the homepage and possibly the article page). The client decided it's not needed — the site is tidy and it can be removed. Do NOT touch Sanity schema files — frontend only.
+
+TASK — remove the scroll-to-top button entirely:
+- Remove the scroll-to-top up-arrow button from everywhere it's rendered (homepage left column / anywhere else it appears), and remove the ScrollToTop component usage and the component file if it's no longer referenced.
+- Clean up any now-unused imports, state, or scroll-position listeners that existed only for it.
+- Do NOT change anything else: the projects auto-scroll, arrows for the posts, the illustration column, the contact button, testimonials — all stay as they are.
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts, mobile + desktop layouts otherwise unchanged.
+- Do NOT touch Sanity schema files. Frontend only.
+- Run `npx tsc --noEmit` and ensure it passes (no leftover references to the removed component).
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser (mobile + desktop): the scroll-to-top button is gone, and nothing else broke.
+- Push the branch and print the branch name + compare URL.

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BeforeAfterHint from "@/components/BeforeAfterHint";
-import ScrollToTop from "@/components/ScrollToTop";
 import ZoomableImage from "@/components/ZoomableImage";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
@@ -262,7 +261,6 @@ export default async function ProjectPage({
         ) : null}
       </div>
 
-      <ScrollToTop variant="article" />
     </main>
   );
 }
