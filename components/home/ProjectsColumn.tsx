@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type MouseEvent, type PointerEvent } from "react";
 import ProjectCover from "./ProjectCover";
+import { FRAME_ROOM, PROJECT_TILE_WIDTH, tileWidth } from "./layout";
 import type { HomeProject } from "./types";
 
 // Upward drift of the column, in px per second.
@@ -29,17 +30,6 @@ function Arrow({ direction }: { direction: "up" | "down" }) {
   );
 }
 
-// Room on each side of a tile for its frame, which floats outside the image.
-const FRAME_ROOM = 8;
-// One thin "hand-drawn" frame per tile: uneven corner radii and a hair of
-// rotation so it reads as sketched rather than ruled. Three variants cycle
-// down the column so neighbouring tiles aren't identical.
-const FRAME_SHAPES = [
-  { borderRadius: "14px 5px 12px 6px / 6px 12px 5px 13px", transform: "rotate(-0.6deg)" },
-  { borderRadius: "6px 13px 7px 15px / 12px 6px 14px 5px", transform: "rotate(0.5deg)" },
-  { borderRadius: "11px 7px 15px 5px / 5px 14px 7px 12px", transform: "rotate(-0.35deg)" },
-];
-
 const ARROW_CLASS =
   "flex h-10 w-12 shrink-0 cursor-pointer items-center justify-center self-center rounded-full text-brand opacity-50 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand/40 select-none touch-none";
 
@@ -47,7 +37,7 @@ const ARROW_CLASS =
 // endless loop. The list is rendered several times back to back and the
 // offset wraps at the height of one copy, so the seam is never visible.
 // Hover pauses the drift; the wheel and the arrow buttons move it by hand.
-export default function ProjectsColumn({ projects, tileWidth }: { projects: HomeProject[]; tileWidth: number }) {
+export default function ProjectsColumn({ projects }: { projects: HomeProject[] }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -165,7 +155,8 @@ export default function ProjectsColumn({ projects, tileWidth }: { projects: Home
   return (
     <div
       className="pointer-events-auto flex h-full flex-col py-3"
-      style={{ width: tileWidth + 2 * FRAME_ROOM }}
+      // 100% = the projects region of the gutter (the aside's content box).
+      style={{ width: `calc(${tileWidth("100%")} + ${2 * FRAME_ROOM}px)` }}
       onPointerEnter={(e) => e.pointerType === "mouse" && (paused.current = true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && (paused.current = false)}
       onFocus={onFocus}
@@ -189,24 +180,19 @@ export default function ProjectsColumn({ projects, tileWidth }: { projects: Home
               aria-hidden={c > 0 || undefined}
               style={{ paddingInline: FRAME_ROOM }}
             >
-              {projects.map((p, i) => (
+              {projects.map((p) => (
                 <Link
                   key={p._id}
                   href={`/projects/${p.slug}`}
                   tabIndex={c > 0 ? -1 : undefined}
                   className="group block w-full py-7 focus-visible:outline-none"
                 >
-                  <div className="relative">
-                    {/* Floats 5px outside the image; 1px, burgundy at 50%. */}
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -inset-[5px] border border-[rgba(159,43,53,0.5)]"
-                      style={FRAME_SHAPES[i % FRAME_SHAPES.length]}
-                    />
+                  {/* Double sketched frame: ::before / ::after (globals.css). */}
+                  <div className="sketch-frame relative">
                     <ProjectCover
                       src={p.coverSrc}
                       alt={c > 0 ? "" : p.title}
-                      sizes={`${tileWidth}px`}
+                      sizes={`${PROJECT_TILE_WIDTH}px`}
                       className="group-focus-visible:ring-2 group-focus-visible:ring-brand/50"
                     />
                   </div>
