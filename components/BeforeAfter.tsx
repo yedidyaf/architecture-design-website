@@ -21,6 +21,8 @@ type Props = {
   aspectRatio?: number;
   /** Fired on the very first tap/click, so a parent can dismiss the hint site-wide. */
   onFirstInteract?: () => void;
+  /** Fired on every tap/click with the new state: true = "before" is shown. */
+  onToggle?: (showingBefore: boolean) => void;
 };
 
 const PEEK_VISIBLE_MS = 1100;
@@ -87,6 +89,7 @@ export default function BeforeAfter({
   showHintLabel = false,
   aspectRatio = 1,
   onFirstInteract,
+  onToggle,
 }: Props) {
   const [toggled, setToggled] = useState(false);
   const [autoPeek, setAutoPeek] = useState(false);
@@ -100,7 +103,9 @@ export default function BeforeAfter({
 
   const handleClick = () => {
     onFirstInteract?.();
-    setToggled((v) => !v);
+    const next = !toggled;
+    setToggled(next);
+    onToggle?.(next);
   };
 
   const showBefore = toggled || (autoPeek && hintActive);
