@@ -191,6 +191,8 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
                   <div className="sketch-frame relative">
                     <ProjectCover
                       src={p.coverSrc}
+                      fit={p.coverFit}
+                      position={p.coverPosition}
                       alt={c > 0 ? "" : p.title}
                       sizes={`${PROJECT_TILE_WIDTH}px`}
                       className="group-focus-visible:ring-2 group-focus-visible:ring-brand/50"

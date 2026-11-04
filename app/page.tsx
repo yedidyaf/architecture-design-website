@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import ContactFab from "@/components/ContactFab";
 import ScrollToTop from "@/components/ScrollToTop";
 import HomeView, { type BioAlign } from "@/components/home/HomeView";
+import type { HomeProject } from "@/components/home/types";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
@@ -9,7 +10,13 @@ import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable
 // `bio` used to be a plain string; documents saved before the switch to
 // Portable Text still return one until they are re-entered in Studio.
 type About = { name?: string; logo?: unknown; tagline?: string; bioAlign?: BioAlign; bio?: string | Parameters<typeof PortableText>[0]["value"] };
-type ProjectSummary = { _id: string; title: string; slug: string; coverImage: unknown };
+type ProjectSummary = {
+  _id: string;
+  title: string;
+  slug: string;
+  coverImage: { hotspot?: { x?: number; y?: number } } | null;
+  coverFit?: string | null;
+};
 type Testimonial = { _id: string; clientName: string; quote: string };
 type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Testimonial[] };
 
@@ -25,6 +32,27 @@ const bioComponents: PortableTextComponents = {
   },
 };
 
+// Cover URL for a square tile, per the project's `coverFit` (missing or
+// unknown values mean "crop"):
+//   crop    — an 800×800 crop from the CDN; the builder reads the image's
+//             crop + hotspot, so the focal point stays centered. The same
+//             hotspot also becomes an object-position, as a fallback.
+//   contain — fit("max") with no height, so the CDN never crops it;
+//             ProjectCover letterboxes it over a blurred copy instead.
+function cover(p: ProjectSummary): Pick<HomeProject, "coverSrc" | "coverFit" | "coverPosition"> {
+  const image = urlFor(p.coverImage as never);
+  if (p.coverFit === "contain") {
+    return { coverFit: "contain", coverSrc: image.width(800).fit("max").url() };
+  }
+  const h = p.coverImage?.hotspot;
+  return {
+    coverFit: "crop",
+    coverSrc: image.width(800).height(800).fit("crop").url(),
+    coverPosition:
+      typeof h?.x === "number" && typeof h?.y === "number" ? `${h.x * 100}% ${h.y * 100}%` : undefined,
+  };
+}
+
 // Title, description and share tags come from the root layout. The canonical
 // lives here, not in the layout, so other pages don't inherit "/" as theirs.
 export const metadata: Metadata = {
@@ -36,7 +64,7 @@ export default async function Home() {
     `{
       "about": *[_type == "about"][0]{name, logo, tagline, bio, bioAlign},
       "projects": *[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc){
-        _id, title, "slug": slug.current, coverImage
+        _id, title, "slug": slug.current, coverImage, coverFit
       },
       "testimonials": *[_type == "testimonial"] | order(order asc){_id, clientName, quote}
     }`
@@ -57,13 +85,11 @@ export default async function Home() {
         tagline={about?.tagline}
         bio={bioNode}
         bioAlign={about?.bioAlign}
-        // fit("max") with no height: the CDN never crops the cover to a
-        // square; ProjectCover letterboxes it over a blurred copy instead.
         projects={projects.map((p) => ({
           _id: p._id,
           title: p.title,
           slug: p.slug,
-          coverSrc: urlFor(p.coverImage as never).width(800).fit("max").url(),
+          ...cover(p),
         }))}
         testimonials={testimonials}
       />
