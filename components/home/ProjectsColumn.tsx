@@ -36,7 +36,7 @@ const ARROW_CLASS =
 // endless loop. The list is rendered several times back to back and the
 // offset wraps at the height of one copy, so the seam is never visible.
 // Hover pauses the drift; the wheel and the arrow buttons move it by hand.
-export default function ProjectsColumn({ projects }: { projects: HomeProject[] }) {
+export default function ProjectsColumn({ projects, tileWidth }: { projects: HomeProject[]; tileWidth: number }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -153,7 +153,8 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
 
   return (
     <div
-      className="flex h-full w-full flex-col py-3"
+      className="pointer-events-auto flex h-full flex-col py-3"
+      style={{ width: tileWidth }}
       onPointerEnter={(e) => e.pointerType === "mouse" && (paused.current = true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && (paused.current = false)}
       onFocus={onFocus}
@@ -182,7 +183,7 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
                   <ProjectCover
                     src={p.coverSrc}
                     alt={c > 0 ? "" : p.title}
-                    sizes="136px"
+                    sizes={`${tileWidth}px`}
                     className="group-focus-visible:ring-2 group-focus-visible:ring-brand/50"
                   />
                   <p className="mt-2.5 text-center text-sm font-medium leading-snug text-brand-ink transition-colors group-hover:text-brand">
