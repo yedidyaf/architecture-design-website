@@ -110,10 +110,14 @@ export default function ContactFab() {
     // The box has only `right`+`bottom` set, so its width is the standard
     // CSS2.1 shrink-to-fit value sized by its one child (the 56px button
     // anchor) — universally supported, zero ambiguity.
+    // Desktop (>= 900px): the homepage's 200px illustration column runs down
+    // the right edge, so the button sits just inboard of it (200 + 24px).
+    // sm:right-8 is capped below 900px because Tailwind sorts the px-based
+    // min-[900px] variant before sm, so sm would otherwise win.
     <div
       ref={ref}
       inert={footerInView}
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 sm:bottom-8 sm:right-8 ${
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 sm:bottom-8 sm:max-[899px]:right-8 min-[900px]:right-[224px] ${
         footerInView ? "pointer-events-none translate-y-4 opacity-0" : "translate-y-0 opacity-100"
       }`}
     >
