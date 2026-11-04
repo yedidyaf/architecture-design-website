@@ -68,7 +68,7 @@ export default async function Home() {
         testimonials={testimonials}
       />
       <ContactFab />
-      <ScrollToTop />
+      <ScrollToTop variant="home" />
     </>
   );
 }
