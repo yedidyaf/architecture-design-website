@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import BeforeAfter from "./BeforeAfter";
-import ImageLightbox from "./ImageLightbox";
+import { useLightboxEntry } from "./LightboxGallery";
 import ZoomButton from "./ZoomButton";
 
 type Props = {
@@ -13,6 +13,8 @@ type Props = {
   /** Larger renditions for the zoom lightbox; default to the inline ones. */
   beforeZoomSrc?: string;
   afterZoomSrc?: string;
+  /** The block's label, shown as the caption in the lightbox. */
+  caption?: string;
 };
 
 // Fires the SAME hint system BeforeAfter already supports for the homepage
@@ -30,12 +32,21 @@ export default function BeforeAfterHint({
   aspectRatio,
   beforeZoomSrc = beforeSrc,
   afterZoomSrc = afterSrc,
+  caption,
 }: Props) {
   // Mirrors BeforeAfter's tap-to-toggle state, so the magnifier opens the
   // image that is currently shown.
   const [showingBefore, setShowingBefore] = useState(false);
-  const [zoomOpen, setZoomOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  // In the lightbox this block is one entry, starting on the side shown now.
+  const { openLightbox, soloLightbox } = useLightboxEntry(containerRef, () => ({
+    images: [
+      { src: afterZoomSrc, alt: afterAlt, label: afterAlt },
+      { src: beforeZoomSrc, alt: beforeAlt, label: beforeAlt },
+    ],
+    side: showingBefore ? 1 : 0,
+    caption: caption || undefined,
+  }));
   const [hintActive, setHintActive] = useState(false);
   const [labelVisible, setLabelVisible] = useState(false);
   const [peekTrigger, setPeekTrigger] = useState(0);
@@ -96,17 +107,8 @@ export default function BeforeAfterHint({
       {/* A sibling of the tap-to-toggle block (not inside it), in the one
           free corner: the state tag is top-right, the dog-ear top-left and
           the swap icon bottom-left. */}
-      <ZoomButton onClick={() => setZoomOpen(true)} className="bottom-1.5 right-1.5" />
-      {zoomOpen ? (
-        <ImageLightbox
-          images={[
-            { src: afterZoomSrc, alt: afterAlt, label: afterAlt },
-            { src: beforeZoomSrc, alt: beforeAlt, label: beforeAlt },
-          ]}
-          initialIndex={showingBefore ? 1 : 0}
-          onClose={() => setZoomOpen(false)}
-        />
-      ) : null}
+      <ZoomButton onClick={openLightbox} className="bottom-1.5 right-1.5" />
+      {soloLightbox}
       {/* Peeled-corner (dog-ear) cue — permanent, subtle hint that there's a
           layer underneath. Opposite corner from BeforeAfter's own state tag
           (top-right) so the two never overlap. */}

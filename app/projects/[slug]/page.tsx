@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BeforeAfterHint from "@/components/BeforeAfterHint";
+import LightboxGallery from "@/components/LightboxGallery";
 import ZoomableImage from "@/components/ZoomableImage";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
@@ -101,6 +102,7 @@ const portableTextComponents: PortableTextComponents = {
             src={urlFor(value.image).width(1400).auto("format").url()}
             zoomSrc={urlFor(value.image).width(2800).auto("format").url()}
             alt={value.caption || ""}
+            caption={value.caption}
           />
           {value.caption ? (
             <figcaption className="mt-2 text-center text-sm italic text-brand-ink">
@@ -123,6 +125,7 @@ const portableTextComponents: PortableTextComponents = {
             afterSrc={urlFor(value.afterImage).width(1400).auto("format").url()}
             beforeZoomSrc={urlFor(value.beforeImage).width(2800).auto("format").url()}
             afterZoomSrc={urlFor(value.afterImage).width(2800).auto("format").url()}
+            caption={value.label}
             aspectRatio={
               getImageAspectRatio(value.afterImage) ?? getImageAspectRatio(value.beforeImage)
             }
@@ -234,7 +237,10 @@ export default async function ProjectPage({
         </Link>
         <h1 className="mb-8 mt-6 text-3xl font-bold text-brand sm:text-4xl">{project.title}</h1>
         <div className={TEXT_ALIGN_CLASS[project.textAlign ?? "right"] ?? TEXT_ALIGN_CLASS.right}>
-          <PortableText value={project.body ?? []} components={portableTextComponents} />
+          {/* One lightbox for all the article's images, in page order. */}
+          <LightboxGallery>
+            <PortableText value={project.body ?? []} components={portableTextComponents} />
+          </LightboxGallery>
         </div>
 
         {nextProject ? (
