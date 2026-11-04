@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
+import { PROJECT_TILE_WIDTH, SIDE_COLUMN_WIDTH, TEXT_TRACK } from "./layout";
 import ProjectsColumn from "./ProjectsColumn";
 import type { HomeProject } from "./types";
 
@@ -17,17 +18,13 @@ const ALIGN_CLASS: Record<BioAlign, string> = {
 
 // Right column: the illustration strip (approved, keep as is). 200px column,
 // 32px inset, so the drawn band is 136px wide.
-const SIDE_COLUMN_WIDTH = 200;
 const SIDE_INSET = "px-8";
 const SIDE_CONTENT_WIDTH = SIDE_COLUMN_WIDTH - 2 * 32;
 // The band is 173px of the PNG's 1414px width; scale it to the content box.
 const ILLUSTRATION_WIDTH = Math.round((SIDE_CONTENT_WIDTH * 1414) / 173);
 
-// Center reading column on desktop: 620px of text, no side padding, so the
-// left gutter starts exactly where the text ends.
-const TEXT_TRACK = 620;
-// Projects tile width on desktop.
-const PROJECT_TILE_WIDTH = 168;
+// The center reading column (TEXT_TRACK) has no side padding on desktop, so
+// the left gutter starts exactly where the text ends.
 // Clearance between the testimonials and the project tiles.
 const TESTIMONIALS_GAP = 24;
 
@@ -144,12 +141,15 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
         </div>
       </div>
 
-      {/* pointer-events-none: the aside spans the whole gutter, which the
+      {/* 900–1239px: the gutter is too narrow for the scroll-to-top button
+          beside the tiles, so the column stops 64px short of the bottom and
+          the button sits centered under it (ScrollToTop variant="home").
+          pointer-events-none: the aside spans the whole gutter, which the
           testimonials row overlaps; only the projects column itself takes
           the pointer. */}
       <aside
         aria-label="פרויקטים"
-        className="pointer-events-none sticky top-0 hidden h-svh self-start justify-center min-[900px]:flex"
+        className="pointer-events-none sticky top-0 hidden h-svh self-start justify-center min-[900px]:flex min-[900px]:max-[1240px]:pb-16"
         style={{ gridColumn: "4 / span 2", gridRow: "1 / span 2" }}
       >
         <ProjectsColumn projects={projects} tileWidth={PROJECT_TILE_WIDTH} />

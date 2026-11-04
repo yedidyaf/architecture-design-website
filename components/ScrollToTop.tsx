@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { PROJECT_TILE_WIDTH, leftGutter } from "@/components/home/layout";
 import { SITE_FOOTER_ID } from "@/lib/site";
 
 const SHOW_AFTER_PX = 400;
@@ -13,7 +14,33 @@ type Props = {
    * 65ch content column instead of the far viewport edge. Below lg (and
    * always for "default") it's the same subtle bottom-left corner position.
    */
-  variant?: "default" | "article";
+  /**
+   * "home" (desktop, >= 900px) moves the button inboard, next to the
+   * homepage's projects column instead of the far-left edge: just past the
+   * tiles' inner edge where the gutter is wide enough (>= 1240px), and
+   * centered under the column between 900 and 1239px, where the column
+   * leaves room for it at the bottom (see HomeView). Mobile is unchanged.
+   */
+  variant?: "default" | "article" | "home";
+};
+
+const BUTTON_PX = 44;
+const HOME_GAP_PX = 12;
+// The tiles are centered in the gutter, so their inner edge is at
+// gutter / 2 + tile / 2 from the screen edge. 100% = the viewport width
+// (a fixed element's containing block), which is also the page width.
+const HOME_GUTTER = leftGutter("100%");
+const HOME_LEFT_BESIDE = `calc(${HOME_GUTTER} / 2 + ${PROJECT_TILE_WIDTH / 2 + HOME_GAP_PX}px)`;
+const HOME_LEFT_BELOW = `calc(${HOME_GUTTER} / 2 - ${BUTTON_PX / 2}px)`;
+
+// Tailwind sorts these px-based min-[...] variants before the rem-based sm,
+// so on the homepage sm is capped below 900px or it would win.
+const POSITION_CLASS = {
+  default: "left-6 bottom-6 sm:left-8 sm:bottom-8",
+  article:
+    "left-6 bottom-6 sm:left-8 sm:bottom-8 lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%_-_min(65ch,100vw_-_3rem)/2_-_4rem)]",
+  home:
+    "left-6 bottom-6 sm:max-[900px]:left-8 sm:max-[900px]:bottom-8 min-[900px]:bottom-4 min-[900px]:left-[var(--home-left-below)] min-[1240px]:bottom-8 min-[1240px]:left-[var(--home-left-beside)]",
 };
 
 export default function ScrollToTop({ variant = "default" }: Props) {
@@ -69,11 +96,12 @@ export default function ScrollToTop({ variant = "default" }: Props) {
       inert={!visible}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="חזרה לראש העמוד"
-      className={`fixed z-40 flex h-11 w-11 items-center justify-center text-brand/45 transition-[opacity,scale,color] duration-300 hover:text-brand focus-visible:text-brand focus-visible:outline-none left-6 bottom-6 sm:left-8 sm:bottom-8 ${
-        variant === "article"
-          ? "lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%_-_min(65ch,100vw_-_3rem)/2_-_4rem)]"
-          : ""
-      } ${
+      style={
+        variant === "home"
+          ? ({ "--home-left-beside": HOME_LEFT_BESIDE, "--home-left-below": HOME_LEFT_BELOW } as CSSProperties)
+          : undefined
+      }
+      className={`fixed z-40 flex h-11 w-11 items-center justify-center text-brand/45 transition-[opacity,scale,color] duration-300 hover:text-brand focus-visible:text-brand focus-visible:outline-none ${POSITION_CLASS[variant]} ${
         visible
           ? "pointer-events-auto scale-100 opacity-100"
           : "pointer-events-none scale-90 opacity-0"
