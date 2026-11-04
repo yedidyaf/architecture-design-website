@@ -92,3 +92,35 @@ CONSTRAINTS
 - New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
 - Verify on desktop in a headless browser: hovering the column does NOT make the posts jump; a single click on a tile navigates to the project; leaving resumes the scroll without a jump.
 - Push the branch and print the branch name + compare URL.
+
+---
+
+UPDATE: ZOOM LIGHTBOX FOR ARTICLE IMAGES
+
+CONTEXT
+Next.js 16 + Sanity CMS portfolio site, RTL Hebrew, on Vercel. On a project/article page (app/projects/[slug]/page.tsx), the body (Portable Text) renders two image block types: `contentImage` (a single image + caption) and `beforeAfter` (tap-to-toggle reveal between a "before" and "after" image, via components/BeforeAfterHint.tsx). Visitors asked for the ability to ZOOM into images. Brand burgundy #9f2b35. Do NOT touch Sanity schema files — frontend only. Do NOT change the homepage.
+
+TASK — add a zoom lightbox for article images:
+
+1. MAGNIFIER ICON ON EACH IMAGE
+On every content image AND every before/after block, add a small magnifier (zoom) icon in a corner. Style: NO circle/background behind it — just the drawn magnifier SVG icon itself, in brand burgundy #9f2b35, with a subtle drop-shadow so it stays visible on any image. On hover it may brighten slightly. It must be a real <button> with a Hebrew aria-label (e.g. "הגדלת תמונה").
+
+2. CLICKING THE ICON OPENS A FULLSCREEN LIGHTBOX (client component)
+- Dark translucent backdrop covering the viewport.
+- The image centered, zoomable: mouse wheel zooms, pinch-to-zoom on touch, and a + / − control (plain icons, white, drop-shadow, NO circles/backgrounds). Zoom range ~1x–4x. Allow panning/dragging when zoomed in.
+- A close control: a plain white "✕" (no circle/background, drop-shadow) top-left; also close on Escape and on backdrop click. Lock body scroll while open.
+
+3. BEFORE/AFTER IN THE LIGHTBOX
+- For a beforeAfter block, the magnifier opens the lightbox showing the CURRENTLY displayed image (after by default). Inside the lightbox add a "החלף לפני/אחרי" text button (plain text, brand burgundy #9f2b35, underlined, drop-shadow, NO background) that swaps between the before and after images while zoomed.
+- The normal tap-to-toggle behavior on the inline before/after block stays exactly as it is now; the magnifier icon's click must NOT trigger the toggle (stop propagation).
+
+4. ICON CONTRAST
+Burgundy icon with a drop-shadow should read on most photos. If it would get lost on a dark image, add a very subtle light halo/shadow so it stays visible — but keep it minimal and on-brand (no solid button background).
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts. Mobile + desktop both. Do NOT touch the homepage or Sanity schema.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser (mobile + desktop): magnifier icon on content images and before/after; clicking opens the lightbox; wheel/pinch/buttons zoom; before/after has a working "החלף" in the lightbox; close via ✕/Escape/backdrop. Screenshot an open lightbox for a content image and for a before/after.
+- Push the branch and print the branch name + compare URL.
+- You can't reach Sanity from the sandbox — verify by code + tsc + mock images.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BeforeAfterHint from "@/components/BeforeAfterHint";
 import ScrollToTop from "@/components/ScrollToTop";
+import ZoomableImage from "@/components/ZoomableImage";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -97,11 +98,10 @@ const portableTextComponents: PortableTextComponents = {
       if (!value?.image) return null;
       return (
         <figure className="my-8">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <ZoomableImage
             src={urlFor(value.image).width(1400).auto("format").url()}
+            zoomSrc={urlFor(value.image).width(2800).auto("format").url()}
             alt={value.caption || ""}
-            className="w-full rounded-md object-cover"
           />
           {value.caption ? (
             <figcaption className="mt-2 text-center text-sm italic text-brand-ink">
@@ -122,6 +122,8 @@ const portableTextComponents: PortableTextComponents = {
           <BeforeAfterHint
             beforeSrc={urlFor(value.beforeImage).width(1400).auto("format").url()}
             afterSrc={urlFor(value.afterImage).width(1400).auto("format").url()}
+            beforeZoomSrc={urlFor(value.beforeImage).width(2800).auto("format").url()}
+            afterZoomSrc={urlFor(value.afterImage).width(2800).auto("format").url()}
             aspectRatio={
               getImageAspectRatio(value.afterImage) ?? getImageAspectRatio(value.beforeImage)
             }
