@@ -43,7 +43,11 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
   const copyRef = useRef<HTMLDivElement>(null);
   const offset = useRef(0);
   const period = useRef(0);
-  const paused = useRef(false);
+  // Two independent reasons to stop the drift: the mouse is over the column,
+  // or keyboard focus is inside it. Neither touches the offset, so the column
+  // freezes exactly where it is and resumes from there.
+  const hovered = useRef(false);
+  const keyboardFocus = useRef(false);
   const nudge = useRef(0);
   // Enough copies that the visible area is always covered, plus one so a
   // full period can scroll by. Two is the minimum (the original + a twin).
@@ -84,7 +88,7 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
       const dt = Math.min(now - last, 64) / 1000;
       last = now;
       let delta = nudge.current * NUDGE_SPEED * dt;
-      if (!paused.current && !reduce.matches && nudge.current === 0) delta += AUTO_SPEED * dt;
+      if (!hovered.current && !keyboardFocus.current && !reduce.matches && nudge.current === 0) delta += AUTO_SPEED * dt;
       if (delta !== 0) {
         offset.current += delta;
         apply();
@@ -117,10 +121,17 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
   // Keyboard focus on a tile: stop drifting and bring that tile into view.
   // The browser would otherwise scroll the clipped viewport itself, which
   // fights the transform-based offset.
+  //
+  // Only for keyboard focus (:focus-visible). A mouse press also focuses the
+  // link, on mousedown; moving the column then would slide another tile
+  // under the pointer before mouseup, and the browser drops the click
+  // (mousedown and mouseup on different elements), so the first click on a
+  // moving tile used to just make the column jump.
   const onFocus = (e: FocusEvent<HTMLDivElement>) => {
-    paused.current = true;
-    const viewport = viewportRef.current;
     const target = e.target as HTMLElement;
+    if (!target.matches(":focus-visible")) return;
+    keyboardFocus.current = true;
+    const viewport = viewportRef.current;
     if (!viewport || !target.matches("a")) return;
     viewport.scrollTop = 0;
     offset.current = target.offsetTop - 24;
@@ -157,11 +168,11 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
       className="pointer-events-auto flex h-full flex-col py-3"
       // 100% = the projects region of the gutter (the aside's content box).
       style={{ width: `calc(${tileWidth("100%")} + ${2 * FRAME_ROOM}px)` }}
-      onPointerEnter={(e) => e.pointerType === "mouse" && (paused.current = true)}
-      onPointerLeave={(e) => e.pointerType === "mouse" && (paused.current = false)}
+      onPointerEnter={(e) => e.pointerType === "mouse" && (hovered.current = true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && (hovered.current = false)}
       onFocus={onFocus}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) paused.current = false;
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) keyboardFocus.current = false;
       }}
     >
       <button type="button" aria-label="גלול למעלה" className={ARROW_CLASS} data-dir="-1" {...arrowProps}>
