@@ -177,7 +177,7 @@ export default function ProjectsColumn({ projects }: { projects: HomeProject[] }
                   key={p._id}
                   href={`/projects/${p.slug}`}
                   tabIndex={c > 0 ? -1 : undefined}
-                  className="group mx-auto block w-[136px] py-7 focus-visible:outline-none"
+                  className="group block w-full py-7 focus-visible:outline-none"
                 >
                   <ProjectCover
                     src={p.coverSrc}

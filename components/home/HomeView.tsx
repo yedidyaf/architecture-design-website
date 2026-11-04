@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
 import ProjectsColumn from "./ProjectsColumn";
@@ -14,6 +14,16 @@ const ALIGN_CLASS: Record<BioAlign, string> = {
   center: "text-center",
   justify: "text-justify",
 };
+
+// Both side columns share one width and one inset from their outer edge, so
+// the illustrations (right) and the projects (left) mirror each other.
+// 200px column - 2 x 32px inset = 136px content: the projects tile width,
+// and the drawn width of the illustration band.
+const SIDE_COLUMN_WIDTH = 200;
+const SIDE_INSET = "px-8";
+const SIDE_CONTENT_WIDTH = SIDE_COLUMN_WIDTH - 2 * 32;
+// The band is 173px of the PNG's 1414px width; scale it to the content box.
+const ILLUSTRATION_WIDTH = Math.round((SIDE_CONTENT_WIDTH * 1414) / 173);
 
 type Testimonial = { _id: string; clientName: string; quote: string };
 
@@ -37,24 +47,26 @@ export type HomeViewProps = {
 // projects open in a full-screen overlay and the illustrations are hidden.
 export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "right", projects, testimonials }: HomeViewProps) {
   return (
-    <main className="flex-1 min-[900px]:grid min-[900px]:grid-cols-[200px_minmax(0,1fr)_200px]">
-      {/* Decorative strip. The PNG is a wide transparent canvas with the
-          drawings in a narrow band at its horizontal center (x 620–793 of
-          1414), so it is drawn at 980px wide — which makes that band ~120px —
-          centered in a 120px window that clips the empty sides. Static. */}
-      <aside aria-hidden="true" className="sticky top-0 hidden h-svh self-start overflow-hidden min-[900px]:block">
-        <div className="relative mx-auto h-full w-[120px] overflow-hidden">
-          <Image
-            src="/illustrations.png"
-            alt=""
-            width={1414}
-            height={2000}
-            sizes="980px"
-            className="absolute left-1/2 top-6 h-auto w-[980px] max-w-none -translate-x-1/2 select-none"
-            draggable={false}
-            priority
-          />
-        </div>
+    <main
+      className="flex-1 min-[900px]:grid min-[900px]:grid-cols-[var(--side)_minmax(0,1fr)_var(--side)]"
+      style={{ "--side": `${SIDE_COLUMN_WIDTH}px` } as CSSProperties}
+    >
+      {/* Decorative strip. Not sticky: it stretches to the full height of
+          the page row and scrolls with it, so scrolling reveals more of it.
+          It never moves on its own. The PNG is a wide transparent canvas
+          with the drawings in a narrow band at its horizontal center
+          (x 620–793 of 1414), so it is drawn at ILLUSTRATION_WIDTH, which
+          makes that band as wide as the projects tiles opposite, and the
+          box clips the empty sides. repeat-y tiles it down the whole page. */}
+      <aside aria-hidden="true" className={`hidden pt-6 min-[900px]:block ${SIDE_INSET}`}>
+        <div
+          className="h-full w-full bg-repeat-y"
+          style={{
+            backgroundImage: "url(/illustrations.png)",
+            backgroundSize: `${ILLUSTRATION_WIDTH}px auto`,
+            backgroundPosition: "center top",
+          }}
+        />
       </aside>
 
       <div className="px-6 pt-16 sm:pt-14">
@@ -100,7 +112,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
         </div>
       </div>
 
-      <aside aria-label="פרויקטים" className="sticky top-0 hidden h-svh self-start min-[900px]:flex">
+      <aside aria-label="פרויקטים" className={`sticky top-0 hidden h-svh self-start min-[900px]:flex ${SIDE_INSET}`}>
         <ProjectsColumn projects={projects} />
       </aside>
     </main>
