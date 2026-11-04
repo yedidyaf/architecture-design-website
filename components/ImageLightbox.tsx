@@ -4,12 +4,20 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPoi
 import { createPortal } from "react-dom";
 
 export type LightboxImage = { src: string; alt: string; label?: string };
+/**
+ * One entry in the lightbox: a single image, or a before/after pair that the
+ * visitor can swap between (`side` = the one to start on).
+ */
+export type LightboxItem = { images: LightboxImage[]; side?: number; caption?: string };
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const BUTTON_STEP = 1.5;
 // Pointer travel (px) under which a press on the backdrop counts as a click.
 const CLICK_SLOP = 6;
+// A touch swipe (at 1x) this long, and clearly more horizontal than
+// vertical, moves to the previous / next image.
+const SWIPE_MIN_PX = 50;
 
 // White controls with no background: a drop-shadow keeps them readable on
 // both the dark backdrop and a bright photo behind it.
@@ -24,19 +32,24 @@ const RESET: View = { scale: 1, x: 0, y: 0 };
 /**
  * Full-screen zoom viewer. Wheel, pinch, double-click and the + / − buttons
  * zoom (1x–4x, around the pointer / pinch center); dragging pans while
- * zoomed. Closes on ✕, Escape, or a click on the backdrop. With two images
- * (before / after), a text button swaps between them, keeping the zoom.
+ * zoomed. Closes on ✕, Escape, or a click on the backdrop.
+ *
+ * With several items, prev / next arrows, the arrow keys and a horizontal
+ * swipe step through them (looping; RTL, so "next" is to the left), and
+ * moving resets the zoom. A before/after item gets a text button that swaps
+ * its two images, keeping the zoom. The item's caption shows at the bottom.
  */
 export default function ImageLightbox({
-  images,
-  initialIndex = 0,
+  items,
+  startIndex = 0,
   onClose,
 }: {
-  images: LightboxImage[];
-  initialIndex?: number;
+  items: LightboxItem[];
+  startIndex?: number;
   onClose: () => void;
 }) {
-  const [index, setIndex] = useState(initialIndex);
+  const [itemIndex, setItemIndex] = useState(startIndex);
+  const [index, setIndex] = useState(items[startIndex]?.side ?? 0);
   const [view, setViewState] = useState<View>(RESET);
   const stageRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -52,7 +65,17 @@ export default function ImageLightbox({
   // Active pointers on the stage, for drag and pinch.
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ dist: number; mid: { x: number; y: number } } | null>(null);
-  const press = useRef<{ x: number; y: number; onImage: boolean; moved: boolean } | null>(null);
+  // The current press: where it started, and whether it can still be a
+  // click (not moved) or a swipe (one finger only, at 1x).
+  const press = useRef<{
+    x: number;
+    y: number;
+    onImage: boolean;
+    moved: boolean;
+    touch: boolean;
+    atRest: boolean;
+    multi: boolean;
+  } | null>(null);
 
   // Keep the image covering the stage center: pan is limited to how far the
   // zoomed image overhangs the stage on each axis.
@@ -91,6 +114,25 @@ export default function ImageLightbox({
   }, [onClose]);
   const close = useCallback(() => onCloseRef.current(), []);
 
+  const count = items.length;
+  // Step to another item (looping), on its starting side, at 1x.
+  const go = useCallback(
+    (delta: number) => {
+      if (count < 2) return;
+      setItemIndex((i) => {
+        const next = (((i + delta) % count) + count) % count;
+        setIndex(items[next]?.side ?? 0);
+        return next;
+      });
+      setView(RESET);
+    },
+    [count, items, setView]
+  );
+  const goRef = useRef(go);
+  useEffect(() => {
+    goRef.current = go;
+  }, [go]);
+
   // Body scroll lock, Escape, focus in and back out.
   useEffect(() => {
     const prevFocus = document.activeElement as HTMLElement | null;
@@ -99,6 +141,9 @@ export default function ImageLightbox({
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
+      // RTL: the next image is to the left.
+      else if (e.key === "ArrowLeft") goRef.current(1);
+      else if (e.key === "ArrowRight") goRef.current(-1);
     };
     document.addEventListener("keydown", onKey);
     return () => {
@@ -138,10 +183,21 @@ export default function ImageLightbox({
     e.currentTarget.setPointerCapture(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) {
-      press.current = { x: e.clientX, y: e.clientY, onImage: e.target === imgRef.current, moved: false };
+      press.current = {
+        x: e.clientX,
+        y: e.clientY,
+        onImage: e.target === imgRef.current,
+        moved: false,
+        touch: e.pointerType !== "mouse",
+        atRest: viewRef.current.scale === 1,
+        multi: false,
+      };
     } else if (pointers.current.size === 2) {
       gesture.current = pinchState();
-      if (press.current) press.current.moved = true;
+      if (press.current) {
+        press.current.moved = true;
+        press.current.multi = true;
+      }
     }
   };
 
@@ -172,11 +228,29 @@ export default function ImageLightbox({
     if (pointers.current.size === 0) {
       const p = press.current;
       press.current = null;
+      if (e.type !== "pointerup" || !p) return;
       // A plain click on the dark area around the image closes.
-      if (e.type === "pointerup" && p && !p.moved && !p.onImage) close();
+      if (!p.moved && !p.onImage) close();
+      // A horizontal touch swipe at 1x steps. RTL: the next image comes in
+      // from the left, so dragging rightward reveals it.
+      const dx = e.clientX - p.x;
+      const dy = e.clientY - p.y;
+      // Never after a pinch (a second finger joined) or once zoomed.
+      if (
+        p.touch &&
+        !p.multi &&
+        p.atRest &&
+        viewRef.current.scale === 1 &&
+        Math.abs(dx) >= SWIPE_MIN_PX &&
+        Math.abs(dx) > Math.abs(dy) * 1.5
+      ) {
+        go(dx > 0 ? 1 : -1);
+      }
     }
   };
 
+  const item = items[itemIndex] ?? items[0];
+  const images = item.images;
   const current = images[index] ?? images[0];
   const canSwap = images.length > 1;
 
@@ -219,7 +293,45 @@ export default function ImageLightbox({
         </button>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-6 sm:bottom-6">
+      {/* Prev / next. RTL: "previous" sits on the right pointing right,
+          "next" on the left pointing left. */}
+      {count > 1 ? (
+        <>
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="התמונה הקודמת"
+            className={`${WHITE_ICON} absolute right-1 top-1/2 -translate-y-1/2 sm:right-4`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="התמונה הבאה"
+            className={`${WHITE_ICON} absolute left-1 top-1/2 -translate-y-1/2 sm:left-4`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+        </>
+      ) : null}
+
+      {/* Bottom: the caption (if any) over a soft dark gradient, then the
+          zoom / swap controls. Only the controls take the pointer. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/70 via-black/35 to-transparent px-6 pb-4 pt-14 sm:pb-6">
+        {item.caption ? (
+          <p
+            aria-live="polite"
+            className="max-w-[65ch] text-balance text-center text-sm leading-relaxed text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] sm:text-base"
+          >
+            {item.caption}
+          </p>
+        ) : null}
+        <div className="pointer-events-auto flex items-center gap-6">
         <button
           type="button"
           onClick={() => zoomTo(viewRef.current.scale * BUTTON_STEP)}
@@ -253,6 +365,7 @@ export default function ImageLightbox({
             <path d="M5 12h14" />
           </svg>
         </button>
+        </div>
       </div>
 
       {canSwap && current.label ? (

@@ -144,3 +144,28 @@ CONSTRAINTS
 - New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
 - Verify in a headless browser (mobile + desktop): the scroll-to-top button is gone, and nothing else broke.
 - Push the branch and print the branch name + compare URL.
+
+---
+
+UPDATE: LIGHTBOX PREV / NEXT + CAPTIONS
+
+CONTEXT
+Next.js 16 portfolio site, RTL Hebrew. The article page (app/projects/[slug]/page.tsx) has a working zoom lightbox opened by a magnifier icon on content images and before/after blocks. Brand burgundy #9f2b35. Improve the lightbox. Do NOT touch Sanity schema files — frontend only. Do NOT change the homepage.
+
+TASK — two lightbox improvements:
+
+1. PREV / NEXT NAVIGATION WITH ARROWS
+In the lightbox, let the visitor move between the images of the CURRENT article without closing it. Collect all the article's lightbox-able images in document order (each contentImage; for a beforeAfter block, treat its currently-shown side as that entry) into an ordered list. In the lightbox show a previous and a next arrow (plain icons, white, drop-shadow, NO circle/background — matching the existing ✕ and +/− style), and support left/right arrow keys and horizontal swipe on touch. Moving resets zoom to 1x. At the ends, either loop or disable the arrow (pick looping for simplicity). Keep RTL arrow direction correct.
+
+2. SHOW THE CAPTION IN THE LIGHTBOX
+When an image has a caption (contentImage.caption, or the beforeAfter label), show that caption text inside the lightbox too — e.g. centered near the bottom, white text with a subtle drop-shadow / slight dark gradient behind it for legibility, so it's readable over the photo. Update the caption as the visitor navigates prev/next. If an image has no caption, show nothing.
+
+Keep everything that already works: wheel/pinch/+/− zoom, pan when zoomed, ✕/Escape/backdrop close, the "החלף לפני/אחרי" button for before/after blocks, and the burgundy magnifier icons.
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts, mobile + desktop. Do NOT touch the homepage or Sanity schema.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser (mobile + desktop): prev/next arrows + keys + swipe move between images, zoom resets on move, captions show and update, before/after swap still works.
+- Push the branch and print the branch name + compare URL.
+- You can't reach Sanity from the sandbox — verify by code + tsc + mock images with captions.
