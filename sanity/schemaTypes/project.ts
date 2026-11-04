@@ -91,6 +91,21 @@ export const project = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'coverFit',
+      title: 'אופן הצגת תמונת השער',
+      description:
+        'חיתוך: התמונה ממלאת את הריבוע, והנקודה שנבחרה בתמונה (Hotspot) נשארת במרכז. תמונה מלאה: כל התמונה מוצגת, עם רקע מטושטש מסביב.',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'חיתוך למילוי הריבוע', value: 'crop'},
+          {title: 'תמונה מלאה עם רקע מטושטש', value: 'contain'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'crop',
+    }),
+    defineField({
       name: 'order',
       title: 'סדר תצוגה',
       description: 'מספר שקובע את סדר ההצגה ברשת (מספר קטן יותר = מוצג קודם).',

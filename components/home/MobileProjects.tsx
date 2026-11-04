@@ -100,7 +100,7 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
             <div className="grid grid-cols-2 gap-x-3 gap-y-6 px-3 pb-12 pt-2">
               {projects.map((p) => (
                 <Link key={p._id} href={`/projects/${p.slug}`} className="group block">
-                  <ProjectCover src={p.coverSrc} alt={p.title} sizes="50vw" />
+                  <ProjectCover src={p.coverSrc} fit={p.coverFit} position={p.coverPosition} alt={p.title} sizes="50vw" />
                   <p className="mt-2 text-center text-sm font-medium text-brand-ink">{p.title}</p>
                 </Link>
               ))}

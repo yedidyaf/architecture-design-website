@@ -34,3 +34,35 @@ The floating "scroll to top" up-arrow on the LEFT is glued to the far-left scree
 
 6. SINGLE HAND-DRAWN FRAME AROUND EACH PROJECT TILE (desktop only)
 Around each project tile in the left column, add ONE thin frame in the brand burgundy that "floats" around the image — i.e. offset a few px OUTSIDE the tile (not flush to the image edge), with a small gap between the frame and the image. The frame should feel HAND-DRAWN / sketch-like and imperfect, not a crisp geometric border: use a slightly irregular rounded-rectangle look (e.g. uneven border-radius on each corner so it reads as hand-sketched), thin (~1px), in a semi-transparent burgundy (e.g. rgba(159,43,53,0.5)). Just ONE frame (not double). Keep it subtle and on-brand. DESKTOP ONLY (>=900px) — do NOT apply on mobile for now.
+
+---
+
+UPDATE: PER-PROJECT COVER DISPLAY MODE
+
+CONTEXT
+Next.js 16 + Sanity CMS portfolio site, RTL Hebrew, on Vercel. Project documents (sanity/schemaTypes/project.ts) have a coverImage (image, hotspot:true) shown in square tiles in the homepage projects column and in the mobile posts grid. Currently all covers use the contain+blurred-fill treatment. We want Miri to choose, PER PROJECT, how each cover is displayed. This task IS allowed to modify Sanity schema files.
+
+TASK:
+
+1. ADD A DISPLAY-MODE FIELD (project.ts)
+Add a field to the project schema named `coverFit` (string) with a radio/dropdown list of two options, Hebrew titles:
+   - { title: 'חיתוך למילוי הריבוע', value: 'crop' }
+   - { title: 'תמונה מלאה עם רקע מטושטש', value: 'contain' }
+   initialValue: 'crop'. Hebrew field title e.g. "אופן הצגת תמונת השער" with a short Hebrew description explaining: crop = fills the square (use the image's hotspot to choose what stays centered); contain = shows the whole image with a blurred fill around it.
+
+2. RESPECT THE FIELD WHEN RENDERING COVER IMAGES
+Everywhere the coverImage is shown as a square (homepage projects column AND mobile posts grid):
+   - If coverFit === 'crop' (default): render the image with object-cover so it fills the square, and USE THE SANITY HOTSPOT so the chosen focal point stays centered when cropping (use urlFor(...).fit('crop') with the hotspot, or object-position derived from the asset hotspot — whichever your @sanity/image-url setup supports so the hotspot is honored). No blurred backdrop in this mode.
+   - If coverFit === 'contain': keep the current contain + blurred-fill treatment (whole image visible, blurred cream-tinted fill around it).
+   - Fetch `coverFit` in the GROQ queries that load projects (homepage + mobile grid + anywhere covers render). Default missing values to 'crop'.
+
+3. Do not change layout, the scroll behavior, the illustration column, or the tile frame — only how the cover image fills its square and the new schema field.
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts.
+- Hebrew singular-masculine in UI text; field title/description/options in Hebrew.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser with mock data: a 'crop' cover fills the square respecting a hotspot, a 'contain' cover shows the blurred fill. Screenshot both.
+- Push the branch and print the branch name + compare URL.
+- You can't reach Sanity from the sandbox — verify by code + tsc + mock data.
