@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
-import { PROJECT_TILE_WIDTH, SIDE_COLUMN_WIDTH, TEXT_TRACK } from "./layout";
+import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
 import ProjectsColumn from "./ProjectsColumn";
 import type { HomeProject } from "./types";
 
@@ -23,26 +23,13 @@ const SIDE_CONTENT_WIDTH = SIDE_COLUMN_WIDTH - 2 * 32;
 // The band is 173px of the PNG's 1414px width; scale it to the content box.
 const ILLUSTRATION_WIDTH = Math.round((SIDE_CONTENT_WIDTH * 1414) / 173);
 
-// The center reading column (TEXT_TRACK) has no side padding on desktop, so
-// the left gutter starts exactly where the text ends.
-// Clearance between the testimonials and the project tiles.
-const TESTIMONIALS_GAP = 24;
-
 // Desktop grid, RTL (track 1 is on the right):
 //   1 illustrations | 2 spacer (1fr) | 3 text | 4 spacer (1fr) | 5 (200px)
 // The two 1fr spacers are equal, so the text stays centered on the screen.
-// The projects span tracks 4–5 (the whole left gutter) and are centered in
-// it. The testimonials span tracks 2–4 in their own row; their side padding
-// keeps them clear of the project tiles and is mirrored on the other side so
-// they stay centered.
+// The projects span tracks 4–5 (the whole left gutter), centered in it minus
+// the arrow slot on its inner side (see layout.ts). The testimonials span
+// tracks 2–4 in their own row, padded clear of the arrow.
 const GRID_COLUMNS = `${SIDE_COLUMN_WIDTH}px minmax(0, 1fr) min(${TEXT_TRACK}px, calc(100% - ${2 * SIDE_COLUMN_WIDTH}px)) minmax(0, 1fr) ${SIDE_COLUMN_WIDTH}px`;
-// Inside tracks 2–4 (width W = 2 * spacer + text, so spacer = (W - text) / 2)
-// the tile's inner edge sits (spacer + 200 + tile) / 2 from the gutter's
-// outer edge, i.e. (spacer + tile - 200) / 2 past the start of track 4; the
-// gap is added to that. Never more than the spacer itself, so on narrow
-// desktops the testimonials are at least as wide as the text.
-const SPACER = `((100% - min(${TEXT_TRACK}px, 100%)) / 2)`;
-const TESTIMONIALS_INSET = `max(0px, min(${SPACER}, calc((${SPACER} + ${PROJECT_TILE_WIDTH - SIDE_COLUMN_WIDTH}px) / 2 + ${TESTIMONIALS_GAP}px)))`;
 
 type Testimonial = { _id: string; clientName: string; quote: string };
 
@@ -141,18 +128,17 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
         </div>
       </div>
 
-      {/* 900–1239px: the gutter is too narrow for the scroll-to-top button
-          beside the tiles, so the column stops 64px short of the bottom and
-          the button sits centered under it (ScrollToTop variant="home").
+      {/* The arrow slot (padding on the inner, right side) keeps the gap
+          between the tiles and the text free for the scroll-to-top button.
           pointer-events-none: the aside spans the whole gutter, which the
           testimonials row overlaps; only the projects column itself takes
           the pointer. */}
       <aside
         aria-label="פרויקטים"
-        className="pointer-events-none sticky top-0 hidden h-svh self-start justify-center min-[900px]:flex min-[900px]:max-[1240px]:pb-16"
-        style={{ gridColumn: "4 / span 2", gridRow: "1 / span 2" }}
+        className="pointer-events-none sticky top-0 hidden h-svh self-start justify-center min-[900px]:flex"
+        style={{ gridColumn: "4 / span 2", gridRow: "1 / span 2", paddingRight: ARROW_SLOT }}
       >
-        <ProjectsColumn projects={projects} tileWidth={PROJECT_TILE_WIDTH} />
+        <ProjectsColumn projects={projects} />
       </aside>
     </main>
   );
