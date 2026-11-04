@@ -66,3 +66,29 @@ CONSTRAINTS
 - Verify in a headless browser with mock data: a 'crop' cover fills the square respecting a hotspot, a 'contain' cover shows the blurred fill. Screenshot both.
 - Push the branch and print the branch name + compare URL.
 - You can't reach Sanity from the sandbox — verify by code + tsc + mock data.
+
+---
+
+UPDATE: PROJECTS COLUMN — FIRST CLICK MUST OPEN THE PROJECT
+
+CONTEXT
+Next.js 16 + Tailwind homepage, RTL Hebrew desktop. The LEFT projects column auto-scrolls upward (JS updates translateY each frame); hovering pauses it; wheel/arrows scroll it; each tile links to /projects/[slug]. Do NOT touch Sanity schema files — frontend only. Do NOT change the right illustration column.
+
+BUG
+When the user clicks a moving project tile, the FIRST click doesn't open the project — instead the posts "jump"/snap into place, and only a SECOND click opens the project. This is because the first click interrupts the animation and the column resets/snaps, swallowing the click.
+
+FIX
+Make clicking a project work on the FIRST click, with no jump:
+1. When the pointer enters the projects column (hover), pausing the auto-scroll must FREEZE the column exactly where it currently is — do NOT reset or snap the offset to a rounded/base value. The current translateY offset must be preserved precisely so nothing moves when hovering.
+2. Ensure the click/navigation on a tile is not being cancelled by the animation logic. The first click on a tile must navigate to its /projects/[slug] immediately. Check that: pointer/hover pausing happens before the click resolves; the offset isn't reset on mouseenter/click; and there's no pointer-events or re-render on hover that drops the click.
+3. Keep everything else working: auto-scroll resumes on mouse leave (continuing smoothly from where it is, no jump), wheel scrolling, arrows, seamless loop.
+
+So: hover = freeze in place (no snap), first click opens the project, leave = resume smoothly.
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts, the tile frame, mobile unchanged.
+- Do NOT touch Sanity schema files. Frontend only.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify on desktop in a headless browser: hovering the column does NOT make the posts jump; a single click on a tile navigates to the project; leaving resumes the scroll without a jump.
+- Push the branch and print the branch name + compare URL.
