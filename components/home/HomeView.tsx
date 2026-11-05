@@ -22,6 +22,12 @@ const SIDE_INSET = "px-8";
 const SIDE_CONTENT_WIDTH = SIDE_COLUMN_WIDTH - 2 * 32;
 // The band is 173px of the PNG's 1414px width; scale it to the content box.
 const ILLUSTRATION_WIDTH = Math.round((SIDE_CONTENT_WIDTH * 1414) / 173);
+// The strip is shifted up so the top of the page cuts through the middle of
+// the first house, as if the page were a window onto a continuous band. The
+// house spans y 44–178 of the PNG's 2000px height (middle ≈ 111), scaled to
+// the drawn width. repeat-y keeps tiling above and below, so no gap appears.
+const HOUSE_MIDDLE_Y = 111;
+const STRIP_OFFSET_Y = Math.round((HOUSE_MIDDLE_Y * ILLUSTRATION_WIDTH) / 1414);
 
 // Desktop grid, RTL (track 1 is on the right):
 //   1 illustrations | 2 spacer (1fr) | 3 text | 4 spacer (1fr) | 5 (200px)
@@ -63,10 +69,11 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           with the drawings in a narrow band at its horizontal center
           (x 620–793 of 1414), so it is drawn at ILLUSTRATION_WIDTH, which
           makes that band 136px wide, and the box clips the empty sides.
-          repeat-y tiles it down the whole page. */}
+          repeat-y tiles it down the whole page, and STRIP_OFFSET_Y starts it
+          mid-house at the very top of the page. */}
       <aside
         aria-hidden="true"
-        className={`hidden pt-6 min-[900px]:block ${SIDE_INSET}`}
+        className={`hidden min-[900px]:block ${SIDE_INSET}`}
         style={{ gridColumn: "1", gridRow: "1 / span 2" }}
       >
         <div
@@ -74,7 +81,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           style={{
             backgroundImage: "url(/illustrations.png)",
             backgroundSize: `${ILLUSTRATION_WIDTH}px auto`,
-            backgroundPosition: "center top",
+            backgroundPosition: `center -${STRIP_OFFSET_Y}px`,
           }}
         />
       </aside>
