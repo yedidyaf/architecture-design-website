@@ -169,3 +169,31 @@ CONSTRAINTS
 - Verify in a headless browser (mobile + desktop): prev/next arrows + keys + swipe move between images, zoom resets on move, captions show and update, before/after swap still works.
 - Push the branch and print the branch name + compare URL.
 - You can't reach Sanity from the sandbox — verify by code + tsc + mock images with captions.
+
+---
+
+UPDATE: LIGHTBOX — CAPTION WAITS FOR ITS IMAGE, PRELOADING, LOADING INDICATOR
+
+CONTEXT
+Next.js 16 portfolio site, RTL Hebrew. The article page has a zoom lightbox with prev/next navigation and captions. BUG: when navigating to another image, the CAPTION updates immediately but the IMAGE itself takes time to load from the network, so the caption (and UI) appear before the image arrives — sometimes with a significant delay. Brand burgundy #9f2b35. Do NOT touch Sanity schema files — frontend only. Do NOT change the homepage.
+
+TASK — make the image and its caption appear together, and speed up navigation:
+
+1. SYNC CAPTION TO IMAGE LOAD
+When the visitor moves to another lightbox image (prev/next/swipe/arrow key) or opens the lightbox, do NOT show the new caption until the new image has finished loading. Track the image's load event (onLoad) and only reveal the caption (and fade the image in) once it's ready, so the caption never appears before its image. Keep it smooth (a short fade-in of image+caption together).
+
+2. PRELOAD NEIGHBORS
+Preload the NEXT and PREVIOUS images in the lightbox list in the background (e.g. new Image() / <link rel=prefetch> / hidden preloading) so that moving to them is usually instant. When possible also use a reasonably sized image URL via @sanity/image-url (not the full-resolution original) so lightbox images load fast — but still large enough to look good when zoomed (e.g. width ~1600).
+
+3. LOADING INDICATOR
+While an image is still loading (first open, or a neighbor not yet preloaded), show a subtle loading indicator (a small spinner or a soft shimmer) centered where the image will be, in a restrained on-brand style — so the visitor never sees just a caption on an empty background. Hide it as soon as the image is ready.
+
+Keep everything working: zoom (wheel/pinch/+/−), pan, prev/next arrows + keys + swipe, before/after swap, ✕/Escape/backdrop close, burgundy magnifier icons, captions.
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts, mobile + desktop. Do NOT touch the homepage or Sanity schema.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser: caption appears together with its image (not before), neighbors preload so navigation feels fast, a loading indicator shows while an image loads.
+- Push the branch and print the branch name + compare URL.
+- You can't reach Sanity from the sandbox — verify by code + tsc + mock images (simulate slow load).

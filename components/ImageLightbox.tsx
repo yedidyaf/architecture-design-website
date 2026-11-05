@@ -24,6 +24,19 @@ const SWIPE_MIN_PX = 50;
 const WHITE_ICON =
   "flex h-11 w-11 cursor-pointer items-center justify-center text-white opacity-90 [filter:drop-shadow(0_1px_3px_rgba(0,0,0,0.7))] transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white/70 rounded-sm disabled:cursor-default disabled:opacity-35";
 
+// Images warmed up in the background, kept referenced so the browser holds
+// them decoded; capped so a long session doesn't hoard memory.
+const preloaded = new Map<string, HTMLImageElement>();
+const PRELOAD_CAP = 24;
+function preload(src: string) {
+  if (preloaded.has(src)) return;
+  const img = new window.Image();
+  img.decoding = "async";
+  img.src = src;
+  preloaded.set(src, img);
+  if (preloaded.size > PRELOAD_CAP) preloaded.delete(preloaded.keys().next().value!);
+}
+
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 type View = { scale: number; x: number; y: number };
@@ -51,6 +64,10 @@ export default function ImageLightbox({
   const [itemIndex, setItemIndex] = useState(startIndex);
   const [index, setIndex] = useState(items[startIndex]?.side ?? 0);
   const [view, setViewState] = useState<View>(RESET);
+  // The src that last finished loading in the <img>. Until it matches the
+  // current one, the image stays transparent, the caption is held back and
+  // a spinner shows, so a caption never appears before its photo.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -173,6 +190,17 @@ export default function ImageLightbox({
     return () => window.removeEventListener("resize", onResize);
   }, [clampView, setView]);
 
+  // Warm up the neighbours (both sides of a before/after) and the other side
+  // of the current item, so prev / next / swap are usually instant.
+  useEffect(() => {
+    const around = count > 1 ? [itemIndex - 1, itemIndex + 1] : [];
+    for (const i of around) {
+      const it = items[((i % count) + count) % count];
+      it?.images.forEach((im) => preload(im.src));
+    }
+    items[itemIndex]?.images.forEach((im) => preload(im.src));
+  }, [items, itemIndex, count]);
+
   const pinchState = () => {
     const [a, b] = [...pointers.current.values()];
     return { dist: Math.hypot(a.x - b.x, a.y - b.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } };
@@ -253,6 +281,7 @@ export default function ImageLightbox({
   const images = item.images;
   const current = images[index] ?? images[0];
   const canSwap = images.length > 1;
+  const ready = loadedSrc === current.src;
 
   return createPortal(
     <div
@@ -279,9 +308,17 @@ export default function ImageLightbox({
           src={current.src}
           alt={current.alt}
           draggable={false}
-          className="max-h-full max-w-full object-contain will-change-transform"
+          onLoad={(e) => setLoadedSrc(e.currentTarget.getAttribute("src"))}
+          // A broken image shouldn't leave the spinner spinning forever.
+          onError={(e) => setLoadedSrc(e.currentTarget.getAttribute("src"))}
+          className={`max-h-full max-w-full object-contain will-change-transform transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+            ready ? "opacity-100" : "opacity-0"
+          }`}
           style={{ transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})` }}
         />
+        {!ready ? (
+          <span role="status" aria-label="טוען תמונה" className="lightbox-spinner pointer-events-none absolute left-1/2 top-1/2 -ml-4 -mt-4 h-8 w-8 rounded-full border-2 border-white/15 border-t-[#d9959b]" />
+        ) : null}
       </div>
 
       {/* Top-left close; zoom controls stacked under it. */}
@@ -323,10 +360,13 @@ export default function ImageLightbox({
       {/* Bottom: the caption (if any) over a soft dark gradient, then the
           zoom / swap controls. Only the controls take the pointer. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/70 via-black/35 to-transparent px-6 pb-4 pt-14 sm:pb-6">
-        {item.caption ? (
+        {/* Shown only once its image has loaded, fading in with it. Keyed
+            by src so each new image replays the fade. */}
+        {item.caption && ready ? (
           <p
+            key={current.src}
             aria-live="polite"
-            className="max-w-[65ch] text-balance text-center text-sm leading-relaxed text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] sm:text-base"
+            className="animate-lightbox-in max-w-[65ch] text-balance text-center text-sm leading-relaxed text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] sm:text-base"
           >
             {item.caption}
           </p>
@@ -368,10 +408,11 @@ export default function ImageLightbox({
         </div>
       </div>
 
-      {canSwap && current.label ? (
+      {canSwap && current.label && ready ? (
         <p
+          key={current.src}
           aria-live="polite"
-          className="pointer-events-none absolute right-4 top-4 text-sm font-medium text-white [filter:drop-shadow(0_1px_3px_rgba(0,0,0,0.7))] sm:right-6 sm:top-6"
+          className="animate-lightbox-in pointer-events-none absolute right-4 top-4 text-sm font-medium text-white [filter:drop-shadow(0_1px_3px_rgba(0,0,0,0.7))] sm:right-6 sm:top-6"
         >
           {current.label}
         </p>

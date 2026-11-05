@@ -155,3 +155,41 @@ body {
     transform: rotate(0.55deg);
   }
 }
+
+/* Zoom lightbox: the caption fades in together with its image, and a small
+   ring spins while an image loads. The ring waits 150ms before appearing, so
+   an image that is already preloaded never flashes it. */
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-lightbox-in {
+  animation: lightbox-in 0.2s ease-out both;
+}
+
+@keyframes lightbox-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.lightbox-spinner {
+  animation:
+    lightbox-spin 0.9s linear infinite,
+    lightbox-in 0.2s ease-out 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-lightbox-in {
+    animation: none;
+  }
+
+  .lightbox-spinner {
+    animation: lightbox-in 0.2s ease-out 0.15s both;
+  }
+}
