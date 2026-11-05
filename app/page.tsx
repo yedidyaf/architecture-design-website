@@ -21,7 +21,27 @@ type Data = { about: About | null; projects: ProjectSummary[]; testimonials: Tes
 
 export const revalidate = 60;
 
+// Shift+Enter in Studio stores a soft break as "\n" inside a span's text.
+// @portabletext/react only treats a span that is exactly "\n" as a hard
+// break, so split spans on "\n" and let `hardBreak` render them as <br/>.
+type BioValue = Parameters<typeof PortableText>[0]["value"];
+function splitSoftBreaks(value: BioValue): BioValue {
+  const blocks = (Array.isArray(value) ? value : [value]) as unknown as Record<string, unknown>[];
+  return blocks.map((block) => {
+    if (block._type !== "block" || !Array.isArray(block.children)) return block;
+    const children = (block.children as Record<string, unknown>[]).flatMap((child) => {
+      if (child._type !== "span" || typeof child.text !== "string" || !child.text.includes("\n")) return [child];
+      return child.text.split("\n").flatMap((part, i) => [
+        ...(i > 0 ? [{ ...child, _key: `${child._key}-br${i}`, text: "\n", marks: [] }] : []),
+        ...(part ? [{ ...child, _key: i === 0 ? child._key : `${child._key}-${i}`, text: part }] : []),
+      ]);
+    });
+    return { ...block, children };
+  }) as unknown as BioValue;
+}
+
 const bioComponents: PortableTextComponents = {
+  hardBreak: () => <br />,
   block: {
     normal: ({ children }) => <p className="[&:not(:first-child)]:mt-5">{children}</p>,
   },
@@ -71,7 +91,7 @@ export default async function Home() {
 
   const bio = about?.bio;
   const bioNode = Array.isArray(bio) ? (
-    bio.length > 0 ? <PortableText value={bio} components={bioComponents} /> : null
+    bio.length > 0 ? <PortableText value={splitSoftBreaks(bio)} components={bioComponents} /> : null
   ) : typeof bio === "string" && bio.trim() ? (
     <p className="whitespace-pre-line">{bio}</p>
   ) : null;
