@@ -100,7 +100,7 @@ const portableTextComponents: PortableTextComponents = {
         <figure className="my-8">
           <ZoomableImage
             src={urlFor(value.image).width(1400).auto("format").url()}
-            zoomSrc={urlFor(value.image).width(2800).auto("format").url()}
+            zoomSrc={urlFor(value.image).width(1600).auto("format").url()}
             alt={value.caption || ""}
             caption={value.caption}
           />
@@ -123,8 +123,8 @@ const portableTextComponents: PortableTextComponents = {
           <BeforeAfterHint
             beforeSrc={urlFor(value.beforeImage).width(1400).auto("format").url()}
             afterSrc={urlFor(value.afterImage).width(1400).auto("format").url()}
-            beforeZoomSrc={urlFor(value.beforeImage).width(2800).auto("format").url()}
-            afterZoomSrc={urlFor(value.afterImage).width(2800).auto("format").url()}
+            beforeZoomSrc={urlFor(value.beforeImage).width(1600).auto("format").url()}
+            afterZoomSrc={urlFor(value.afterImage).width(1600).auto("format").url()}
             caption={value.label}
             aspectRatio={
               getImageAspectRatio(value.afterImage) ?? getImageAspectRatio(value.beforeImage)
