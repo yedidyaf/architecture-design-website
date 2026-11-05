@@ -197,3 +197,27 @@ CONSTRAINTS
 - Verify in a headless browser: caption appears together with its image (not before), neighbors preload so navigation feels fast, a loading indicator shows while an image loads.
 - Push the branch and print the branch name + compare URL.
 - You can't reach Sanity from the sandbox — verify by code + tsc + mock images (simulate slow load).
+
+---
+
+UPDATE: MOBILE POSTS OVERLAY — RESPECT THE BACK BUTTON
+
+CONTEXT
+Next.js 16 (App Router) portfolio site, RTL Hebrew, on Vercel. On MOBILE, the homepage hides the projects inline; instead a "לפוסטים" button opens a full-screen posts overlay (a client component with open/close state, not a separate route). From that overlay the visitor taps a project and navigates to /projects/[slug]. Do NOT touch Sanity schema files — frontend only.
+
+BUG
+On mobile: open the posts overlay ("לפוסטים") → tap a project → you're on the project page. Press "back" (browser/phone back button) → you land on the plain homepage with the overlay CLOSED, instead of back on the open posts overlay. The overlay's open/closed state isn't part of history, so "back" skips it.
+
+FIX — make the posts overlay respect browser history / back button:
+- When the posts overlay opens, push a history entry (e.g. history.pushState, or sync the open state to a URL hash like #posts) so the overlay being open is a distinct history state.
+- Pressing back from a project should return to the homepage with the posts overlay OPEN (and scrolled to where it was if easy), not the plain closed homepage. Then a further back from the open overlay closes it (back to the plain homepage).
+- Also: pressing the phone/browser back while the overlay is open (without entering a project) should simply CLOSE the overlay, not leave the site.
+- Use popstate handling so the overlay's open/closed state stays in sync with history. Clean up listeners properly. Make sure this doesn't break normal navigation on desktop (where there's no overlay).
+
+CONSTRAINTS
+- Keep RTL, brand colors, fonts; desktop layout and behavior unchanged.
+- Do NOT touch Sanity schema files. Frontend only.
+- Run `npx tsc --noEmit` and ensure it passes.
+- New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
+- Verify in a headless browser at mobile width: open posts → tap project → back returns to the OPEN posts overlay; back again closes it to the homepage; back while overlay open (no project entered) closes the overlay. Desktop unaffected.
+- Push the branch and print the branch name + compare URL.
