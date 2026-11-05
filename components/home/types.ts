@@ -14,3 +14,10 @@ export type HomeProject = {
   /** CSS object-position from the hotspot, for crop mode. */
   coverPosition?: string;
 };
+
+/**
+ * Hash for a link to the homepage with the mobile posts overlay open (e.g.
+ * the back arrow on an article). Here, not in the client component, so
+ * server components can import it as a plain string.
+ */
+export const POSTS_HASH = "#posts";

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import BeforeAfterHint from "@/components/BeforeAfterHint";
 import LightboxGallery from "@/components/LightboxGallery";
 import ZoomableImage from "@/components/ZoomableImage";
+import { POSTS_HASH } from "@/components/home/types";
 import { PortableText, type PortableTextComponents } from "@/sanity/lib/portable-text";
 import { client } from "@/sanity/lib/client";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -218,8 +219,10 @@ export default async function ProjectPage({
 
       <div className="mx-auto max-w-[65ch]">
         <Link
-          href="/"
-          aria-label="חזרה לדף הבית"
+          // Back to the posts: on mobile the homepage opens its posts overlay
+          // for this hash; on desktop the projects column is on the homepage.
+          href={`/${POSTS_HASH}`}
+          aria-label="חזרה לפוסטים"
           className="inline-flex text-brand transition-colors hover:text-brand-hover"
         >
           <svg
