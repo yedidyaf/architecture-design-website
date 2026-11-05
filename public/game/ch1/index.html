@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="חדר בריחה של מירי פרידלנד · תכנון ועיצוב פנים">
+<meta property="og:title" content="הדירה של משפחת קלרוסנבסקי · פרק 1">
+<meta property="og:description" content="מצא את 8 הבאגים התכנוניים בסלון של אבא קלרוסנבסקי. חדר בריחה של מירי פרידלנד.">
+<title>הדירה של משפחת קלרוסנבסקי · פרק 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;800&family=Amatic+SC:wght@700&display=swap">
+<style>
+/* Layout: full-screen 3D room; top HUD (title, bug count, savings counter, hint, timer), bottom HUD (letter tray, tools, room chips); story cards as centered panels */
+:root{
+  --ink:#4A2C30;
+  --muted:#8C7175;
+  --paper:#FFFBFA;
+  --line:#E7D6D3;
+  --accent:#9F2B35;
+  --accent-soft:#F2DCDD;
+  --olive:#5F7A4C;
+  --glass:rgba(255,251,250,.92);
+  --body:"Assistant",system-ui,sans-serif;
+  --hand:"Amatic SC","Assistant",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:var(--body);color:var(--ink);-webkit-tap-highlight-color:transparent}
+#scene{position:fixed;inset:0;touch-action:none;cursor:grab}
+#scene.drag{cursor:grabbing}#scene.point{cursor:pointer}
+.card{background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;box-shadow:0 6px 20px rgba(40,20,20,.18)}
+.hud{position:fixed;top:0;left:0;right:0;direction:rtl;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none;
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.title{padding:8px 12px;pointer-events:auto;min-width:0}
+.title b{display:block;font-weight:800;font-size:.95rem;line-height:1.15}
+.title small{font-size:.76rem;color:var(--muted)}
+.title small i{font-style:normal;color:var(--accent);font-weight:800}
+.right{display:flex;gap:6px;align-items:center;pointer-events:auto}
+.pill{padding:7px 11px;font-weight:800;font-variant-numeric:tabular-nums;font-size:.92rem}
+.btn{font:inherit;font-weight:600;border:1.5px solid var(--accent);background:var(--paper);color:var(--accent);border-radius:99px;padding:7px 15px;cursor:pointer}
+.btn.primary{background:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,.chip:focus-visible,.tile:focus-visible,.slot:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.counter{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);direction:rtl;display:flex;gap:12px;align-items:center;padding:6px 12px;font-size:.8rem;pointer-events:none;white-space:nowrap}
+.counter b{font-variant-numeric:tabular-nums;font-weight:800}
+.counter .save b{color:var(--olive)}
+.counter .cost b{color:var(--accent)}
+.counter .sep{width:1px;height:16px;background:var(--line)}
+.counter.bump .cost b{animation:bump .6s}
+@keyframes bump{40%{transform:scale(1.25)}}
+.bottom{position:fixed;left:0;right:0;bottom:0;direction:rtl;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
+  padding:0 max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.inv{display:flex;gap:8px;align-items:center;padding:6px 10px;pointer-events:auto;max-width:100%;flex-wrap:wrap;justify-content:center}
+.inv .lbl{font-size:.75rem;color:var(--muted)}
+.letters{display:flex;gap:4px}
+.lt{width:32px;height:34px;border-radius:7px;border:1.5px dashed #CDB9B5;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:1.15rem;background:#fff}
+.lt.got{border-style:solid;border-color:var(--accent);animation:pop .45s}
+@keyframes pop{50%{transform:scale(1.2)}}
+.tool{font:inherit;font-size:.8rem;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:5px 9px;cursor:pointer}
+.inv .div{width:1px;height:26px;background:var(--line)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+.chip{font:inherit;font-size:.88rem;font-weight:600;border:0;background:var(--glass);color:var(--ink);padding:8px 14px;border-radius:99px;cursor:pointer;box-shadow:0 4px 14px rgba(40,20,20,.15)}
+.chip.on{background:var(--ink);color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(132px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);direction:rtl;max-width:min(440px,calc(100% - 32px));padding:10px 16px;font-size:.95rem;text-align:center;pointer-events:none;transition:opacity .3s;line-height:1.45}
+.toast b{color:var(--accent)}
+.tip{position:fixed;pointer-events:none;transform:translate(-50%,-150%);direction:rtl;font-size:.82rem;font-weight:600;padding:4px 10px;white-space:nowrap}
+.wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(30,20,18,.38);direction:rtl;z-index:20;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{width:min(440px,100%);max-height:88vh;overflow:auto;background:var(--paper);border-radius:16px;padding:20px 20px 18px;box-shadow:0 24px 60px rgba(30,15,15,.35);animation:rise .3s ease}
+@keyframes rise{from{transform:translateY(16px);opacity:0}}
+.tag{font-size:.75rem;font-weight:800;letter-spacing:.04em;color:var(--accent)}
+.modal h2{margin:4px 0 8px;font-size:1.4rem;font-weight:800;line-height:1.15;text-wrap:balance}
+.modal p{margin:0 0 10px;line-height:1.6}
+.joke{font-style:italic;color:var(--ink);border-inline-start:3px solid var(--accent-soft);padding-inline-start:10px}
+.fix{background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin:12px 0}
+.fix .h{font-family:var(--hand);font-size:1.65rem;color:var(--accent);line-height:1}
+.fix p{margin:4px 0 0;font-size:.95rem}
+.reward{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1.5px dashed var(--accent);border-radius:10px;padding:10px 14px}
+.reward span{font-size:.88rem;color:var(--muted)}
+.reward b{font-size:1.5rem;font-weight:800;color:var(--accent)}
+.reward.tool b{font-size:1rem}
+.costline{font-size:.85rem;color:var(--muted);margin-top:8px}
+.costline b{color:var(--accent)}
+.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.piece{background:#F6F1E8;border-radius:4px;padding:14px 16px;transform:rotate(-1.2deg);box-shadow:0 3px 0 rgba(0,0,0,.08);margin:10px 0;clip-path:polygon(0 0,100% 2%,98% 100%,3% 96%)}
+.piece .d{display:inline-flex;width:40px;height:40px;border-radius:50%;background:#7A5A48;color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;margin-inline-end:10px}
+.piece .row{display:flex;align-items:center}
+.piece small{display:block;color:var(--muted);font-size:.8rem}
+.lockslots{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.slot{width:42px;height:48px;border-radius:8px;border:0;border-bottom:3px solid var(--line);background:#fff;font:inherit;font-size:1.5rem;font-weight:800;color:var(--ink);cursor:pointer}
+.slot.filled{border-bottom-color:var(--accent)}
+.tiles{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:46px}
+.tile{width:42px;height:44px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent-soft);font:inherit;font-size:1.4rem;font-weight:800;color:var(--accent);cursor:pointer}
+.tile.used{visibility:hidden}
+.msg{min-height:1.4em;margin-top:8px;font-weight:600;font-size:.92rem;text-align:center}
+.msg.bad{color:var(--accent)}.msg.good{color:var(--olive)}
+.note{font-size:.82rem;color:var(--muted)}
+.intro{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(30,20,18,.5);direction:rtl;overflow:auto;z-index:30;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.intro .modal{width:min(470px,100%)}
+.intro h1{margin:2px 0 4px;font-size:2rem;font-weight:800;line-height:1.05;text-wrap:balance}
+.intro h1 em{font-style:normal;color:var(--accent)}
+.intro .sub{color:var(--muted);margin:0 0 12px;font-weight:600}
+.method{display:flex;gap:6px;direction:rtl;margin:10px 0 4px}
+.method span{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.rules{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:.93rem;margin:12px 0 4px;color:var(--muted)}
+.rules b{color:var(--ink)}
+.brand{font-size:.74rem;color:var(--muted)}
+.brand b{color:var(--accent)}
+.end{position:fixed;inset:0;z-index:40;background:#F7EFEC;overflow:auto;direction:rtl;display:flex;justify-content:center}
+.end .in{width:100%;max-width:520px;padding:calc(24px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
+.end h2{font-size:2rem;margin:0;font-weight:800;line-height:1.05}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.stats b{display:block;font-size:1.25rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.stats span{font-size:.76rem;color:var(--muted)}
+.box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.box h3{margin:0 0 8px;font-size:1.05rem;font-weight:800}
+.box ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px;font-size:.95rem}
+.teaser{background:var(--ink);color:#fff;border-radius:12px;padding:16px}
+.teaser p{margin:0 0 6px;line-height:1.5}
+.teaser .h{font-family:var(--hand);font-size:1.8rem;line-height:1}
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start}
+.step .n{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.contact{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.contact code{direction:ltr;font:inherit;font-weight:800;font-size:1.05rem;background:var(--accent-soft);padding:4px 10px;border-radius:6px;user-select:all}
+a.btn{text-decoration:none;display:inline-block;text-align:center}
+.wa{background:#2E7D4F;border-color:#2E7D4F;color:#fff}
+.dad{font-family:var(--hand);font-size:1.7rem;line-height:1.05;color:var(--ink);text-align:center}
+@media (max-width:520px){.title b{font-size:.85rem}.counter{font-size:.72rem;gap:8px;top:calc(60px + env(safe-area-inset-top,0px))}.lt{width:28px;height:30px;font-size:1rem}.chip{padding:7px 12px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="scene"></div>
+
+<header class="hud">
+  <div class="card title"><b>משפחת קלרוסנבסקי · פרק 1</b><small>באגים שנמצאו: <i id="cnt">0</i> מתוך 8</small></div>
+  <div class="right">
+    <button class="btn" id="hintBtn" type="button">רמז</button>
+    <span class="card pill" id="timer">00:00</span>
+  </div>
+</header>
+<div class="card counter" id="counter"><span class="save">חסכנו על אדריכלית: <b>15,000 ₪</b></span><span class="sep"></span><span class="cost">עלות התיקונים: <b id="costv">0 ₪</b></span></div>
+
+<div class="bottom" id="bottom">
+  <div class="card inv">
+    <span class="lbl">אותיות</span>
+    <div class="letters" id="letters"></div>
+    <span class="div"></span>
+    <span class="lbl" id="toolsLbl">כלים</span>
+    <div id="tools" style="display:flex;gap:6px"><span class="note">עדיין אין</span></div>
+  </div>
+  <nav class="chips" id="chips">
+    <button type="button" class="chip on" data-go="salon">סלון</button>
+    <button type="button" class="chip" data-go="kitchen">מטבח</button>
+    <button type="button" class="chip" data-go="study">פינת לימוד</button>
+  </nav>
+</div>
+
+<div class="card toast" id="toast" style="opacity:0"></div>
+<div class="card tip" id="tip" hidden></div>
+<div class="wrap" id="wrap" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<div class="intro" id="intro">
+  <div class="modal">
+    <div class="brand"><b>מירי פרידלנד</b> · תכנון ועיצוב פנים</div>
+    <h1>הדירה של משפחת <em>קלרוסנבסקי</em></h1>
+    <p class="sub">פרק 1: בוקר בסלון</p>
+    <p>אבא קלרוסנבסקי תכנן את הדירה לבד. בלי אדריכלית, לפי השיטה שלו:</p>
+    <div class="method"><span>ח</span><span>ס</span><span>כ</span><span>ו</span><span>ן</span></div>
+    <p>״תרגיש בבית! רק אל תיכנס למסדרון. נעלתי אותו עד שהשיפוץ שם ייגמר.״</p>
+    <div class="rules">
+      <b>8</b><span>באגים תכנוניים מסתתרים בסלון ובמטבח. מצא אותם.</span>
+      <b>אותיות</b><span>רוב הבאגים נותנים אות. בסוף מסדרים אותן למילה שפותחת את המסדרון.</span>
+      <b>איך</b><span>גרור כדי להסתכל מסביב. לחץ על חפצים כדי לבדוק אותם.</span>
+      <b>רמז</b><span>אפשר לבקש רמז בכל רגע. כל רמז מוסיף 30 שניות לזמן.</span>
+    </div>
+    <div class="actions"><button class="btn primary" id="startBtn" type="button">להיכנס לדירה</button></div>
+  </div>
+</div>
+
+<div class="end" id="end" hidden><div class="in" id="endIn"></div></div>
+
+<script src="three.min.js"></script>
+<script>
+(function(){
+const WORD='דיאלוג';
+const PHONE_INTL='972546563464', PHONE='054-656-3464';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id);
+const fmtN=n=>n.toLocaleString('he-IL')+' ₪';
+
+const host=$('scene');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.1;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+host.appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x2a2220);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.05,100);camera.rotation.order='YXZ';
+
+function tex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);}return t;}
+function noise(g,w,h,n,a,dark){for(let i=0;i<n;i++){const v=dark?0:255;g.fillStyle=`rgba(${v},${v},${v},${Math.random()*a})`;g.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2,1+Math.random()*2);}}
+const R=(a,b)=>a+Math.random()*(b-a);
+const parquet=(W,D)=>tex(512,512,(g,w,h)=>{const pw=32,ph=128;for(let x=0;x<w;x+=pw){const off=(x/pw%2)*ph/2;for(let y=-ph;y<h;y+=ph){g.fillStyle=`hsl(${30+R(-3,3)},42%,${52+R(-6,6)}%)`;g.fillRect(x,y+off,pw,ph);g.strokeStyle='rgba(0,0,0,.18)';g.strokeRect(x+.5,y+off+.5,pw-1,ph-1);for(let k=0;k<4;k++){g.strokeStyle=`rgba(60,30,10,${R(.03,.09)})`;g.beginPath();g.moveTo(x+R(3,pw-3),y+off);g.lineTo(x+R(3,pw-3),y+off+ph);g.stroke();}}}},[W/2,D/2]);
+const plaster=(col)=>tex(256,256,(g,w,h)=>{g.fillStyle=col;g.fillRect(0,0,w,h);noise(g,w,h,3000,.05,true);noise(g,w,h,2000,.05);},[3,2]);
+const fabric=(col,rep)=>tex(128,128,(g,w,h)=>{g.fillStyle=col;g.fillRect(0,0,w,h);for(let y=0;y<h;y+=2){g.fillStyle=`rgba(0,0,0,${R(.02,.07)})`;g.fillRect(0,y,w,1);}for(let x=0;x<w;x+=2){g.fillStyle=`rgba(255,255,255,${R(.01,.05)})`;g.fillRect(x,0,1,h);}},rep||[2,2]);
+const woodT=(col)=>tex(256,256,(g,w,h)=>{g.fillStyle=col;g.fillRect(0,0,w,h);for(let i=0;i<60;i++){g.strokeStyle=`rgba(50,25,10,${R(.04,.14)})`;g.lineWidth=R(.5,2);g.beginPath();const y=R(0,h);g.moveTo(0,y);g.bezierCurveTo(w*.3,y+R(-8,8),w*.6,y+R(-8,8),w,y+R(-4,4));g.stroke();}});
+const skyDay=tex(512,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#8EC1E6');gr.addColorStop(.62,'#D7EAF4');gr.addColorStop(.63,'#C9D6C0');gr.addColorStop(1,'#A9B99A');g.fillStyle=gr;g.fillRect(0,0,w,h);
+  for(let i=0;i<14;i++){const x=R(0,w),bw=R(30,80),bh=R(40,170);g.fillStyle=`hsl(30,${R(8,18)}%,${R(78,90)}%)`;g.fillRect(x,h*.63-bh,bw,bh);g.fillStyle='rgba(120,150,170,.35)';for(let yy=h*.63-bh+8;yy<h*.63-8;yy+=16)for(let xx=x+6;xx<x+bw-8;xx+=14)g.fillRect(xx,yy,7,9);}
+  g.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<5;i++){const x=R(0,w),y=R(20,140);for(let k=0;k<6;k++){g.beginPath();g.arc(x+k*14,y+R(-5,5),R(10,20),0,7);g.fill();}}});
+const tiles=tex(256,256,(g,w,h)=>{g.fillStyle='#F3F0EA';g.fillRect(0,0,w,h);g.strokeStyle='#D9D2C6';g.lineWidth=2;for(let y=0;y<h;y+=32){for(let x=(y/32%2)*32;x<w+64;x+=64){g.strokeRect(x-32,y,64,32);}}},[5,1]);
+
+const M={white:new THREE.MeshStandardMaterial({color:0xF7F4EF,roughness:.6}),frame:new THREE.MeshStandardMaterial({color:0xFAFAF7,roughness:.4}),black:new THREE.MeshStandardMaterial({color:0x222222,roughness:.4,metalness:.3}),
+  brass:new THREE.MeshStandardMaterial({color:0xC2A05A,roughness:.35,metalness:.8}),oak:new THREE.MeshStandardMaterial({map:woodT('#B88A5A'),roughness:.55}),walnut:new THREE.MeshStandardMaterial({map:woodT('#7A5034'),roughness:.5}),
+  glass:new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.1,roughness:.05,depthWrite:false}),leaf:new THREE.MeshStandardMaterial({color:0x5E7F45,roughness:.7}),leaf2:new THREE.MeshStandardMaterial({color:0x7D9A55,roughness:.7}),
+  pot:new THREE.MeshStandardMaterial({color:0xB8653F,roughness:.85}),counter:new THREE.MeshStandardMaterial({color:0xEDEAE4,roughness:.25}),steel:new THREE.MeshStandardMaterial({color:0xC9CCD0,roughness:.25,metalness:.85}),
+  cab:new THREE.MeshStandardMaterial({color:0x93A08A,roughness:.55}),cabLine:new THREE.MeshStandardMaterial({color:0x6E7A66})};
+const mat=(c,r)=>new THREE.MeshStandardMaterial({color:c,roughness:r==null?.7:r});
+function box(w,h,d,m,x,y,z,p,shadow=true){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=shadow;o.receiveShadow=true;p.add(o);return o;}
+function cyl(rt,rb,h,m,x,y,z,p,seg){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||20),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;p.add(o);return o;}
+function sph(r,m,x,y,z,p,sx,sy,sz){const o=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);o.position.set(x,y,z);o.scale.set(sx||1,sy||1,sz||1);o.castShadow=true;p.add(o);return o;}
+function grp(p,x,y,z,ry){const g=new THREE.Group();g.position.set(x||0,y||0,z||0);g.rotation.y=ry||0;p.add(g);return g;}
+function frameOf(side,W,D){if(side==='n')return{pos:[0,0,-D/2],ry:0,L:W,lx:c=>c};if(side==='s')return{pos:[0,0,D/2],ry:Math.PI,L:W,lx:c=>-c};if(side==='w')return{pos:[-W/2,0,0],ry:Math.PI/2,L:D,lx:c=>-c};return{pos:[W/2,0,0],ry:-Math.PI/2,L:D,lx:c=>c};}
+function opening(wg,o){const fw=.06,x=o.x,w=o.w,y0=o.y0,y1=o.y1,h=y1-y0;const fg=grp(wg,x,0,0);
+  box(w+fw*2,fw,.16,M.frame,0,y1+fw/2,-.07,fg);box(fw,h,.16,M.frame,-w/2-fw/2,y0+h/2,-.07,fg);box(fw,h,.16,M.frame,w/2+fw/2,y0+h/2,-.07,fg);
+  if(y0>0)box(w+fw*2+.1,.04,.24,M.frame,0,y0-.02,-.04,fg);if(o.kind==='door')return;
+  if(o.kind!=='slide')box(.04,h,.05,M.frame,0,y0+h/2,-.08,fg);else{box(.05,h,.06,M.frame,0,y0+h/2,-.06,fg);}
+  const gl=new THREE.Mesh(new THREE.PlaneGeometry(w,h),M.glass);gl.position.set(0,y0+h/2,-.08);fg.add(gl);
+  const s=new THREE.Mesh(new THREE.PlaneGeometry(w+4,h+3.2),new THREE.MeshBasicMaterial({map:skyDay,toneMapped:false}));s.position.set(0,y0+h/2,-2.2);fg.add(s);
+  if(o.curtain){const cm=new THREE.MeshStandardMaterial({map:fabric(o.curtain,[3,6]),roughness:.95,side:THREE.DoubleSide});
+    [-1,1].forEach(sd=>{const cg=new THREE.Mesh(new THREE.PlaneGeometry(.45,y1+.15,12,1),cm);const p=cg.geometry.attributes.position;for(let i=0;i<p.count;i++)p.setZ(i,Math.sin(p.getX(i)*28)*.03);cg.geometry.computeVertexNormals();cg.position.set(sd*(w/2+.3),(y1+.15)/2,.12);cg.castShadow=true;fg.add(cg);});
+    cyl(.015,.015,w+1.3,M.brass,0,y1+.2,.12,fg).rotation.z=Math.PI/2;}
+}
+function makeRoom(W,D,H,wallMat,floorMat,openings){const g=new THREE.Group();scene.add(g);
+  const f=new THREE.Mesh(new THREE.PlaneGeometry(W,D),floorMat);f.rotation.x=-Math.PI/2;f.receiveShadow=true;g.add(f);
+  const c=new THREE.Mesh(new THREE.PlaneGeometry(W,D),M.white);c.rotation.x=Math.PI/2;c.position.y=H;g.add(c);const base=mat(0xF4F1EC,.5);
+  ['n','s','w','e'].forEach(side=>{const fr=frameOf(side,W,D);const wg=grp(g,fr.pos[0],0,fr.pos[2],fr.ry);const ops=openings.filter(o=>o.side===side).map(o=>({...o,x:fr.lx(o.c)})).sort((a,b)=>a.x-b.x);
+    let cur=-fr.L/2-.12;const T=.14;const piece=(x0,x1,y0,y1,bb)=>{if(x1-x0<.01||y1-y0<.01)return;box(x1-x0,y1-y0,T,wallMat,(x0+x1)/2,(y0+y1)/2,-T/2,wg);if(bb)box(x1-x0,.08,.015,base,(x0+x1)/2,.04,.008,wg,false);};
+    ops.forEach(o=>{piece(cur,o.x-o.w/2,0,H,true);piece(o.x-o.w/2,o.x+o.w/2,0,o.y0,o.y0>0);piece(o.x-o.w/2,o.x+o.w/2,o.y1,H);cur=o.x+o.w/2;opening(wg,o);});piece(cur,fr.L/2+.12,0,H,true);});
+  return g;}
+function plant(p,x,z,s){const g=grp(p,x,0,z);g.scale.setScalar(s||1);cyl(.18,.14,.36,M.pot,0,.18,0,g);cyl(.17,.17,.03,mat(0x3D2B1F),0,.35,0,g);cyl(.015,.02,.8,mat(0x5B4632),0,.75,0,g);
+  for(let i=0;i<14;i++){const a=i*2.4,r=R(.1,.28),y=R(.75,1.35);const l=sph(.11,i%3?M.leaf:M.leaf2,Math.cos(a)*r,y,Math.sin(a)*r,g,1,.45,1.5);l.rotation.set(R(-.5,.5),a,R(-.5,.5));}return g;}
+function books(p,x,y,z,len,ry){const g=grp(p,x,y,z,ry);let cx=-len/2;const cols=[0x9F2B35,0x4A2C30,0xD2A64A,0x5F7A4C,0xE8DCC6,0x7C93A6,0x3E4A57];while(cx<len/2-.04){const w=R(.025,.05),h=R(.18,.27);box(w,h,R(.15,.2),mat(cols[Math.random()*cols.length|0],.8),cx+w/2,h/2,0,g);cx+=w+.003;}return g;}
+function art(p,x,y,z,w,h,ry,draw){const g=grp(p,x,y,z,ry);box(w+.06,h+.06,.03,M.walnut,0,0,0,g);const t=tex(256,Math.round(256*h/w),draw);const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:t,roughness:.8}));m.position.z=.017;g.add(m);return g;}
+function chair(p,x,z,ry,col){const g=grp(p,x,0,z,ry);const m=mat(col||0x7A5034,.55);box(.42,.04,.42,m,0,.45,0,g);[[-.18,-.18],[.18,-.18],[-.18,.18],[.18,.18]].forEach(([a,b])=>cyl(.018,.016,.45,m,a,.225,b,g,8));box(.42,.42,.03,m,0,.68,-.2,g);return g;}
+
+const sun=new THREE.DirectionalLight(0xFFF1DC,2.4);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:.5,far:40});sun.shadow.bias=-.0006;sun.shadow.normalBias=.02;
+sun.position.set(1.5,4.2,9);sun.target.position.set(0,0,0);scene.add(sun);scene.add(sun.target);
+scene.add(new THREE.HemisphereLight(0xFFF6EC,0x6B5444,.55));
+
+const W=9,D=5.6,H=2.7;
+const g=makeRoom(W,D,H,new THREE.MeshStandardMaterial({map:plaster('#EFE7DD'),roughness:.9}),new THREE.MeshStandardMaterial({map:parquet(W,D),roughness:.55}),[
+  {side:'s',c:1.5,w:2.0,y0:.55,y1:2.35,curtain:'#E9E2D6'},
+  {side:'s',c:-2.6,w:1.8,y0:0,y1:2.35,kind:'slide'},
+  {side:'w',c:1.3,w:1.2,y0:.95,y1:2.15},
+  {side:'e',c:-1.6,w:.9,y0:0,y1:2.12,kind:'door'},
+  {side:'e',c:1.4,w:.95,y0:0,y1:2.12,kind:'door'},
+]);
+[[-2.6,-.8],[2.2,0]].forEach(([x,z])=>cyl(.12,.12,.03,M.white,x,H-.015,z,g,24));
+
+const targets=[];
+function target(obj,id,name,onClick){const t={obj,id,name,onClick};targets.push(t);obj.traverse(o=>{if(o.isMesh)o.userData.t=t;});return t;}
+
+/* ---- study corner: chair + shtender facing the south window ---- */
+const study=grp(g,1.5,0,1.85);chair(study,0,0,0,0x6B4A33);
+const sh=grp(study,0,0,.55);box(.05,.95,.05,M.walnut,0,.475,0,sh);box(.36,.04,.3,M.walnut,0,.02,0,sh);const top=grp(sh,0,1.0,0);top.rotation.x=-.55;box(.5,.03,.38,M.walnut,0,0,0,top);
+const bookL=box(.22,.03,.3,mat(0xF4EDE0,.8),-.11,.03,0,top);bookL.rotation.z=.06;const bookR=box(.22,.03,.3,mat(0xF4EDE0,.8),.11,.03,0,top);bookR.rotation.z=-.06;box(.46,.012,.32,mat(0x5B2A20,.6),0,.012,0,top);
+const glare=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.8),new THREE.MeshBasicMaterial({map:tex(128,128,(gg,w,h)=>{const r=gg.createRadialGradient(w/2,h/2,8,w/2,h/2,w/2);r.addColorStop(0,'rgba(255,248,225,1)');r.addColorStop(1,'rgba(255,248,225,0)');gg.fillStyle=r;gg.fillRect(0,0,w,h);}),transparent:true,opacity:.35,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending}));
+glare.position.set(0,1.3,.75);glare.rotation.y=Math.PI;study.add(glare);glare.raycast=()=>{};
+
+/* ---- salon ---- */
+const sofa=grp(g,2.9,0,-2.2,0);const sf=new THREE.MeshStandardMaterial({map:fabric('#8E9178'),roughness:.95});
+box(2.3,.25,.95,sf,0,.27,0,sofa);box(2.3,.5,.22,sf,0,.6,-.38,sofa);box(.22,.6,.95,sf,-1.1,.36,0,sofa);box(.22,.6,.95,sf,1.1,.36,0,sofa);
+[-.5,.5].forEach(x=>box(1,.14,.75,sf,x,.46,.06,sofa));[-.75,.7].forEach((x,i)=>{const c=box(.42,.38,.13,mat(i?0xD2A64A:0xE8DCC6,.95),x,.68,-.22,sofa);c.rotation.set(-.2,0,i?.15:-.15);});
+[-1.05,1.05].forEach(x=>[-.38,.38].forEach(z=>cyl(.025,.02,.14,M.walnut,x,.07,z,sofa,8)));
+const socketGrp=grp(g,0,0,0);box(.09,.09,.015,mat(0xFFFFFF,.4),3.4,.3,-2.79,socketGrp,false);
+const cordM=new THREE.MeshStandardMaterial({color:0xF0F0F0,roughness:.5,emissive:0x000000});
+const cordCurve=new THREE.CatmullRomCurve3([[3.4,.3,-2.78],[3.45,.015,-2.72],[3.9,.012,-1.9],[3.95,.012,-.9],[4.0,.012,-.1],[4.05,.012,.45]].map(p=>new THREE.Vector3(...p)));
+const cord=new THREE.Mesh(new THREE.TubeGeometry(cordCurve,80,.011,6,false),cordM);cord.castShadow=true;socketGrp.add(cord);
+const cordHit=new THREE.Mesh(new THREE.TubeGeometry(cordCurve,40,.07,6,false),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));socketGrp.add(cordHit);
+const fl=grp(g,4.05,0,.55);cyl(.14,.16,.03,M.black,0,.015,0,fl);cyl(.012,.012,1.5,M.black,0,.76,0,fl);const fs=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.26,24,1,true),new THREE.MeshStandardMaterial({color:0xF2EBDD,roughness:.9,side:THREE.DoubleSide,emissive:0xFFDDAA,emissiveIntensity:.3}));fs.position.y=1.55;fl.add(fs);
+const fll=new THREE.PointLight(0xFFD8A0,.6,4,2);fll.position.set(0,1.5,0);fl.add(fll);
+
+const rug=grp(g,2.9,0,.05);const rugT=tex(256,160,(gg,w,h)=>{gg.fillStyle='#C9B79C';gg.fillRect(0,0,w,h);gg.strokeStyle='#9F2B35';gg.lineWidth=6;gg.strokeRect(14,14,w-28,h-28);gg.strokeStyle='#4A2C30';gg.lineWidth=2;gg.strokeRect(26,26,w-52,h-52);noise(gg,w,h,3000,.08,true);});
+const rugM=new THREE.MeshStandardMaterial({map:rugT,roughness:1});const rm=new THREE.Mesh(new THREE.BoxGeometry(1.0,.012,.62),rugM);rm.position.y=.006;rm.receiveShadow=true;rug.add(rm);
+const ct=grp(rug,0,0,0);box(.7,.04,.4,M.oak,0,.38,0,ct);[[-.3,-.16],[.3,-.16],[-.3,.16],[.3,.16]].forEach(([a,b])=>cyl(.015,.015,.36,M.black,a,.18,b,ct,8));cyl(.09,.06,.06,mat(0xEDE6DA,.4),.15,.43,0,ct);
+
+const shelf=grp(g,4.32,0,-.3,-Math.PI/2);[0,.5,1.0,1.5,1.95].forEach(y=>box(1.2,.03,.32,M.oak,0,y+.02,0,shelf));[-.6,.6].forEach(x=>box(.03,1.97,.32,M.oak,x,.985,0,shelf));
+[.05,.55,1.05,1.55].forEach((y,i)=>books(shelf,i%2?-.2:.15,y,0,.7));cyl(.08,.1,.22,M.pot,.42,1.16,0,shelf);sph(.12,M.leaf,.42,1.33,0,shelf,1,.6,1);
+const painting=art(g,2.9,1.65,-2.79,1.1,.72,0,(gg,w,h)=>{gg.fillStyle='#EFE6D8';gg.fillRect(0,0,w,h);gg.fillStyle='#D2A64A';gg.beginPath();gg.arc(w*.35,h*.55,w*.2,0,7);gg.fill();gg.fillStyle='#9F2B35';gg.fillRect(w*.5,h*.25,w*.28,h*.5);gg.fillStyle='#5F7A4C';gg.beginPath();gg.ellipse(w*.62,h*.82,w*.3,h*.1,0,0,7);gg.fill();});
+const plant1=plant(g,-1.35,2.35,1.15);
+
+const binG=grp(g,4.05,0,2.35);cyl(.17,.15,.5,mat(0x3E6FA8,.6),0,.25,0,binG,16);const brochure=box(.2,.02,.28,mat(0x6E4F45,.6),0,.51,0,binG);brochure.rotation.set(.3,.4,.2);
+const bp=box(.18,.02,.22,mat(0xF2EEE6,.8),.04,.53,.03,binG);bp.rotation.set(-.2,-.3,.1);
+
+const doorC=grp(g,4.5,0,-1.6);const leaf=grp(doorC,-.03,0,.44);box(.05,2.08,.88,mat(0xF4F1EC,.5),0,1.04,-.44,leaf);const lockBox=box(.06,.22,.14,mat(0x3A3A3A,.4),-.05,1.15,-.78,leaf);
+const lockScr=box(.005,.05,.1,new THREE.MeshBasicMaterial({color:0xFF5A5A}),-.081,1.21,-.78,leaf,false);
+const sign=art(leaf,-.04,1.6,-.44,.5,.3,-Math.PI/2,(gg,w,h)=>{gg.fillStyle='#FFF7D6';gg.fillRect(0,0,w,h);gg.fillStyle='#9F2B35';gg.font='bold 34px Assistant,sans-serif';gg.textAlign='center';gg.direction='rtl';gg.fillText('לא להיכנס!',w/2,h*.45);gg.fillStyle='#4A2C30';gg.font='22px Assistant,sans-serif';gg.fillText('בשיפוץ. אבא',w/2,h*.78);});
+const doorE=grp(g,4.5,0,1.4);box(.05,2.08,.93,mat(0xD9CFC4,.5),-.03,1.04,0,doorE);cyl(.012,.012,.12,M.brass,-.08,1.0,-.36,doorE).rotation.z=Math.PI/2;
+const slideB=grp(g,-2.6,0,2.78);box(.88,2.3,.04,M.glass,.43,1.16,-.06,slideB,false);box(.04,2.3,.06,M.frame,0,1.16,-.06,slideB);
+
+/* ---- dining + pendant ---- */
+const dt=grp(g,-.2,0,.9);box(1.6,.05,.9,M.oak,0,.75,0,dt);[[-.72,-.36],[.72,-.36],[-.72,.36],[.72,.36]].forEach(([a,b])=>box(.06,.73,.06,M.oak,a,.365,b,dt));
+chair(dt,-.42,.62,Math.PI);chair(dt,.42,.62,Math.PI);chair(dt,-.42,-.62,0);chair(dt,.42,-.62,0);cyl(.06,.08,.22,mat(0x9F2B35,.5),0,.89,0,dt);for(let i=0;i<5;i++)sph(.035,M.leaf2,R(-.06,.06),1.05+R(0,.1),R(-.06,.06),dt);
+const pend=grp(g,1.45,H,-1.0);cyl(.006,.006,.8,M.black,0,-.4,0,pend);const shade=new THREE.Mesh(new THREE.CylinderGeometry(.08,.26,.22,28,1,true),new THREE.MeshStandardMaterial({color:0x2E2A26,roughness:.4,metalness:.4,side:THREE.DoubleSide}));shade.position.y=-.9;shade.castShadow=true;pend.add(shade);
+const bulb=sph(.05,new THREE.MeshBasicMaterial({color:0xFFE6B5}),0,-.96,0,pend);bulb.castShadow=false;const spl=new THREE.SpotLight(0xFFD9A0,6,4,.7,.6,1.5);spl.position.set(0,-.95,0);pend.add(spl);spl.target.position.set(0,-H,0);pend.add(spl.target);
+
+/* ---- kitchen ---- */
+const kit=grp(g,0,0,0);
+box(.6,.86,1.5,M.cab,-4.2,.43,-2.05,kit);box(.64,.04,1.52,M.counter,-4.19,.88,-2.05,kit);
+box(.6,.86,.6,M.cab,-4.2,.43,-2.5,kit);
+const drawer=grp(kit,-3.89,0,-1.9);box(.03,.22,.56,M.cab,0,.2,0,drawer);box(.02,.015,.16,M.brass,.02,.25,0,drawer,false);box(.03,.22,.56,M.cab,0,.46,0,kit).position.set(-3.89,.46,-1.9);box(.03,.22,.56,M.cab,-3.89,.71,-1.9,kit);
+[.46,.71].forEach(y=>box(.02,.015,.16,M.brass,-3.87,y+.05,-1.9,kit,false));
+box(.36,.22,.5,mat(0xD9D4CB,.7),-.2,.2,0,drawer);
+const tapeOnDrawer=cyl(.05,.05,.04,mat(0xF2C230,.5),-.2,.33,.05,drawer);
+box(3.4,.86,.6,M.cab,-2.2,.43,-2.5,kit);box(3.44,.04,.64,M.counter,-2.2,.88,-2.49,kit);
+const dw=grp(kit,-3.6,.08,-2.2);const dwDoor=grp(dw,0,0,0);box(.58,.74,.03,M.steel,0,.37,.015,dwDoor);dwDoor.rotation.x=Math.PI/2;
+box(.56,.06,.5,mat(0x8D9399,.4),0,.45,-.25,dw);for(let i=0;i<6;i++)box(.01,.2,.18,mat(0xFFFFFF,.3),-.2+i*.08,.55,-.25,dw);
+box(.55,.02,.42,M.steel,-2.8,.9,-2.5,kit);cyl(.012,.012,.3,M.steel,-2.8,1.05,-2.72,kit,8);box(.012,.012,.18,M.steel,-2.8,1.2,-2.63,kit);
+const cook=grp(kit,-1.3,0,-2.5);box(.6,.015,.52,M.black,0,.905,0,cook);[[-.14,-.12],[.14,-.12],[-.14,.12],[.14,.12]].forEach(([a,b])=>cyl(.07,.07,.006,mat(0x333333,.3),a,.915,b,cook));
+const pot=cyl(.13,.11,.15,M.steel,.12,.99,.1,cook);
+const tall=grp(kit,-.7,0,-2.5);box(.6,2.2,.6,M.cab,0,1.1,0,tall);box(.015,2.1,.01,M.cabLine,0,1.1,.305,tall,false);box(.02,.25,.02,M.brass,.25,1.1,.31,tall,false);
+for(let i=0;i<5;i++)box(.01,.7,.01,M.cabLine,-3.9+i*.6,.45,-2.19,kit,false);
+const bs=new THREE.Mesh(new THREE.PlaneGeometry(3.5,1.15),new THREE.MeshStandardMaterial({map:tiles,roughness:.3}));bs.position.set(-2.75,1.48,-2.79);kit.add(bs);
+const up=grp(kit,0,0,0);box(3.5,.62,.35,M.cab,-2.75,2.34,-2.62,up);for(let i=0;i<6;i++){box(.16,.015,.02,M.brass,-4.2+i*.6,2.08,-2.44,up,false);box(.01,.58,.01,M.cabLine,-4.5+i*.6,2.34,-2.44,up,false);}
+const upDoor=grp(up,-1.6,0,-2.44);box(.58,.6,.02,M.cab,-.29,2.34,.01,upDoor);
+const lad=grp(kit,-2.1,0,-1.85,-.4);const lm=mat(0xC9CCD0,.35);[-.2,.2].forEach(x=>{const l=box(.03,1.25,.04,lm,x,.6,0,lad);l.rotation.x=.18;});for(let i=0;i<3;i++)box(.44,.03,.16,lm,0,.32+i*.32,.02-i*.06,lad);
+const eyes=tex(128,64,(gg,w,h)=>{gg.fillStyle='#fff';gg.beginPath();gg.arc(40,32,16,0,7);gg.arc(88,32,16,0,7);gg.fill();gg.fillStyle='#222';gg.beginPath();gg.arc(44,34,7,0,7);gg.arc(92,34,7,0,7);gg.fill();});
+const face=new THREE.Mesh(new THREE.PlaneGeometry(.26,.13),new THREE.MeshBasicMaterial({map:eyes,transparent:true}));face.position.set(0,1.02,.06);face.rotation.x=-.2;lad.add(face);
+
+const fridge=grp(kit,-4.17,0,-.9);const fIn=mat(0xF4F6F7,.4);box(.04,1.95,.7,M.steel,-.31,.975,0,fridge);box(.66,1.95,.04,M.steel,0,.975,-.33,fridge);box(.66,1.95,.04,M.steel,0,.975,.33,fridge);box(.66,.04,.7,M.steel,0,1.93,0,fridge);box(.66,.06,.7,M.steel,0,.03,0,fridge);
+box(.01,1.85,.62,fIn,-.285,.975,0,fridge,false);[.62,1.02,1.42].forEach(y=>box(.56,.015,.6,new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.6}),0,y,0,fridge,false));
+box(.08,.2,.08,mat(0xffffff,.5),-.1,.73,-.15,fridge);cyl(.035,.035,.25,mat(0x5E9F45,.4),-.05,1.15,.1,fridge);sph(.06,mat(0xE0A030,.5),0,1.49,-.1,fridge);cyl(.07,.07,.08,mat(0xF4EEE6,.5),.05,1.07,-.15,fridge);
+const fDoor=grp(fridge,.33,0,.35);box(.04,1.9,.7,M.steel,.02,.975,-.35,fDoor);box(.03,.55,.03,mat(0x777777,.3),.06,1.2,-.62,fDoor,false);
+const vegD=grp(fridge,0,0,0);box(.5,.18,.55,new THREE.MeshStandardMaterial({color:0xDDEEDD,transparent:true,opacity:.85}),.04,.2,0,vegD);sph(.04,mat(0x5E9F45,.6),.15,.3,-.1,vegD,2,1,1);
+box(.6,2.2,.6,M.cab,-4.2,1.1,-.2,kit);box(.02,.25,.02,M.brass,-3.88,1.1,-.3,kit,false);
+
+/* ---- target wiring ---- */
+const BUGS={
+  shtender:{n:1,room:'פינת הלימוד',title:'הסטנדר מול השמש',letters:['ד'],cost:0,
+    text:'מקום הלימוד צמוד לחלון הדרומי. בצהריים השמש נכנסת ישר לדף ולעיניים, ואחרי חצי שעה כואב הראש.',
+    joke:'אבא: ״זה המקום הכי מואר בבית! מושלם ללימוד.״ הגמרא: ״אני לא רואה כלום.״',
+    fix:'מקום לימוד מקבל אור מהצד, לא מקדימה. הסטנדר עובר לקיר שניצב לחלון.',h:['איפה הכי קשה ללמוד בשתיים בצהריים?','לחץ על הסטנדר שליד החלון, בפינת הלימוד.']},
+  rug:{n:2,room:'הסלון',title:'השטיח הצף',letters:['י'],cost:1800,
+    text:'שטיח קטנטן צף באמצע הסלון, רחוק מהספה. במקום לחבר את פינת הישיבה, הוא מקטין את כל החדר.',
+    joke:'אבא: ״השטיח היה במבצע. גם הגודל היה במבצע.״',fix:'שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו. כמעט תמיד, גדול יותר זה טוב יותר.',h:['משהו בסלון קטן מדי בשביל המקום שלו.','מה אמור לחבר בין הספה לשאר הסלון?']},
+  socket:{n:3,room:'הסלון',title:'השקע מאחורי הספה',letters:['א'],cost:1100,
+    text:'השקע היחיד בפינת הישיבה מסתתר מאחורי הספה. המנורה העומדת מחוברת בכבל שחוצה את כל המעבר.',
+    joke:'הכבל הזה הפיל כבר שלושה אורחים ומגש של חמין.',fix:'שקעים מתכננים לפי מיקום הרהיטים: ליד הספה, ליד המנורות, ליד השולחן.',h:['מאיפה המנורה העומדת מקבלת חשמל?','לחץ על הכבל הלבן שעל הרצפה.']},
+  cabinets:{n:4,room:'המטבח',title:'ארונות למטפסים',letters:[],cost:6500,key:'piece',
+    text:'הארונות העליונים הותקנו בגובה של יותר משני מטרים. בלי סולם אי אפשר להוציא אפילו כוס.',
+    joke:'זלמן הסולם: ״שלום, אני זלמן. אני גר פה מאז שהתקינו את הארונות.״',fix:'בין השיש לארון העליון משאירים בערך 60 ס״מ. מה שמשתמשים בו כל יום צריך להיות בהישג יד.',h:['למה יש סולם באמצע המטבח?','לחץ על הארונות העליונים.']},
+  fridge:{n:5,room:'המטבח',title:'המקרר שלא נפתח עד הסוף',letters:['ל'],cost:350,
+    text:'המקרר צמוד לארון הגבוה בצד הצירים. הדלת נעצרת ב-90 מעלות, ומגירת הירקות לא יכולה לצאת.',
+    joke:'המלפפונים במגירה התחתונה לא ראו אור יום מאז חנוכה.',fix:'ליד צד הצירים של המקרר משאירים מרווח, או מחליפים את כיוון הפתיחה של הדלת.',h:['נסה להוציא ירקות מהמקרר.','פתח את המקרר ולחץ על מגירת הירקות.']},
+  cooktop:{n:6,room:'המטבח',title:'כיריים בפינה',letters:['ו'],cost:9500,needs:'tape',
+    text:'הכיריים דחוקות ליד הארון הגבוה. סרט המדידה מראה 0 ס״מ משטח בצד אחד. אין איפה להניח סיר רותח.',
+    joke:'אבא: ״איפה מניחים את הסיר? על זלמן.״ זלמן: ״אני לא חתמתי על זה.״',fix:'ליד הכיריים משאירים 30 עד 40 ס״מ משטח עבודה בכל צד.',h:['איפה מניחים סיר שירד מהאש?','מדוד עם סרט המדידה ליד הכיריים. אין לך סרט? חפש במגירות.']},
+  dishwasher:{n:7,room:'המטבח',title:'המדיח והמגירה',letters:[],cost:1600,key:'tape',
+    text:'המדיח מותקן בפינה. כשהדלת שלו פתוחה, המגירה שלידו נתקעת בה ואי אפשר להוציא סכו״ם.',
+    joke:'המשפחה אוכלת עם כפות כבר שבוע, כי המזלגות במגירה.',fix:'מכשירים עם דלת לא מתקינים בפינה מול מגירות.',h:['נסה לפתוח את המגירה שליד המדיח.','לחץ על המגירה התחתונה בפינת המטבח, ליד המדיח הפתוח.']},
+  pendant:{n:8,room:'פינת האוכל',title:'המנורה שנשארה מאחור',letters:['ג'],cost:1200,
+    text:'את נקודת החשמל של המנורה התקינו לפני שהחליטו איפה יעמוד השולחן. עכשיו היא תלויה מעל כלום, והשולחן בצל.',
+    joke:'המנורה מאירה בדיוק את המקום שבו החתול ישן. החתול מרוצה.',fix:'קודם מתכננים איפה יעמדו הרהיטים, ורק אחר כך את נקודות החשמל.',h:['מה אמור להיות מתחת למנורה התלויה?','הסתכל למעלה, ליד פינת האוכל.']},
+};
+const ORDER=['shtender','rug','pendant','cabinets','dishwasher','fridge','cooktop','socket'];
+
+const S={found:new Set(),letters:[],tape:false,piece:false,cost:0,hints:0,hintStep:{},start:0,end:0,tries:0,lockHints:0};
+const anims=[];function anim(dur,fn,done){anims.push({t:0,dur,fn,done});}
+
+target(study,'d-chair','כיסא',()=>toast('כיסא נוח. השאלה מה רואים כשיושבים עליו.'));
+target(sh,'shtender','סטנדר',()=>{anim(1.4,t=>{glare.material.opacity=.35+Math.sin(t*Math.PI)*.65;});bug('shtender',900);});
+target(rug,'rug','שטיח',()=>{anim(1.4,t=>rugM.emissive.setRGB(.35*Math.sin(t*Math.PI*3)**2,0,0));bug('rug',900);});
+target(ct,'d-ctable','שולחן קפה',()=>toast('שולחן קפה קטן וחמוד. תסתכל על מה הוא עומד.'));
+target(fl,'d-lamp','מנורה עומדת',()=>toast('מנורה עומדת יפה. מעניין מאיפה היא מקבלת חשמל...'));
+target(socketGrp,'socket','כבל חשמל',()=>{anim(1.4,t=>cordM.emissive.setRGB(.6*Math.sin(t*Math.PI*3)**2,0,0));bug('socket',900);});
+target(up,'cabinets','ארונות עליונים',()=>{anim(1.2,t=>{lad.position.y=Math.abs(Math.sin(t*Math.PI*3))*.06;upDoor.rotation.y=-Math.min(1,t*2)*1.2;});bug('cabinets',900);});
+target(lad,'d-zalman','זלמן הסולם',()=>{anim(.8,t=>{lad.position.y=Math.abs(Math.sin(t*Math.PI*3))*.05;});toast('זלמן הסולם: <b>״שלום, אני זלמן. אני גר במטבח הזה.</b> רוצה לדעת למה? תסתכל למעלה.״');});
+let fridgeOpen=false;
+target(fridge,'d-fridge','מקרר',()=>{const open=!fridgeOpen;fridgeOpen=open;const a0=fDoor.rotation.y;anim(.6,t=>{fDoor.rotation.y=a0+((open?-Math.PI/2:0)-a0)*t;});if(open)toast('המקרר: <b>״צריך משהו?״</b>');});
+target(vegD,'fridge','מגירת ירקות',()=>{if(!fridgeOpen)return;if(S.found.has('fridge')){toast('המגירה עדיין נתקעת. המלפפונים מוסרים ד״ש.');return;}anim(1.4,t=>{vegD.position.x=Math.min(.12,t*.5)+(t>.3?Math.sin(t*60)*.01:0);},()=>{vegD.position.x=0;});bug('fridge',1300);});
+const dwClick=()=>{if(S.found.has('dishwasher')){toast('המדיח סגור, המגירה פתוחה. סוף סוף מזלגות.');return;}anim(1.2,t=>{drawer.position.x=-3.89+Math.min(.1,t*.4)+(t>.3?Math.sin(t*50)*.008:0);});bug('dishwasher',1000);};
+target(dw,'d-dw','מדיח',()=>toast(S.found.has('dishwasher')?'המדיח סגור. סוף סוף אפשר להגיע למגירה.':'המדיח פתוח. אבא באמצע להעמיס, כבר שבוע.'));target(drawer,'dishwasher','מגירה',dwClick);
+target(cook,'cooktop','כיריים',()=>{if(!S.tape&&!S.found.has('cooktop')){toast('הכיריים נראות דחוקות ליד הארון הגבוה. <b>צריך למדוד.</b> איפה יש פה סרט מדידה?');return;}anim(1.4,t=>{pot.position.y=.99+Math.abs(Math.sin(t*Math.PI*4))*.03;});bug('cooktop',700);});
+target(pend,'pendant','מנורה תלויה',()=>{anim(2.2,t=>{pend.rotation.z=Math.sin(t*Math.PI*4)*.12*(1-t);});bug('pendant',900);});
+target(sofa,'d-sofa','ספה',()=>toast('ספה נוחה. אבל משהו מאחוריה מחובר לכל הסלון.'));
+target(dt,'d-table','שולחן אוכל',()=>toast('שולחן יפה מעץ אלון. אבל כדאי להסתכל קצת למעלה.'));
+target(shelf,'d-shelf','ספרייה',()=>toast('ספרייה מושלמת. אבא הרכיב אותה לבד, ונשארו רק ארבעה ברגים.'));
+target(plant1,'d-plant','עציץ',()=>toast('הפיקוס במקום הנכון: ליד הזכוכית, באור מלא. הוא היחיד פה שמרוצה.'));
+target(painting,'d-art','תמונה',()=>toast('תמונה בגובה הנכון, מעל הספה. אין פה באג, יש פה טעם טוב.'));
+target(tall,'d-tall','ארון גבוה',()=>toast('ארון אחסון גבוה. הוא בסדר. השכנים שלו פחות.'));
+target(slideB,'d-balcony','דלת המרפסת',()=>toast('המרפסת נעולה. אבא: ״לשם נגיע בסוף. אם בכלל.״'));
+target(doorE,'d-entry','דלת הכניסה',()=>toast('דלת הכניסה. אבא: ״אף אחד לא יוצא מפה בלי לראות את המסדרון שלי!״'));
+target(binG,'bin','פח מחזור',()=>{openModal(`<div class="tag">פח המחזור</div><h2>חוברת קרועה</h2><p>בפח שליד הכניסה זרוקה חוברת: <b>״מירי פרידלנד · תכנון ועיצוב פנים״</b>. על הכריכה אבא כתב בטוש: ״מי צריך את זה?״</p><p>חסר בה דף אחד, ״שיטת ד.י.ו.ק״. מישהו קרע אותו והחביא את החלקים בבית.</p><p class="note">אולי הדף הזה יעזור לפתוח את המסדרון.</p><div class="actions"><button class="btn primary" data-close type="button">הבנתי</button></div>`);});
+target(doorC,'lock','דלת המסדרון (נעולה)',()=>openLock());
+
+/* ---- interaction ---- */
+const VIEWS={salon:{pos:[-1.2,1.6,-.4],at:[3.4,.8,-.2]},kitchen:{pos:[.6,1.6,.5],at:[-3.2,1.15,-1.9]},study:{pos:[-.4,1.55,-.9],at:[1.6,1.0,2.6]}};
+let yaw=0,pitch=0,tYaw=0,tPitch=0,curView='salon';const tmp=new THREE.Vector3();
+function aim(at,instant){const d=tmp.copy(at).sub(camera.position);const y=Math.atan2(-d.x,-d.z),p=Math.atan2(d.y,Math.hypot(d.x,d.z));let df=y-yaw;while(df>Math.PI)df-=2*Math.PI;while(df<-Math.PI)df+=2*Math.PI;tYaw=yaw+df;tPitch=p;if(instant){yaw=tYaw;pitch=tPitch;}}
+const camPos=new THREE.Vector3(),camTarget=new THREE.Vector3();
+function go(v,instant){curView=v;const V=VIEWS[v];camTarget.set(...V.pos);if(instant)camera.position.copy(camTarget);
+  const at=new THREE.Vector3(...V.at);if(instant)aim(at,true);else{const tmpCam=camera.position.clone();camera.position.copy(camTarget);aim(at);camera.position.copy(tmpCam);}
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.go===v));}
+$('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b&&S.start)go(b.dataset.go);});
+
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();const pickables=[];targets.forEach(t=>t.obj.traverse(o=>{if(o.isMesh)pickables.push(o);}));
+function pick(x,y){ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);const h=ray.intersectObjects(pickables,false)[0];return h&&h.distance<9?h.object.userData.t:null;}
+let drag=null;const tip=$('tip');
+host.addEventListener('pointerdown',e=>{if(!$('wrap').hidden)return;drag={x:e.clientX,y:e.clientY,m:0,yaw:tYaw,pitch:tPitch};host.setPointerCapture(e.pointerId);});
+host.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.max(drag.m,Math.hypot(dx,dy));if(drag.m>6){host.classList.add('drag');tYaw=drag.yaw+dx*.005;tPitch=Math.max(-1.1,Math.min(.9,drag.pitch+dy*.004));tip.hidden=true;}return;}
+  if(e.pointerType!=='mouse'||!$('wrap').hidden)return;const t=pick(e.clientX,e.clientY);host.classList.toggle('point',!!t);if(t){tip.hidden=false;tip.textContent=t.name;tip.style.left=e.clientX+'px';tip.style.top=e.clientY+'px';}else tip.hidden=true;});
+host.addEventListener('pointerup',e=>{if(!drag)return;const m=drag.m;drag=null;host.classList.remove('drag');if(m<=6&&S.start&&!S.end){const t=pick(e.clientX,e.clientY);if(t){aimAt(t.obj);t.onClick();}}});
+function aimAt(obj){const c=new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());aim(c);}
+
+let toastT=0;function toast(s){const t=$('toast');t.innerHTML=s;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>t.style.opacity=0,3800);}
+function openModal(html,focus){$('modal').innerHTML=html;$('wrap').hidden=false;tip.hidden=true;$('modal').scrollTop=0;$('modal').querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));const f=$('modal').querySelector(focus||'.btn.primary,button');if(f)setTimeout(()=>f.focus({preventScroll:true}),40);}
+let onClose=null;function closeModal(){$('wrap').hidden=true;const f=onClose;onClose=null;if(f)f();}
+$('wrap').addEventListener('click',e=>{if(e.target===$('wrap'))closeModal();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('wrap').hidden)closeModal();});
+
+function renderLetters(flash){$('letters').innerHTML=Array.from({length:6},(_,i)=>{const l=S.letters[i];return `<div class="lt ${l?'got':''}" style="${l&&i!==flash?'animation:none':''}">${l||''}</div>`;}).join('');}
+function renderTools(){const t=[];if(S.tape)t.push('<button type="button" class="tool" data-tool="tape">סרט מדידה</button>');if(S.piece)t.push('<button type="button" class="tool" data-tool="piece">פיסת חוברת</button>');
+  $('tools').innerHTML=t.length?t.join(''):'<span class="note">עדיין אין</span>';}
+$('tools').addEventListener('click',e=>{const b=e.target.closest('.tool');if(!b)return;if(b.dataset.tool==='piece')showPiece();else toast('סרט מדידה. לחץ על משהו שצריך למדוד, והוא יימדד אוטומטית.');});
+function addCost(n){if(!n)return;const from=S.cost;S.cost+=n;const c=$('counter');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');const t0=performance.now();
+  const step=now=>{const k=Math.min(1,(now-t0)/700);$('costv').textContent=fmtN(Math.round(from+(S.cost-from)*k));if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
+function pieceHTML(){return `<div class="piece"><div class="row"><span class="d">ד</span><div><b>01 · ד</b><small>שיטת ד.י.ו.ק · מירי פרידלנד</small></div></div><p style="margin:10px 0 0">״<b>הקשבה אמיתית לחלום שלכם.</b> כל תכנון מתחיל בשיחה עמוקה על מה שחשוב לכם.״</p><p class="note" style="margin:6px 0 0">שאר הדף קרוע.</p></div>`;}
+function showPiece(){openModal(`<div class="tag">פיסת חוברת</div><h2>מתוך ״שיטת ד.י.ו.ק״</h2>${pieceHTML()}<div class="actions"><button class="btn primary" data-close type="button">סגור</button></div>`);}
+
+function bug(id,delay){
+  const b=BUGS[id];const again=S.found.has(id);
+  if(!again){S.found.add(id);$('cnt').textContent=S.found.size;b.letters.forEach(l=>S.letters.push(l));}
+  const rewards=[];
+  if(b.letters.length)rewards.push(`<div class="reward"><span>${b.letters.length>1?'קיבלת אותיות':'קיבלת אות'}</span><b>${b.letters.join(' ')}</b></div>`);
+  if(b.key==='tape')rewards.push(`<div class="reward tool"><span>סגרת את המדיח ופתחת את המגירה. בפנים:</span><b>סרט מדידה</b></div>`);
+  if(b.key==='piece')rewards.push(`<div class="reward tool"><span>טיפסת על זלמן ופתחת את הארון העליון. בפנים:</span><b>פיסת חוברת קרועה</b></div>`);
+  const html=`<div class="tag">באג ${S.found.size} מתוך 8 · ${b.room}</div><h2>${b.title}</h2><p>${b.text}</p><p class="joke">${b.joke}</p>
+    <div class="fix"><div class="h">איך מירי הייתה מתכננת</div><p>${b.fix}</p></div>${rewards.join('')}
+    <div class="costline">עלות התיקון: <b>${b.cost?fmtN(b.cost):'0 ₪, רק להזיז. אבל שלושה חודשים של כאבי ראש לא מחזירים.'}</b></div>
+    <div class="actions"><button class="btn primary" data-close type="button">${S.found.size===8&&!again?'לדלת המסדרון':'להמשיך לחפש'}</button></div>`;
+  setTimeout(()=>{
+    openModal(html);
+    if(!again){
+      renderLetters(S.letters.length-1);addCost(b.cost);
+      if(b.key==='tape'){S.tape=true;renderTools();onClose=()=>{anim(.8,t=>{dwDoor.rotation.x=Math.PI/2*(1-t);drawer.position.x=-3.89+t*.38;},()=>{tapeOnDrawer.visible=false;});toast('מצאת <b>סרט מדידה</b>. עכשיו אפשר למדוד דברים בדירה.');};}
+      if(b.key==='piece'){S.piece=true;renderTools();onClose=()=>showPiece();}
+      if(S.found.size===8&&!b.key)onClose=()=>{toast('מצאת את כל 8 הבאגים! עכשיו לדלת המסדרון, בצד ימין של הסלון.');go('salon');};
+      if(S.found.size===8&&b.key){const prev=onClose;onClose=()=>{prev&&prev();setTimeout(()=>toast('מצאת את כל 8 הבאגים! עכשיו לדלת המסדרון, בצד ימין של הסלון.'),400);};}
+    }
+  },again?0:delay);
+}
+
+/* ---- lock ---- */
+function openLock(){
+  let slots=Array(6).fill(null);const order=S.letters.map((l,i)=>({l,i})).sort(()=>Math.random()-.5);
+  const missing=6-S.letters.length;
+  openModal(`<div class="tag">דלת המסדרון</div><h2>מנעול של 6 אותיות</h2>
+    <p>על הדלת פתק של אבא: <b>״הקוד: מה שהיה חסר בבית הזה.״</b></p>
+    ${missing?`<p class="note">יש לך ${S.letters.length} מתוך 6 אותיות. ${missing===1?'חסרה עוד אחת':'חסרות עוד '+missing}, חפש עוד באגים.</p>`:'<p class="note">יש לך את כל 6 האותיות. לחץ על אות כדי להכניס אותה, ועל משבצת כדי להחזיר.</p>'}
+    ${S.piece?'<p class="note">יש לך גם פיסת חוברת. <button type="button" class="btn" id="seePiece" style="padding:3px 10px;font-size:.8rem">להציץ בה</button></p>':''}
+    <div class="lockslots" id="ls" dir="rtl"></div><div class="tiles" id="tl"></div><div class="msg" id="lm"></div>
+    <div class="actions"><button class="btn primary" id="tryOpen" type="button">לפתוח</button><button class="btn" id="clr" type="button">לנקות</button><button class="btn" data-close type="button">סגור</button></div>`,'#tl .tile');
+  const draw=()=>{$('ls').innerHTML=slots.map((s,i)=>`<button type="button" class="slot ${s!=null?'filled':''}" data-i="${i}" aria-label="משבצת ${i+1}">${s!=null?S.letters[s]:''}</button>`).join('');
+    $('tl').innerHTML=order.map(o=>`<button type="button" class="tile ${slots.includes(o.i)?'used':''}" data-i="${o.i}">${o.l}</button>`).join('')||'<span class="note">עוד אין אותיות</span>';};
+  draw();
+  $('tl').addEventListener('click',e=>{const t=e.target.closest('.tile');if(!t||t.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;slots[k]=+t.dataset.i;draw();});
+  $('ls').addEventListener('click',e=>{const t=e.target.closest('.slot');if(!t)return;slots[+t.dataset.i]=null;draw();});
+  $('clr').addEventListener('click',()=>{slots=Array(6).fill(null);draw();$('lm').textContent='';});
+  const sp=$('seePiece');if(sp)sp.addEventListener('click',()=>{$('lm').className='msg';$('lm').innerHTML='ד · ״הקשבה אמיתית לחלום שלכם. כל תכנון מתחיל בשיחה...״';});
+  $('tryOpen').addEventListener('click',()=>{const w=slots.map(s=>s==null?'':S.letters[s]).join('');const m=$('lm');
+    if(w.length<6){m.className='msg bad';m.textContent=missing?'חסרות אותיות. חפש עוד באגים בדירה.':'מלא את כל 6 המשבצות.';return;}
+    if(w===WORD){m.className='msg good';m.textContent='קליק. הדלת נפתחת.';setTimeout(()=>{closeModal();win();},700);return;}
+    S.tries++;m.className='msg bad';m.textContent=S.tries<2?'לא נפתח. נסה סדר אחר.':S.piece?'לא נפתח. רמז: המילה מתחילה באות ד, והיא קשורה ל״שיחה״.':'לא נפתח. אולי משהו בארון העליון יעזור.';});
+}
+
+/* ---- hints ---- */
+$('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;
+  let html;
+  if(S.found.size===8){S.lockHints++;html=S.lockHints===1?'כל האותיות אצלך. הפיסה מהחוברת מתחילה באות <b>ד</b> ומדברת על הקשבה ושיחה.':'המילה היא <b>דיאלוג</b>: ד, י, א, ל, ו, ג.';}
+  else{const id=ORDER.find(k=>!S.found.has(k));const b=BUGS[id];const st=S.hintStep[id]||0;S.hintStep[id]=Math.min(1,st+1);
+    html=`<b>${b.room}:</b> ${b.h[st]}`;if(id==='cooktop'&&!S.tape)html=`<b>${BUGS.dishwasher.room}:</b> ${BUGS.dishwasher.h[S.hintStep.dishwasher?1:0]}`;}
+  openModal(`<div class="tag">רמז ${S.hints} · נוסף 30 שניות</div><h2>רמז</h2><p>${html}</p><div class="actions"><button class="btn primary" data-close type="button">הבנתי</button></div>`);});
+
+/* ---- win / end ---- */
+function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+const elapsed=now=>now-S.start+S.hints*30000;
+function win(){S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
+  anim(1.6,t=>{leaf.rotation.y=-t*1.4;});setTimeout(showEnd,2000);}
+function showEnd(){
+  const time=fmtT(elapsed(S.end));
+  const msg=`פתרתי את פרק 1 של משפחת קלרוסנבסקי ב-${time}! תעדכני אותי כשפרק 2 עולה`;
+  $('endIn').innerHTML=`
+    <div class="brand"><b>מירי פרידלנד</b> · תכנון ועיצוב פנים</div>
+    <div><div class="tag">פרק 1 הושלם</div><h2>פתחת את המסדרון!</h2></div>
+    <div class="stats"><div><b>${time}</b><span>זמן, כולל רמזים</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
+    <p style="margin:0">השיטה של אבא, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
+    <div class="box"><h3>6 דברים לבדוק בסלון ובמטבח</h3><ol>
+      <li>מקום לימוד מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>שקעים מתכננים לפי הרהיטים.</li>
+      <li>בין השיש לארון העליון: בערך 60 ס״מ.</li><li>ליד הכיריים: 30 עד 40 ס״מ משטח בכל צד.</li><li>קודם רהיטים, אחר כך נקודות חשמל.</li></ol></div>
+    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. יענקי: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
+    <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
+      <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
+        <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
+      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div style="margin-top:6px"><a class="btn wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a></div>
+        <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
+    </div></div>
+    <div class="dad">אבא קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה אבא קלרוסנבסקי.</div>
+    <div class="actions" style="justify-content:center"><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
+  $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
+  $('again').addEventListener('click',()=>location.reload());
+  $('copyPh').addEventListener('click',()=>{const b=$('copyPh');const ok=()=>{b.textContent='הועתק';};const fb=()=>{const r=document.createRange();r.selectNodeContents($('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='סמנתי, העתק ידנית';};
+    try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
+}
+
+$('startBtn').addEventListener('click',()=>{$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
+
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<innerHeight?88:68;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();renderLetters();renderTools();go('salon',true);
+
+
+let last=performance.now();
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  camera.position.lerp(camTarget,Math.min(1,dt*4));
+  yaw+=(tYaw-yaw)*Math.min(1,dt*6);pitch+=(tPitch-pitch)*Math.min(1,dt*6);camera.rotation.y=yaw;camera.rotation.x=pitch;
+  if(!S.start&&!reduce)tYaw+=dt*.05;
+  for(let i=anims.length-1;i>=0;i--){const a=anims[i];a.t+=dt;const t=Math.min(1,a.t/a.dur);a.fn(t);if(t>=1){anims.splice(i,1);a.done&&a.done();}}
+  if(!reduce){face.position.y=1.02+Math.sin(now*.003)*.006;}
+  if(S.start&&!S.end)$('timer').textContent=fmtT(elapsed(now));
+  renderer.render(scene,camera);requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
