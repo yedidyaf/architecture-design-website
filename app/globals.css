@@ -106,53 +106,73 @@ body {
   }
 }
 
-/* Homepage projects column (desktop only): a double, hand-sketched frame
+/* Homepage projects column (desktop) and the mobile posts preview: a double, hand-sketched frame
    floating just outside each tile's image. Two thin outlines, slightly offset
    from each other, with uneven corner radii and a small rotation between
    them, so they never line up — like a pencil frame drawn twice. Three
    variants cycle down the column so neighbouring tiles differ. The outlines
    reach up to 7px outside the image (FRAME_REACH in components/home/layout.ts). */
-@media (min-width: 900px) {
-  .sketch-frame::before,
-  .sketch-frame::after {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-    border: 1.5px solid rgba(159, 43, 53, 0.55);
-  }
+.sketch-frame::before,
+.sketch-frame::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1.5px solid rgba(159, 43, 53, 0.55);
+}
 
-  .sketch-frame::before {
-    inset: -5px;
-    border-radius: 14px 6px 12px 7px / 7px 12px 6px 14px;
-    transform: rotate(-0.4deg);
-  }
+.sketch-frame::before {
+  inset: -5px;
+  border-radius: 14px 6px 12px 7px / 7px 12px 6px 14px;
+  transform: rotate(-0.4deg);
+}
 
-  .sketch-frame::after {
-    inset: -7px -3px -3px -7px;
-    border-radius: 8px 15px 6px 13px / 13px 7px 15px 6px;
-    transform: rotate(0.6deg);
-  }
+.sketch-frame::after {
+  inset: -7px -3px -3px -7px;
+  border-radius: 8px 15px 6px 13px / 13px 7px 15px 6px;
+  transform: rotate(0.6deg);
+}
 
-  a:nth-child(3n + 2) > .sketch-frame::before {
-    border-radius: 6px 13px 8px 15px / 12px 6px 14px 7px;
-    transform: rotate(0.35deg);
-  }
+/* a = desktop tile link, .sketch-tile = mobile preview tile */
+:is(a, .sketch-tile):nth-child(3n + 2) > .sketch-frame::before {
+  border-radius: 6px 13px 8px 15px / 12px 6px 14px 7px;
+  transform: rotate(0.35deg);
+}
 
-  a:nth-child(3n + 2) > .sketch-frame::after {
-    inset: -3px -7px -7px -3px;
-    border-radius: 15px 7px 13px 6px / 6px 14px 7px 12px;
-    transform: rotate(-0.6deg);
-  }
+/* a = desktop tile link, .sketch-tile = mobile preview tile */
+:is(a, .sketch-tile):nth-child(3n + 2) > .sketch-frame::after {
+  inset: -3px -7px -7px -3px;
+  border-radius: 15px 7px 13px 6px / 6px 14px 7px 12px;
+  transform: rotate(-0.6deg);
+}
 
-  a:nth-child(3n) > .sketch-frame::before {
-    border-radius: 11px 7px 15px 5px / 5px 14px 8px 12px;
-    transform: rotate(-0.25deg);
-  }
+/* a = desktop tile link, .sketch-tile = mobile preview tile */
+:is(a, .sketch-tile):nth-child(3n) > .sketch-frame::before {
+  border-radius: 11px 7px 15px 5px / 5px 14px 8px 12px;
+  transform: rotate(-0.25deg);
+}
 
-  a:nth-child(3n) > .sketch-frame::after {
-    inset: -6px -6px -4px -3px;
-    border-radius: 7px 14px 6px 12px / 14px 6px 12px 8px;
-    transform: rotate(0.55deg);
+/* a = desktop tile link, .sketch-tile = mobile preview tile */
+:is(a, .sketch-tile):nth-child(3n) > .sketch-frame::after {
+  inset: -6px -6px -4px -3px;
+  border-radius: 7px 14px 6px 12px / 14px 6px 12px 8px;
+  transform: rotate(0.55deg);
+}
+
+/* Mobile posts preview: two identical copies stacked, shifted up by exactly
+   one copy (50%) per loop, so the seam is never visible. */
+@keyframes mobile-posts-drift {
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.mobile-posts-drift {
+  animation: mobile-posts-drift linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-posts-drift {
+    animation: none;
   }
 }
 

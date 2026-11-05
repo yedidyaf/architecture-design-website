@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import MobilePostsPreview from "./MobilePostsPreview";
 import ProjectCover from "./ProjectCover";
 import { POSTS_HASH, type HomeProject } from "./types";
 
@@ -13,7 +14,7 @@ import { POSTS_HASH, type HomeProject } from "./types";
 //     homepage (remounted by the router) comes back with the overlay open;
 //   - a further back closes it.
 const HISTORY_KEY = "postsOverlay";
-// How the flagged entry came about: pushed by the "לפוסטים" button (closing
+// How the flagged entry came about: pushed by the posts preview (closing
 // pops it), or arrived at through a link to POSTS_HASH, e.g. the back arrow
 // on an article (closing just clears the flag, since popping would leave the
 // homepage).
@@ -50,8 +51,8 @@ let savedScroll = 0;
 // Sits above the global "under construction" notice (z-100) so the back
 // arrow is the only thing at the top.
 //
-// Mobile-only: a full-width "לפוסטים" button that opens a full-screen grid of
-// the projects (2 across). The only chrome is a back arrow at the top.
+// Mobile-only: a small auto-scrolling preview of the projects (one tap
+// target) that opens a full-screen grid of them (2 across). The only chrome is a back arrow at the top.
 export default function MobileProjects({ projects }: { projects: HomeProject[] }) {
   const open = useSyncExternalStore(subscribe, isOpenInHistory, closedOnServer);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -111,15 +112,7 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
 
   return (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={openOverlay}
-        aria-haspopup="dialog"
-        className="mb-14 block w-full cursor-pointer bg-brand py-3.5 text-center text-lg font-medium text-white transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-      >
-        לפוסטים
-      </button>
+      <MobilePostsPreview projects={projects} onOpen={openOverlay} buttonRef={triggerRef} />
 
       {open ? (
         <div
