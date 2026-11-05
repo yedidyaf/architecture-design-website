@@ -55,7 +55,7 @@ export type HomeViewProps = {
 //
 // >= 900px: illustrations on the right, the reading column centered, the
 // projects centered in the left gutter (see GRID_COLUMNS).
-// < 900px: one column (header, bio, "לפוסטים" button, testimonials); the
+// < 900px: one column (header, bio, posts preview, testimonials); the
 // projects open in a full-screen overlay and the illustrations are hidden.
 export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "right", projects, testimonials }: HomeViewProps) {
   return (
