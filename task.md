@@ -221,3 +221,9 @@ CONSTRAINTS
 - New branch off latest origin/main. Do NOT push/merge to main, do NOT open a PR.
 - Verify in a headless browser at mobile width: open posts → tap project → back returns to the OPEN posts overlay; back again closes it to the homepage; back while overlay open (no project entered) closes the overlay. Desktop unaffected.
 - Push the branch and print the branch name + compare URL.
+
+---
+
+UPDATE: ARTICLE BACK ARROW GOES TO THE POSTS
+
+כשמישהו בתוך כתבה ולוחץ על החץ הפנימי בצד שמאל למעלה הוא אמור להגיע לעמוד הפוסטים ולא לדף הבית

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import ProjectCover from "./ProjectCover";
-import type { HomeProject } from "./types";
+import { POSTS_HASH, type HomeProject } from "./types";
 
 // Marks the history entry pushed while the overlay is open. The overlay's
 // open state is read from the current history entry, so:
@@ -13,6 +13,13 @@ import type { HomeProject } from "./types";
 //     homepage (remounted by the router) comes back with the overlay open;
 //   - a further back closes it.
 const HISTORY_KEY = "postsOverlay";
+// How the flagged entry came about: pushed by the "לפוסטים" button (closing
+// pops it), or arrived at through a link to POSTS_HASH, e.g. the back arrow
+// on an article (closing just clears the flag, since popping would leave the
+// homepage).
+const PUSHED = true;
+const LINKED = "linked";
+
 // Fired after our own pushState, which (unlike back / forward) doesn't
 // emit popstate.
 const CHANGE_EVENT = "postsoverlaychange";
@@ -54,14 +61,34 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
   const openOverlay = () => {
     savedScroll = 0;
     // Keep the router's own keys in the entry; only add ours.
-    window.history.pushState({ ...window.history.state, [HISTORY_KEY]: true }, "");
+    window.history.pushState({ ...window.history.state, [HISTORY_KEY]: PUSHED }, "");
     window.dispatchEvent(new Event(CHANGE_EVENT));
   };
 
   // Closing goes back through history, consuming the entry pushed on open;
-  // popstate then re-reads the (now unflagged) entry.
+  // popstate then re-reads the (now unflagged) entry. An entry reached via
+  // POSTS_HASH has no homepage entry under it, so its flag is cleared in place.
   const close = useCallback(() => {
-    if (window.history.state?.[HISTORY_KEY]) window.history.back();
+    const flag = window.history.state?.[HISTORY_KEY];
+    if (flag === LINKED) {
+      const rest = { ...window.history.state };
+      delete rest[HISTORY_KEY];
+      window.history.replaceState(rest, "");
+      window.dispatchEvent(new Event(CHANGE_EVENT));
+    } else if (flag) {
+      window.history.back();
+    }
+  }, []);
+
+  // Arriving at /#posts: turn the hash into the history flag (and drop it
+  // from the URL), so the overlay opens on mobile. On desktop the flag is
+  // ignored and the projects column is on the page anyway.
+  useEffect(() => {
+    if (window.location.hash !== POSTS_HASH) return;
+    savedScroll = 0;
+    const url = window.location.pathname + window.location.search;
+    window.history.replaceState({ ...window.history.state, [HISTORY_KEY]: LINKED }, "", url);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }, []);
 
   useEffect(() => {
