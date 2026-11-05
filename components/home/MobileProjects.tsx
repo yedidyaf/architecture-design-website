@@ -1,13 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import ProjectCover from "./ProjectCover";
 import type { HomeProject } from "./types";
 
-// Marks the history entry pushed while the overlay is open, so the phone's
-// back button / gesture closes the overlay instead of leaving the page.
+// Marks the history entry pushed while the overlay is open. The overlay's
+// open state is read from the current history entry, so:
+//   - back while it's open pops that entry and closes it (instead of leaving
+//     the page);
+//   - back from a project opened from it lands on that entry again, and the
+//     homepage (remounted by the router) comes back with the overlay open;
+//   - a further back closes it.
 const HISTORY_KEY = "postsOverlay";
+// Fired after our own pushState, which (unlike back / forward) doesn't
+// emit popstate.
+const CHANGE_EVENT = "postsoverlaychange";
+// Below this width the overlay exists; on desktop the flag is ignored so a
+// flagged entry can never scroll-lock the desktop page.
+const MOBILE_QUERY = "(max-width: 899.98px)";
+
+function subscribe(onChange: () => void) {
+  const mq = window.matchMedia(MOBILE_QUERY);
+  window.addEventListener("popstate", onChange);
+  window.addEventListener(CHANGE_EVENT, onChange);
+  mq.addEventListener("change", onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener(CHANGE_EVENT, onChange);
+    mq.removeEventListener("change", onChange);
+  };
+}
+const isOpenInHistory = () =>
+  Boolean(window.history.state?.[HISTORY_KEY]) && window.matchMedia(MOBILE_QUERY).matches;
+// Server render (and hydration): closed.
+const closedOnServer = () => false;
+
+// Where the overlay was scrolled when a project was tapped, restored when
+// back brings the overlay back. Module scope survives client navigation.
+let savedScroll = 0;
 
 // Sits above the global "under construction" notice (z-100) so the back
 // arrow is the only thing at the top.
@@ -15,26 +46,22 @@ const HISTORY_KEY = "postsOverlay";
 // Mobile-only: a full-width "לפוסטים" button that opens a full-screen grid of
 // the projects (2 across). The only chrome is a back arrow at the top.
 export default function MobileProjects({ projects }: { projects: HomeProject[] }) {
-  const [open, setOpen] = useState(false);
+  const open = useSyncExternalStore(subscribe, isOpenInHistory, closedOnServer);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const backRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const openOverlay = () => {
+    savedScroll = 0;
+    // Keep the router's own keys in the entry; only add ours.
     window.history.pushState({ ...window.history.state, [HISTORY_KEY]: true }, "");
-    setOpen(true);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   };
 
-  // Closing goes through history so the entry pushed on open is consumed;
-  // the popstate handler below then hides the overlay.
+  // Closing goes back through history, consuming the entry pushed on open;
+  // popstate then re-reads the (now unflagged) entry.
   const close = useCallback(() => {
     if (window.history.state?.[HISTORY_KEY]) window.history.back();
-    else setOpen(false);
-  }, []);
-
-  useEffect(() => {
-    const onPop = () => setOpen(Boolean(window.history.state?.[HISTORY_KEY]));
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   useEffect(() => {
@@ -42,18 +69,13 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
     const trigger = triggerRef.current;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    backRef.current?.focus();
+    if (dialogRef.current) dialogRef.current.scrollTop = savedScroll;
+    backRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     document.addEventListener("keydown", onKey);
-    // Widening to the desktop layout hides this component (and the overlay
-    // with it), so close it rather than leave the page scroll-locked.
-    const desktop = window.matchMedia("(min-width: 900px)");
-    const onDesktop = () => desktop.matches && close();
-    desktop.addEventListener("change", onDesktop);
     return () => {
-      desktop.removeEventListener("change", onDesktop);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
       trigger?.focus({ preventScroll: true });
@@ -79,6 +101,7 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
           aria-label="פוסטים"
           dir="rtl"
           lang="he"
+          ref={dialogRef}
           className="animate-about-fade-in fixed inset-0 z-[110] overflow-y-auto overscroll-contain bg-background"
         >
           <div className="sticky top-0 z-10 flex h-14 items-center bg-background/90 px-2 backdrop-blur-sm">
@@ -99,7 +122,14 @@ export default function MobileProjects({ projects }: { projects: HomeProject[] }
           {projects.length > 0 ? (
             <div className="grid grid-cols-2 gap-x-3 gap-y-6 px-3 pb-12 pt-2">
               {projects.map((p) => (
-                <Link key={p._id} href={`/projects/${p.slug}`} className="group block">
+                <Link
+                  key={p._id}
+                  href={`/projects/${p.slug}`}
+                  onClick={() => {
+                    savedScroll = dialogRef.current?.scrollTop ?? 0;
+                  }}
+                  className="group block"
+                >
                   <ProjectCover src={p.coverSrc} fit={p.coverFit} position={p.coverPosition} alt={p.title} sizes="50vw" />
                   <p className="mt-2 text-center text-sm font-medium text-brand-ink">{p.title}</p>
                 </Link>
