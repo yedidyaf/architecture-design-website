@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="חדר בריחה של מירי פרידלנד · תכנון ועיצוב פנים">
 <meta property="og:title" content="הדירה של משפחת קלרוסנבסקי · פרק 1">
-<meta property="og:description" content="מצא את 8 הבאגים התכנוניים בסלון של אבא קלרוסנבסקי. חדר בריחה של מירי פרידלנד.">
+<meta property="og:description" content="מצא את 8 הבאגים התכנוניים בסלון של יורם ״המהנדס״. חדר בריחה של מירי פרידלנד.">
 <title>הדירה של משפחת קלרוסנבסקי · פרק 1</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,10 +34,13 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .hud{position:fixed;top:0;left:0;right:0;direction:rtl;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none;
   padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
 .title{padding:8px 12px;pointer-events:auto;min-width:0}
-.title b{display:block;font-weight:800;font-size:.95rem;line-height:1.15}
+.title b{display:block;font-weight:800;font-size:.95rem;line-height:1.15;white-space:nowrap}
+.title small{white-space:nowrap}
 .title small{font-size:.76rem;color:var(--muted)}
 .title small i{font-style:normal;color:var(--accent);font-weight:800}
 .right{display:flex;gap:6px;align-items:center;pointer-events:auto}
+.icon{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px}
+.icon svg{width:20px;height:20px}
 .pill{padding:7px 11px;font-weight:800;font-variant-numeric:tabular-nums;font-size:.92rem}
 .btn{font:inherit;font-weight:600;border:1.5px solid var(--accent);background:var(--paper);color:var(--accent);border-radius:99px;padding:7px 15px;cursor:pointer}
 .btn.primary{background:var(--accent);color:#fff}
@@ -63,25 +66,26 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
 .chip{font:inherit;font-size:.88rem;font-weight:600;border:0;background:var(--glass);color:var(--ink);padding:8px 14px;border-radius:99px;cursor:pointer;box-shadow:0 4px 14px rgba(40,20,20,.15)}
 .chip.on{background:var(--ink);color:#fff}
-.toast{position:fixed;left:50%;bottom:calc(132px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);direction:rtl;max-width:min(440px,calc(100% - 32px));padding:10px 16px;font-size:.95rem;text-align:center;pointer-events:none;transition:opacity .3s;line-height:1.45}
+.toast{position:fixed;left:50%;bottom:calc(132px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);direction:rtl;max-width:min(460px,calc(100% - 28px));padding:12px 18px;font-size:1.12rem;text-align:center;pointer-events:none;transition:opacity .3s;line-height:1.45}
 .toast b{color:var(--accent)}
 .tip{position:fixed;pointer-events:none;transform:translate(-50%,-150%);direction:rtl;font-size:.82rem;font-weight:600;padding:4px 10px;white-space:nowrap}
 .wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(30,20,18,.38);direction:rtl;z-index:20;
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .modal{width:min(440px,100%);max-height:88vh;overflow:auto;background:var(--paper);border-radius:16px;padding:20px 20px 18px;box-shadow:0 24px 60px rgba(30,15,15,.35);animation:rise .3s ease}
 @keyframes rise{from{transform:translateY(16px);opacity:0}}
-.tag{font-size:.75rem;font-weight:800;letter-spacing:.04em;color:var(--accent)}
-.modal h2{margin:4px 0 8px;font-size:1.4rem;font-weight:800;line-height:1.15;text-wrap:balance}
+.tag{font-size:.85rem;font-weight:800;letter-spacing:.04em;color:var(--accent)}
+.modal{font-size:1.08rem}
+.modal h2{margin:4px 0 8px;font-size:1.65rem;font-weight:800;line-height:1.15;text-wrap:balance}
 .modal p{margin:0 0 10px;line-height:1.6}
 .joke{font-style:italic;color:var(--ink);border-inline-start:3px solid var(--accent-soft);padding-inline-start:10px}
 .fix{background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin:12px 0}
-.fix .h{font-family:var(--hand);font-size:1.65rem;color:var(--accent);line-height:1}
-.fix p{margin:4px 0 0;font-size:.95rem}
+.fix .h{font-family:var(--hand);font-size:1.9rem;color:var(--accent);line-height:1}
+.fix p{margin:4px 0 0;font-size:1.05rem}
 .reward{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1.5px dashed var(--accent);border-radius:10px;padding:10px 14px}
-.reward span{font-size:.88rem;color:var(--muted)}
+.reward span{font-size:.98rem;color:var(--muted)}
 .reward b{font-size:1.5rem;font-weight:800;color:var(--accent)}
 .reward.tool b{font-size:1rem}
-.costline{font-size:.85rem;color:var(--muted);margin-top:8px}
+.costline{font-size:.95rem;color:var(--muted);margin-top:8px}
 .costline b{color:var(--accent)}
 .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .piece{background:#F6F1E8;border-radius:4px;padding:14px 16px;transform:rotate(-1.2deg);box-shadow:0 3px 0 rgba(0,0,0,.08);margin:10px 0;clip-path:polygon(0 0,100% 2%,98% 100%,3% 96%)}
@@ -139,8 +143,9 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
 <div id="scene"></div>
 
 <header class="hud">
-  <div class="card title"><b>משפחת קלרוסנבסקי · פרק 1</b><small>באגים שנמצאו: <i id="cnt">0</i> מתוך 8</small></div>
+  <div class="card title"><b>משפחת קלרוסנבסקי</b><small>פרק 1 · באגים: <i id="cnt">0</i> מתוך 8</small></div>
   <div class="right">
+    <button class="btn icon" id="muteBtn" type="button" aria-label="השתקה" aria-pressed="false"></button>
     <button class="btn" id="hintBtn" type="button">רמז</button>
     <span class="card pill" id="timer">00:00</span>
   </div>
@@ -158,7 +163,7 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
   <nav class="chips" id="chips">
     <button type="button" class="chip on" data-go="salon">סלון</button>
     <button type="button" class="chip" data-go="kitchen">מטבח</button>
-    <button type="button" class="chip" data-go="study">פינת לימוד</button>
+    <button type="button" class="chip" data-go="study">פינת עבודה</button>
   </nav>
 </div>
 
@@ -171,13 +176,13 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
     <div class="brand"><b>מירי פרידלנד</b> · תכנון ועיצוב פנים</div>
     <h1>הדירה של משפחת <em>קלרוסנבסקי</em></h1>
     <p class="sub">פרק 1: בוקר בסלון</p>
-    <p>אבא קלרוסנבסקי תכנן את הדירה לבד. בלי אדריכלית, לפי השיטה שלו:</p>
+    <p>יורם קלרוסנבסקי, ״המהנדס״ (קורס של 40 דקות ביוטיוב), תכנן את הדירה לבד. בלי אדריכלית, לפי השיטה שלו:</p>
     <div class="method"><span>ח</span><span>ס</span><span>כ</span><span>ו</span><span>ן</span></div>
     <p>״תרגיש בבית! רק אל תיכנס למסדרון. נעלתי אותו עד שהשיפוץ שם ייגמר.״</p>
     <div class="rules">
       <b>8</b><span>באגים תכנוניים מסתתרים בסלון ובמטבח. מצא אותם.</span>
       <b>אותיות</b><span>רוב הבאגים נותנים אות. בסוף מסדרים אותן למילה שפותחת את המסדרון.</span>
-      <b>איך</b><span>גרור כדי להסתכל מסביב. לחץ על חפצים כדי לבדוק אותם.</span>
+      <b>איך</b><span>גרור כדי להסתכל מסביב. לחץ על חפצים כדי לבדוק אותם. כדאי להפעיל צליל.</span>
       <b>רמז</b><span>אפשר לבקש רמז בכל רגע. כל רמז מוסיף 30 שניות לזמן.</span>
     </div>
     <div class="actions"><button class="btn primary" id="startBtn" type="button">להיכנס לדירה</button></div>
@@ -189,7 +194,7 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
 <script src="three.min.js"></script>
 <script>
 (function(){
-const WORD='דיאלוג';
+const WORD='מלפפון';
 const PHONE_INTL='972546563464', PHONE='054-656-3464';
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $=id=>document.getElementById(id);
@@ -271,10 +276,12 @@ const g=makeRoom(W,D,H,new THREE.MeshStandardMaterial({map:plaster('#EFE7DD'),ro
 const targets=[];
 function target(obj,id,name,onClick){const t={obj,id,name,onClick};targets.push(t);obj.traverse(o=>{if(o.isMesh)o.userData.t=t;});return t;}
 
-/* ---- study corner: chair + shtender facing the south window ---- */
+/* ---- work corner: chair + desk with laptop facing the south window ---- */
 const study=grp(g,1.5,0,1.85);chair(study,0,0,0,0x6B4A33);
-const sh=grp(study,0,0,.55);box(.05,.95,.05,M.walnut,0,.475,0,sh);box(.36,.04,.3,M.walnut,0,.02,0,sh);const top=grp(sh,0,1.0,0);top.rotation.x=-.55;box(.5,.03,.38,M.walnut,0,0,0,top);
-const bookL=box(.22,.03,.3,mat(0xF4EDE0,.8),-.11,.03,0,top);bookL.rotation.z=.06;const bookR=box(.22,.03,.3,mat(0xF4EDE0,.8),.11,.03,0,top);bookR.rotation.z=-.06;box(.46,.012,.32,mat(0x5B2A20,.6),0,.012,0,top);
+const sh=grp(study,0,0,.55);box(1.1,.04,.55,M.oak,0,.74,.05,sh);[[-.5,-.18],[.5,-.18],[-.5,.28],[.5,.28]].forEach(([x,z])=>box(.04,.72,.04,M.oak,x,.36,z,sh));
+box(.36,.015,.25,mat(0x9AA0A6,.3),0,.77,-.02,sh);const scr=grp(sh,0,.775,.1);scr.rotation.x=-.25;box(.36,.24,.012,mat(0x9AA0A6,.3),0,.12,0,scr);
+const scrM=new THREE.MeshStandardMaterial({color:0x1A2230,roughness:.15,metalness:.2,emissive:0xffffff,emissiveIntensity:0});const scrF=new THREE.Mesh(new THREE.PlaneGeometry(.33,.21),scrM);scrF.position.set(0,.12,-.008);scrF.rotation.y=Math.PI;scr.add(scrF);
+cyl(.04,.035,.09,mat(0xF4EEE6,.5),.42,.81,-.05,sh);box(.2,.02,.28,mat(0xF4F1EA,.8),-.38,.77,0,sh);
 const glare=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.8),new THREE.MeshBasicMaterial({map:tex(128,128,(gg,w,h)=>{const r=gg.createRadialGradient(w/2,h/2,8,w/2,h/2,w/2);r.addColorStop(0,'rgba(255,248,225,1)');r.addColorStop(1,'rgba(255,248,225,0)');gg.fillStyle=r;gg.fillRect(0,0,w,h);}),transparent:true,opacity:.35,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending}));
 glare.position.set(0,1.3,.75);glare.rotation.y=Math.PI;study.add(glare);glare.raycast=()=>{};
 
@@ -300,12 +307,13 @@ const shelf=grp(g,4.32,0,-.3,-Math.PI/2);[0,.5,1.0,1.5,1.95].forEach(y=>box(1.2,
 const painting=art(g,2.9,1.65,-2.79,1.1,.72,0,(gg,w,h)=>{gg.fillStyle='#EFE6D8';gg.fillRect(0,0,w,h);gg.fillStyle='#D2A64A';gg.beginPath();gg.arc(w*.35,h*.55,w*.2,0,7);gg.fill();gg.fillStyle='#9F2B35';gg.fillRect(w*.5,h*.25,w*.28,h*.5);gg.fillStyle='#5F7A4C';gg.beginPath();gg.ellipse(w*.62,h*.82,w*.3,h*.1,0,0,7);gg.fill();});
 const plant1=plant(g,-1.35,2.35,1.15);
 
+const cert=art(g,4.48,1.95,.62,.36,.27,-Math.PI/2,(gg,w,h)=>{gg.fillStyle='#FBF6E6';gg.fillRect(0,0,w,h);gg.strokeStyle='#C2A05A';gg.lineWidth=6;gg.strokeRect(8,8,w-16,h-16);gg.fillStyle='#4A2C30';gg.textAlign='center';gg.direction='rtl';gg.font='bold 30px Assistant,sans-serif';gg.fillText('תעודת מהנדס',w/2,h*.36);gg.font='20px Assistant,sans-serif';gg.fillText('יורם קלרוסנבסקי',w/2,h*.58);gg.fillStyle='#9F2B35';gg.font='16px Assistant,sans-serif';gg.fillText('יוטיוב · 40 דקות',w/2,h*.78);});
 const binG=grp(g,4.05,0,2.35);cyl(.17,.15,.5,mat(0x3E6FA8,.6),0,.25,0,binG,16);const brochure=box(.2,.02,.28,mat(0x6E4F45,.6),0,.51,0,binG);brochure.rotation.set(.3,.4,.2);
 const bp=box(.18,.02,.22,mat(0xF2EEE6,.8),.04,.53,.03,binG);bp.rotation.set(-.2,-.3,.1);
 
 const doorC=grp(g,4.5,0,-1.6);const leaf=grp(doorC,-.03,0,.44);box(.05,2.08,.88,mat(0xF4F1EC,.5),0,1.04,-.44,leaf);const lockBox=box(.06,.22,.14,mat(0x3A3A3A,.4),-.05,1.15,-.78,leaf);
 const lockScr=box(.005,.05,.1,new THREE.MeshBasicMaterial({color:0xFF5A5A}),-.081,1.21,-.78,leaf,false);
-const sign=art(leaf,-.04,1.6,-.44,.5,.3,-Math.PI/2,(gg,w,h)=>{gg.fillStyle='#FFF7D6';gg.fillRect(0,0,w,h);gg.fillStyle='#9F2B35';gg.font='bold 34px Assistant,sans-serif';gg.textAlign='center';gg.direction='rtl';gg.fillText('לא להיכנס!',w/2,h*.45);gg.fillStyle='#4A2C30';gg.font='22px Assistant,sans-serif';gg.fillText('בשיפוץ. אבא',w/2,h*.78);});
+const sign=art(leaf,-.04,1.6,-.44,.5,.3,-Math.PI/2,(gg,w,h)=>{gg.fillStyle='#FFF7D6';gg.fillRect(0,0,w,h);gg.fillStyle='#9F2B35';gg.font='bold 34px Assistant,sans-serif';gg.textAlign='center';gg.direction='rtl';gg.fillText('לא להיכנס!',w/2,h*.45);gg.fillStyle='#4A2C30';gg.font='22px Assistant,sans-serif';gg.fillText('בשיפוץ. יורם',w/2,h*.78);});
 const doorE=grp(g,4.5,0,1.4);box(.05,2.08,.93,mat(0xD9CFC4,.5),-.03,1.04,0,doorE);cyl(.012,.012,.12,M.brass,-.08,1.0,-.36,doorE).rotation.z=Math.PI/2;
 const slideB=grp(g,-2.6,0,2.78);box(.88,2.3,.04,M.glass,.43,1.16,-.06,slideB,false);box(.04,2.3,.06,M.frame,0,1.16,-.06,slideB);
 
@@ -332,8 +340,8 @@ const pot=cyl(.13,.11,.15,M.steel,.12,.99,.1,cook);
 const tall=grp(kit,-.7,0,-2.5);box(.6,2.2,.6,M.cab,0,1.1,0,tall);box(.015,2.1,.01,M.cabLine,0,1.1,.305,tall,false);box(.02,.25,.02,M.brass,.25,1.1,.31,tall,false);
 for(let i=0;i<5;i++)box(.01,.7,.01,M.cabLine,-3.9+i*.6,.45,-2.19,kit,false);
 const bs=new THREE.Mesh(new THREE.PlaneGeometry(3.5,1.15),new THREE.MeshStandardMaterial({map:tiles,roughness:.3}));bs.position.set(-2.75,1.48,-2.79);kit.add(bs);
-const up=grp(kit,0,0,0);box(3.5,.62,.35,M.cab,-2.75,2.34,-2.62,up);for(let i=0;i<6;i++){box(.16,.015,.02,M.brass,-4.2+i*.6,2.08,-2.44,up,false);box(.01,.58,.01,M.cabLine,-4.5+i*.6,2.34,-2.44,up,false);}
-const upDoor=grp(up,-1.6,0,-2.44);box(.58,.6,.02,M.cab,-.29,2.34,.01,upDoor);
+const up=grp(kit,0,0,0);box(3.5,.62,.35,M.cab,-2.75,2.11,-2.62,up);for(let i=0;i<6;i++){box(.16,.015,.02,M.brass,-4.2+i*.6,1.85,-2.44,up,false);box(.01,.58,.01,M.cabLine,-4.5+i*.6,2.11,-2.44,up,false);}
+const upDoor=grp(up,-1.6,0,-2.44);box(.58,.6,.02,M.cab,-.29,2.11,.01,upDoor);
 const lad=grp(kit,-2.1,0,-1.85,-.4);const lm=mat(0xC9CCD0,.35);[-.2,.2].forEach(x=>{const l=box(.03,1.25,.04,lm,x,.6,0,lad);l.rotation.x=.18;});for(let i=0;i<3;i++)box(.44,.03,.16,lm,0,.32+i*.32,.02-i*.06,lad);
 const eyes=tex(128,64,(gg,w,h)=>{gg.fillStyle='#fff';gg.beginPath();gg.arc(40,32,16,0,7);gg.arc(88,32,16,0,7);gg.fill();gg.fillStyle='#222';gg.beginPath();gg.arc(44,34,7,0,7);gg.arc(92,34,7,0,7);gg.fill();});
 const face=new THREE.Mesh(new THREE.PlaneGeometry(.26,.13),new THREE.MeshBasicMaterial({map:eyes,transparent:true}));face.position.set(0,1.02,.06);face.rotation.x=-.2;lad.add(face);
@@ -347,62 +355,100 @@ box(.6,2.2,.6,M.cab,-4.2,1.1,-.2,kit);box(.02,.25,.02,M.brass,-3.88,1.1,-.3,kit,
 
 /* ---- target wiring ---- */
 const BUGS={
-  shtender:{n:1,room:'פינת הלימוד',title:'הסטנדר מול השמש',letters:['ד'],cost:0,
-    text:'מקום הלימוד צמוד לחלון הדרומי. בצהריים השמש נכנסת ישר לדף ולעיניים, ואחרי חצי שעה כואב הראש.',
-    joke:'אבא: ״זה המקום הכי מואר בבית! מושלם ללימוד.״ הגמרא: ״אני לא רואה כלום.״',
-    fix:'מקום לימוד מקבל אור מהצד, לא מקדימה. הסטנדר עובר לקיר שניצב לחלון.',h:['איפה הכי קשה ללמוד בשתיים בצהריים?','לחץ על הסטנדר שליד החלון, בפינת הלימוד.']},
-  rug:{n:2,room:'הסלון',title:'השטיח הצף',letters:['י'],cost:1800,
+  shtender:{n:1,room:'פינת העבודה',title:'שולחן העבודה מול השמש',letters:['מ'],cost:0,
+    text:'שולחן העבודה צמוד לחלון הדרומי. בצהריים השמש מסנוורת מאחורי המסך, ואי אפשר לראות כלום.',
+    joke:'יורם: ״זה המקום הכי מואר בבית! מושלם לעבודה.״ המחשב: ״אני לא רואה כלום.״',
+    fix:'מקום עבודה מקבל אור מהצד, לא מקדימה. השולחן עובר לקיר שניצב לחלון.',h:['איפה הכי קשה לעבוד מול מסך בשתיים בצהריים?','לחץ על המחשב שעל השולחן ליד החלון, בפינת העבודה.']},
+  rug:{n:2,room:'הסלון',title:'השטיח הצף',letters:['ל'],cost:1800,
     text:'שטיח קטנטן צף באמצע הסלון, רחוק מהספה. במקום לחבר את פינת הישיבה, הוא מקטין את כל החדר.',
-    joke:'אבא: ״השטיח היה במבצע. גם הגודל היה במבצע.״',fix:'שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו. כמעט תמיד, גדול יותר זה טוב יותר.',h:['משהו בסלון קטן מדי בשביל המקום שלו.','מה אמור לחבר בין הספה לשאר הסלון?']},
-  socket:{n:3,room:'הסלון',title:'השקע מאחורי הספה',letters:['א'],cost:1100,
+    joke:'יורם: ״השטיח היה במבצע. גם הגודל היה במבצע.״',fix:'שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו. כמעט תמיד, גדול יותר זה טוב יותר.',h:['משהו בסלון קטן מדי בשביל המקום שלו.','מה אמור לחבר בין הספה לשאר הסלון?']},
+  socket:{n:3,room:'הסלון',title:'השקע מאחורי הספה',letters:['פ'],cost:1100,
     text:'השקע היחיד בפינת הישיבה מסתתר מאחורי הספה. המנורה העומדת מחוברת בכבל שחוצה את כל המעבר.',
-    joke:'הכבל הזה הפיל כבר שלושה אורחים ומגש של חמין.',fix:'שקעים מתכננים לפי מיקום הרהיטים: ליד הספה, ליד המנורות, ליד השולחן.',h:['מאיפה המנורה העומדת מקבלת חשמל?','לחץ על הכבל הלבן שעל הרצפה.']},
-  cabinets:{n:4,room:'המטבח',title:'ארונות למטפסים',letters:[],cost:6500,key:'piece',
-    text:'הארונות העליונים הותקנו בגובה של יותר משני מטרים. בלי סולם אי אפשר להוציא אפילו כוס.',
-    joke:'זלמן הסולם: ״שלום, אני זלמן. אני גר פה מאז שהתקינו את הארונות.״',fix:'בין השיש לארון העליון משאירים בערך 60 ס״מ. מה שמשתמשים בו כל יום צריך להיות בהישג יד.',h:['למה יש סולם באמצע המטבח?','לחץ על הארונות העליונים.']},
-  fridge:{n:5,room:'המטבח',title:'המקרר שלא נפתח עד הסוף',letters:['ל'],cost:350,
+    joke:'הכבל הזה הפיל כבר שלושה אורחים ומגש של עוגיות.',fix:'נפזר שקעים לפי גודל החדר.',h:['מאיפה המנורה העומדת מקבלת חשמל?','לחץ על הכבל הלבן שעל הרצפה.']},
+  cabinets:{n:4,room:'המטבח',title:'ארונות למטפסים',letters:[],cost:6500,key:'note',
+    text:'הארונות העליונים הותקנו כמעט מטר מעל השיש. בלי סולם אי אפשר להוציא אפילו כוס.',
+    joke:'סולי הסולם: ״שלום, אני סולי. אני גר פה מאז שהתקינו את הארונות.״',fix:'בין השיש לארון העליון משאירים 50–55 ס״מ. מה שמשתמשים בו כל יום צריך להיות בהישג יד.',h:['למה יש סולם באמצע המטבח?','לחץ על הארונות העליונים.']},
+  fridge:{n:5,room:'המטבח',title:'המקרר שלא נפתח עד הסוף',letters:['פ'],cost:350,
     text:'המקרר צמוד לארון הגבוה בצד הצירים. הדלת נעצרת ב-90 מעלות, ומגירת הירקות לא יכולה לצאת.',
-    joke:'המלפפונים במגירה התחתונה לא ראו אור יום מאז חנוכה.',fix:'ליד צד הצירים של המקרר משאירים מרווח, או מחליפים את כיוון הפתיחה של הדלת.',h:['נסה להוציא ירקות מהמקרר.','פתח את המקרר ולחץ על מגירת הירקות.']},
+    joke:'המלפפונים במגירה התחתונה לא ראו אור יום כבר חודשיים.',fix:'ליד צד הצירים של המקרר משאירים מרווח, או מחליפים את כיוון הפתיחה של הדלת.',h:['נסה להוציא ירקות מהמקרר.','פתח את המקרר ולחץ על מגירת הירקות.']},
   cooktop:{n:6,room:'המטבח',title:'כיריים בפינה',letters:['ו'],cost:9500,needs:'tape',
     text:'הכיריים דחוקות ליד הארון הגבוה. סרט המדידה מראה 0 ס״מ משטח בצד אחד. אין איפה להניח סיר רותח.',
-    joke:'אבא: ״איפה מניחים את הסיר? על זלמן.״ זלמן: ״אני לא חתמתי על זה.״',fix:'ליד הכיריים משאירים 30 עד 40 ס״מ משטח עבודה בכל צד.',h:['איפה מניחים סיר שירד מהאש?','מדוד עם סרט המדידה ליד הכיריים. אין לך סרט? חפש במגירות.']},
+    joke:'יורם: ״איפה מניחים את הסיר? על סולי.״ סולי: ״אני לא חתמתי על זה.״',fix:'ליד הכיריים משאירים משטח עבודה בשני הצדדים.',h:['איפה מניחים סיר שירד מהאש?','מדוד עם סרט המדידה ליד הכיריים. אין לך סרט? חפש במגירות.']},
   dishwasher:{n:7,room:'המטבח',title:'המדיח והמגירה',letters:[],cost:1600,key:'tape',
     text:'המדיח מותקן בפינה. כשהדלת שלו פתוחה, המגירה שלידו נתקעת בה ואי אפשר להוציא סכו״ם.',
     joke:'המשפחה אוכלת עם כפות כבר שבוע, כי המזלגות במגירה.',fix:'מכשירים עם דלת לא מתקינים בפינה מול מגירות.',h:['נסה לפתוח את המגירה שליד המדיח.','לחץ על המגירה התחתונה בפינת המטבח, ליד המדיח הפתוח.']},
-  pendant:{n:8,room:'פינת האוכל',title:'המנורה שנשארה מאחור',letters:['ג'],cost:1200,
+  pendant:{n:8,room:'פינת האוכל',title:'המנורה שנשארה מאחור',letters:['ן'],cost:1200,
     text:'את נקודת החשמל של המנורה התקינו לפני שהחליטו איפה יעמוד השולחן. עכשיו היא תלויה מעל כלום, והשולחן בצל.',
-    joke:'המנורה מאירה בדיוק את המקום שבו החתול ישן. החתול מרוצה.',fix:'קודם מתכננים איפה יעמדו הרהיטים, ורק אחר כך את נקודות החשמל.',h:['מה אמור להיות מתחת למנורה התלויה?','הסתכל למעלה, ליד פינת האוכל.']},
+    joke:'המנורה מאירה בדיוק את המקום שבו החתול ישן. החתול מרוצה.',fix:'את התאורה נמקם בהתאם לריהוט.',h:['מה אמור להיות מתחת למנורה התלויה?','הסתכל למעלה, ליד פינת האוכל.']},
 };
 const ORDER=['shtender','rug','pendant','cabinets','dishwasher','fridge','cooktop','socket'];
 
 const S={found:new Set(),letters:[],tape:false,piece:false,cost:0,hints:0,hintStep:{},start:0,end:0,tries:0,lockHints:0};
 const anims=[];function anim(dur,fn,done){anims.push({t:0,dur,fn,done});}
 
-target(study,'d-chair','כיסא',()=>toast('כיסא נוח. השאלה מה רואים כשיושבים עליו.'));
-target(sh,'shtender','סטנדר',()=>{anim(1.4,t=>{glare.material.opacity=.35+Math.sin(t*Math.PI)*.65;});bug('shtender',900);});
+target(study,'d-chair','כיסא',()=>say('כיסא נוח. השאלה מה רואים כשיושבים עליו.'));
+target(sh,'shtender','שולחן עבודה ומחשב',()=>{anim(1.4,t=>{glare.material.opacity=.35+Math.sin(t*Math.PI)*.65;scrM.emissiveIntensity=Math.sin(t*Math.PI)*1.3;});bug('shtender',900);});
 target(rug,'rug','שטיח',()=>{anim(1.4,t=>rugM.emissive.setRGB(.35*Math.sin(t*Math.PI*3)**2,0,0));bug('rug',900);});
-target(ct,'d-ctable','שולחן קפה',()=>toast('שולחן קפה קטן וחמוד. תסתכל על מה הוא עומד.'));
-target(fl,'d-lamp','מנורה עומדת',()=>toast('מנורה עומדת יפה. מעניין מאיפה היא מקבלת חשמל...'));
+target(ct,'d-ctable','שולחן קפה',()=>say('שולחן קפה קטן וחמוד. תסתכל על מה הוא עומד.'));
+target(fl,'d-lamp','מנורה עומדת',()=>say('מנורה עומדת יפה. מעניין מאיפה היא מקבלת חשמל...'));
 target(socketGrp,'socket','כבל חשמל',()=>{anim(1.4,t=>cordM.emissive.setRGB(.6*Math.sin(t*Math.PI*3)**2,0,0));bug('socket',900);});
 target(up,'cabinets','ארונות עליונים',()=>{anim(1.2,t=>{lad.position.y=Math.abs(Math.sin(t*Math.PI*3))*.06;upDoor.rotation.y=-Math.min(1,t*2)*1.2;});bug('cabinets',900);});
-target(lad,'d-zalman','זלמן הסולם',()=>{anim(.8,t=>{lad.position.y=Math.abs(Math.sin(t*Math.PI*3))*.05;});toast('זלמן הסולם: <b>״שלום, אני זלמן. אני גר במטבח הזה.</b> רוצה לדעת למה? תסתכל למעלה.״');});
+target(lad,'d-soli','סולי הסולם',()=>{anim(.8,t=>{lad.position.y=Math.abs(Math.sin(t*Math.PI*3))*.05;});say('סולי הסולם: <b>״שלום, אני סולי. אני גר במטבח הזה.</b> רוצה לדעת למה? תסתכל למעלה.״');});
 let fridgeOpen=false;
-target(fridge,'d-fridge','מקרר',()=>{const open=!fridgeOpen;fridgeOpen=open;const a0=fDoor.rotation.y;anim(.6,t=>{fDoor.rotation.y=a0+((open?-Math.PI/2:0)-a0)*t;});if(open)toast('המקרר: <b>״צריך משהו?״</b>');});
-target(vegD,'fridge','מגירת ירקות',()=>{if(!fridgeOpen)return;if(S.found.has('fridge')){toast('המגירה עדיין נתקעת. המלפפונים מוסרים ד״ש.');return;}anim(1.4,t=>{vegD.position.x=Math.min(.12,t*.5)+(t>.3?Math.sin(t*60)*.01:0);},()=>{vegD.position.x=0;});bug('fridge',1300);});
-const dwClick=()=>{if(S.found.has('dishwasher')){toast('המדיח סגור, המגירה פתוחה. סוף סוף מזלגות.');return;}anim(1.2,t=>{drawer.position.x=-3.89+Math.min(.1,t*.4)+(t>.3?Math.sin(t*50)*.008:0);});bug('dishwasher',1000);};
-target(dw,'d-dw','מדיח',()=>toast(S.found.has('dishwasher')?'המדיח סגור. סוף סוף אפשר להגיע למגירה.':'המדיח פתוח. אבא באמצע להעמיס, כבר שבוע.'));target(drawer,'dishwasher','מגירה',dwClick);
-target(cook,'cooktop','כיריים',()=>{if(!S.tape&&!S.found.has('cooktop')){toast('הכיריים נראות דחוקות ליד הארון הגבוה. <b>צריך למדוד.</b> איפה יש פה סרט מדידה?');return;}anim(1.4,t=>{pot.position.y=.99+Math.abs(Math.sin(t*Math.PI*4))*.03;});bug('cooktop',700);});
+target(fridge,'d-fridge','מקרר',()=>{const open=!fridgeOpen;fridgeOpen=open;const a0=fDoor.rotation.y;anim(.6,t=>{fDoor.rotation.y=a0+((open?-Math.PI/2:0)-a0)*t;});if(open)say('המקרר: <b>״צריך משהו?״</b>');});
+target(vegD,'fridge','מגירת ירקות',()=>{if(!fridgeOpen)return;if(S.found.has('fridge')){say('המגירה עדיין נתקעת. המלפפונים מוסרים ד״ש.');return;}anim(1.4,t=>{vegD.position.x=Math.min(.12,t*.5)+(t>.3?Math.sin(t*60)*.01:0);},()=>{vegD.position.x=0;});bug('fridge',1300);});
+const dwClick=()=>{if(S.found.has('dishwasher')){say('המדיח סגור, המגירה פתוחה. סוף סוף מזלגות.');return;}anim(1.2,t=>{drawer.position.x=-3.89+Math.min(.1,t*.4)+(t>.3?Math.sin(t*50)*.008:0);});bug('dishwasher',1000);};
+target(dw,'d-dw','מדיח',()=>say(S.found.has('dishwasher')?'המדיח סגור. סוף סוף אפשר להגיע למגירה.':'המדיח פתוח. יורם באמצע להעמיס, כבר שבוע.'));target(drawer,'dishwasher','מגירה',dwClick);
+target(cook,'cooktop','כיריים',()=>{if(!S.tape&&!S.found.has('cooktop')){say('הכיריים נראות דחוקות ליד הארון הגבוה. <b>צריך למדוד.</b> איפה יש פה סרט מדידה?');return;}anim(1.4,t=>{pot.position.y=.99+Math.abs(Math.sin(t*Math.PI*4))*.03;});bug('cooktop',700);});
 target(pend,'pendant','מנורה תלויה',()=>{anim(2.2,t=>{pend.rotation.z=Math.sin(t*Math.PI*4)*.12*(1-t);});bug('pendant',900);});
-target(sofa,'d-sofa','ספה',()=>toast('ספה נוחה. אבל משהו מאחוריה מחובר לכל הסלון.'));
-target(dt,'d-table','שולחן אוכל',()=>toast('שולחן יפה מעץ אלון. אבל כדאי להסתכל קצת למעלה.'));
-target(shelf,'d-shelf','ספרייה',()=>toast('ספרייה מושלמת. אבא הרכיב אותה לבד, ונשארו רק ארבעה ברגים.'));
-target(plant1,'d-plant','עציץ',()=>toast('הפיקוס במקום הנכון: ליד הזכוכית, באור מלא. הוא היחיד פה שמרוצה.'));
-target(painting,'d-art','תמונה',()=>toast('תמונה בגובה הנכון, מעל הספה. אין פה באג, יש פה טעם טוב.'));
-target(tall,'d-tall','ארון גבוה',()=>toast('ארון אחסון גבוה. הוא בסדר. השכנים שלו פחות.'));
-target(slideB,'d-balcony','דלת המרפסת',()=>toast('המרפסת נעולה. אבא: ״לשם נגיע בסוף. אם בכלל.״'));
-target(doorE,'d-entry','דלת הכניסה',()=>toast('דלת הכניסה. אבא: ״אף אחד לא יוצא מפה בלי לראות את המסדרון שלי!״'));
-target(binG,'bin','פח מחזור',()=>{openModal(`<div class="tag">פח המחזור</div><h2>חוברת קרועה</h2><p>בפח שליד הכניסה זרוקה חוברת: <b>״מירי פרידלנד · תכנון ועיצוב פנים״</b>. על הכריכה אבא כתב בטוש: ״מי צריך את זה?״</p><p>חסר בה דף אחד, ״שיטת ד.י.ו.ק״. מישהו קרע אותו והחביא את החלקים בבית.</p><p class="note">אולי הדף הזה יעזור לפתוח את המסדרון.</p><div class="actions"><button class="btn primary" data-close type="button">הבנתי</button></div>`);});
+target(sofa,'d-sofa','ספה',()=>say('ספה נוחה. אבל משהו מאחוריה מחובר לכל הסלון.'));
+target(dt,'d-table','שולחן אוכל',()=>say('שולחן יפה מעץ אלון. אבל כדאי להסתכל קצת למעלה.'));
+target(shelf,'d-shelf','ספרייה',()=>say('ספרייה מושלמת. יורם הרכיב אותה לבד, ונשארו רק ארבעה ברגים.'));
+target(plant1,'d-plant','עציץ',()=>say('הפיקוס במקום הנכון: ליד הזכוכית, באור מלא. הוא היחיד פה שמרוצה.'));
+target(painting,'d-art','תמונה',()=>say('תמונה בגובה הנכון, מעל הספה. אין פה באג, יש פה טעם טוב.'));
+target(tall,'d-tall','ארון גבוה',()=>say('ארון אחסון גבוה. הוא בסדר. השכנים שלו פחות.'));
+target(slideB,'d-balcony','דלת המרפסת',()=>say('המרפסת נעולה. יורם: ״לשם נגיע בסוף. אם בכלל.״'));
+target(doorE,'d-entry','דלת הכניסה',()=>say('דלת הכניסה. יורם: ״אף אחד לא יוצא מפה בלי לראות את המסדרון שלי!״'));
+target(binG,'bin','פח מחזור',()=>say('בפח המחזור: הוראות ההרכבה של הספרייה. <b>יורם לא צריך הוראות.</b>'));
+target(cert,'d-cert','תעודה ממוסגרת',()=>say('תעודת ״מהנדס״ ממוסגרת. יורם הדפיס אותה במדפסת הביתית, אחרי קורס של 40 דקות ביוטיוב. <b>הדיו עוד לא התייבש.</b>'));
 target(doorC,'lock','דלת המסדרון (נעולה)',()=>openLock());
+
+/* ---- sound + vibration ---- */
+const SFX=(()=>{let ac=null,master,musicG,sfxG,muted=false;
+  try{muted=localStorage.getItem('klr-muted')==='1';}catch(e){}
+  const mtof=m=>440*Math.pow(2,(m-69)/12);
+  function tone(f,t0,dur,type,vol,dest,attack,glideTo){const o=ac.createOscillator(),gn=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(glideTo)o.frequency.exponentialRampToValueAtTime(glideTo,t0+dur);
+    gn.gain.setValueAtTime(0,t0);gn.gain.linearRampToValueAtTime(vol,t0+(attack||.005));gn.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(gn);gn.connect(dest||sfxG);o.start(t0);o.stop(t0+dur+.05);}
+  function brass(f,t0,dur,vol){const o=ac.createOscillator(),o2=ac.createOscillator(),fl=ac.createBiquadFilter(),gn=ac.createGain();o.type='sawtooth';o2.type='sawtooth';o.frequency.value=f;o2.frequency.value=f*1.006;
+    fl.type='lowpass';fl.frequency.setValueAtTime(600,t0);fl.frequency.linearRampToValueAtTime(2600,t0+.06);fl.frequency.linearRampToValueAtTime(1400,t0+dur);
+    gn.gain.setValueAtTime(0,t0);gn.gain.linearRampToValueAtTime(vol,t0+.03);gn.gain.setValueAtTime(vol,t0+dur*.7);gn.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+    o.connect(fl);o2.connect(fl);fl.connect(gn);gn.connect(sfxG);o.start(t0);o2.start(t0);o.stop(t0+dur+.05);o2.stop(t0+dur+.05);}
+  function hiss(t0,dur,vol,freq){const len=Math.floor(ac.sampleRate*dur),buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource();src.buffer=buf;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;const gn=ac.createGain();gn.gain.setValueAtTime(vol,t0);gn.gain.exponentialRampToValueAtTime(.0001,t0+dur);src.connect(f);f.connect(gn);gn.connect(sfxG);src.start(t0);}
+  const MEL=[72,null,76,79,76,null,72,74, 72,null,69,72,76,74,72,null, 69,null,72,77,76,null,72,69, 71,74,79,77,74,null,71,null];
+  const BASS=[48,55,45,52,41,48,43,50];const SPB=60/112/2;let step=0,nextT=0;
+  function music(){nextT=ac.currentTime+.15;setInterval(()=>{if(ac.state!=='running')return;while(nextT<ac.currentTime+.3){const i=step%32,m=MEL[i];
+    if(m)tone(mtof(m),nextT,.22,'triangle',.32,musicG,.004);if(i%4===0)tone(mtof(BASS[(step/4|0)%8]),nextT,.38,'sine',.55,musicG,.01);if(i%2===1)tone(2600,nextT,.025,'square',.025,musicG,.001);
+    step++;nextT+=SPB;}},50);}
+  return{
+    init(){if(ac){if(ac.state!=='running')ac.resume();return;}try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+      master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);musicG=ac.createGain();musicG.gain.value=.15;musicG.connect(master);sfxG=ac.createGain();sfxG.gain.value=.55;sfxG.connect(master);music();},
+    fanfare(){if(!ac)return;let t=ac.currentTime;[[67,.12],[72,.12],[76,.12],[79,.45]].forEach(([m,d])=>{brass(mtof(m),t,d,.2);t+=d*.85;});},
+    chime(){if(!ac)return;const t=ac.currentTime;tone(mtof(88),t,.5,'sine',.22);tone(mtof(95),t+.09,.6,'sine',.18);},
+    kaching(){if(!ac)return;const t=ac.currentTime;hiss(t,.08,.35,3000);tone(2637,t+.05,.5,'sine',.2);tone(3136,t+.05,.6,'sine',.16);tone(4186,t+.1,.4,'triangle',.07);},
+    pop(){if(!ac)return;tone(700,ac.currentTime,.12,'sine',.32,null,.003,200);},
+    tick(){if(!ac)return;tone(1200,ac.currentTime,.04,'square',.05);},
+    buzz(){if(!ac)return;const t=ac.currentTime;tone(110,t,.22,'square',.16);tone(98,t+.24,.32,'square',.16);},
+    win(){if(!ac)return;let t=ac.currentTime;[[60,.14],[64,.14],[67,.14],[72,.3],[67,.14],[72,.75]].forEach(([m,d])=>{brass(mtof(m),t,d,.2);brass(mtof(m+4),t,d,.09);t+=d*.9;});},
+    toggle(){muted=!muted;try{localStorage.setItem('klr-muted',muted?'1':'0');}catch(e){}if(ac)master.gain.setTargetAtTime(muted?0:1,ac.currentTime,.05);return muted;},
+    get muted(){return muted;}};
+})();
+function vib(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+function say(m){SFX.pop();vib(20);toast(m);}
+const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>';
+function renderMute(){const b=$('muteBtn');b.innerHTML=SFX.muted?ICON_OFF:ICON_ON;b.setAttribute('aria-pressed',SFX.muted);b.setAttribute('aria-label',SFX.muted?'הפעלת צליל':'השתקה');}
+$('muteBtn').addEventListener('click',()=>{SFX.init();SFX.toggle();renderMute();});renderMute();
 
 /* ---- interaction ---- */
 const VIEWS={salon:{pos:[-1.2,1.6,-.4],at:[3.4,.8,-.2]},kitchen:{pos:[.6,1.6,.5],at:[-3.2,1.15,-1.9]},study:{pos:[-.4,1.55,-.9],at:[1.6,1.0,2.6]}};
@@ -412,7 +458,7 @@ const camPos=new THREE.Vector3(),camTarget=new THREE.Vector3();
 function go(v,instant){curView=v;const V=VIEWS[v];camTarget.set(...V.pos);if(instant)camera.position.copy(camTarget);
   const at=new THREE.Vector3(...V.at);if(instant)aim(at,true);else{const tmpCam=camera.position.clone();camera.position.copy(camTarget);aim(at);camera.position.copy(tmpCam);}
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.go===v));}
-$('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b&&S.start)go(b.dataset.go);});
+$('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b&&S.start){SFX.tick();go(b.dataset.go);}});
 
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();const pickables=[];targets.forEach(t=>t.obj.traverse(o=>{if(o.isMesh)pickables.push(o);}));
 function pick(x,y){ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);const h=ray.intersectObjects(pickables,false)[0];return h&&h.distance<9?h.object.userData.t:null;}
@@ -430,13 +476,13 @@ $('wrap').addEventListener('click',e=>{if(e.target===$('wrap'))closeModal();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('wrap').hidden)closeModal();});
 
 function renderLetters(flash){$('letters').innerHTML=Array.from({length:6},(_,i)=>{const l=S.letters[i];return `<div class="lt ${l?'got':''}" style="${l&&i!==flash?'animation:none':''}">${l||''}</div>`;}).join('');}
-function renderTools(){const t=[];if(S.tape)t.push('<button type="button" class="tool" data-tool="tape">סרט מדידה</button>');if(S.piece)t.push('<button type="button" class="tool" data-tool="piece">פיסת חוברת</button>');
+function renderTools(){const t=[];if(S.tape)t.push('<button type="button" class="tool" data-tool="tape">סרט מדידה</button>');if(S.piece)t.push('<button type="button" class="tool" data-tool="piece">הפתק של יורם</button>');
   $('tools').innerHTML=t.length?t.join(''):'<span class="note">עדיין אין</span>';}
 $('tools').addEventListener('click',e=>{const b=e.target.closest('.tool');if(!b)return;if(b.dataset.tool==='piece')showPiece();else toast('סרט מדידה. לחץ על משהו שצריך למדוד, והוא יימדד אוטומטית.');});
 function addCost(n){if(!n)return;const from=S.cost;S.cost+=n;const c=$('counter');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');const t0=performance.now();
   const step=now=>{const k=Math.min(1,(now-t0)/700);$('costv').textContent=fmtN(Math.round(from+(S.cost-from)*k));if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
-function pieceHTML(){return `<div class="piece"><div class="row"><span class="d">ד</span><div><b>01 · ד</b><small>שיטת ד.י.ו.ק · מירי פרידלנד</small></div></div><p style="margin:10px 0 0">״<b>הקשבה אמיתית לחלום שלכם.</b> כל תכנון מתחיל בשיחה עמוקה על מה שחשוב לכם.״</p><p class="note" style="margin:6px 0 0">שאר הדף קרוע.</p></div>`;}
-function showPiece(){openModal(`<div class="tag">פיסת חוברת</div><h2>מתוך ״שיטת ד.י.ו.ק״</h2>${pieceHTML()}<div class="actions"><button class="btn primary" data-close type="button">סגור</button></div>`);}
+function pieceHTML(){return `<div class="piece"><p style="margin:0;font-family:var(--hand);font-size:1.9rem;line-height:1.1">שמתי את הסיסמה פה, כי לפה אף אחד לא מגיע.</p><p style="margin:10px 0 0"><b>6 אותיות.</b> ירוק, ארוך, ומחכה במגירת הירקות כבר חודשיים.</p><p class="note" style="margin:6px 0 0">יורם</p></div>`;}
+function showPiece(){SFX.chime();openModal(`<div class="tag">בארון העליון</div><h2>מצאת את הפתק של יורם</h2>${pieceHTML()}<div class="actions"><button class="btn primary" data-close type="button">סגור</button></div>`);}
 
 function bug(id,delay){
   const b=BUGS[id];const again=S.found.has(id);
@@ -444,17 +490,18 @@ function bug(id,delay){
   const rewards=[];
   if(b.letters.length)rewards.push(`<div class="reward"><span>${b.letters.length>1?'קיבלת אותיות':'קיבלת אות'}</span><b>${b.letters.join(' ')}</b></div>`);
   if(b.key==='tape')rewards.push(`<div class="reward tool"><span>סגרת את המדיח ופתחת את המגירה. בפנים:</span><b>סרט מדידה</b></div>`);
-  if(b.key==='piece')rewards.push(`<div class="reward tool"><span>טיפסת על זלמן ופתחת את הארון העליון. בפנים:</span><b>פיסת חוברת קרועה</b></div>`);
+  if(b.key==='note')rewards.push(`<div class="reward tool"><span>טיפסת על סולי ופתחת את הארון העליון. בפנים:</span><b>פתק של יורם</b></div>`);
   const html=`<div class="tag">באג ${S.found.size} מתוך 8 · ${b.room}</div><h2>${b.title}</h2><p>${b.text}</p><p class="joke">${b.joke}</p>
     <div class="fix"><div class="h">איך מירי הייתה מתכננת</div><p>${b.fix}</p></div>${rewards.join('')}
     <div class="costline">עלות התיקון: <b>${b.cost?fmtN(b.cost):'0 ₪, רק להזיז. אבל שלושה חודשים של כאבי ראש לא מחזירים.'}</b></div>
     <div class="actions"><button class="btn primary" data-close type="button">${S.found.size===8&&!again?'לדלת המסדרון':'להמשיך לחפש'}</button></div>`;
   setTimeout(()=>{
     openModal(html);
+    if(!again){SFX.fanfare();vib([60,40,90]);if(b.letters.length)setTimeout(()=>SFX.chime(),550);if(b.cost)setTimeout(()=>SFX.kaching(),900);}else SFX.pop();
     if(!again){
       renderLetters(S.letters.length-1);addCost(b.cost);
-      if(b.key==='tape'){S.tape=true;renderTools();onClose=()=>{anim(.8,t=>{dwDoor.rotation.x=Math.PI/2*(1-t);drawer.position.x=-3.89+t*.38;},()=>{tapeOnDrawer.visible=false;});toast('מצאת <b>סרט מדידה</b>. עכשיו אפשר למדוד דברים בדירה.');};}
-      if(b.key==='piece'){S.piece=true;renderTools();onClose=()=>showPiece();}
+      if(b.key==='tape'){S.tape=true;renderTools();onClose=()=>{anim(.8,t=>{dwDoor.rotation.x=Math.PI/2*(1-t);drawer.position.x=-3.89+t*.38;},()=>{tapeOnDrawer.visible=false;});SFX.chime();toast('מצאת <b>סרט מדידה</b>. עכשיו אפשר למדוד דברים בדירה.');};}
+      if(b.key==='note'){S.piece=true;renderTools();onClose=()=>showPiece();}
       if(S.found.size===8&&!b.key)onClose=()=>{toast('מצאת את כל 8 הבאגים! עכשיו לדלת המסדרון, בצד ימין של הסלון.');go('salon');};
       if(S.found.size===8&&b.key){const prev=onClose;onClose=()=>{prev&&prev();setTimeout(()=>toast('מצאת את כל 8 הבאגים! עכשיו לדלת המסדרון, בצד ימין של הסלון.'),400);};}
     }
@@ -466,31 +513,31 @@ function openLock(){
   let slots=Array(6).fill(null);const order=S.letters.map((l,i)=>({l,i})).sort(()=>Math.random()-.5);
   const missing=6-S.letters.length;
   openModal(`<div class="tag">דלת המסדרון</div><h2>מנעול של 6 אותיות</h2>
-    <p>על הדלת פתק של אבא: <b>״הקוד: מה שהיה חסר בבית הזה.״</b></p>
+    <p>על הדלת פתק של יורם: <b>״הקוד? כתבתי אותו על פתק. איפה שמתי את הפתק...״</b></p>
     ${missing?`<p class="note">יש לך ${S.letters.length} מתוך 6 אותיות. ${missing===1?'חסרה עוד אחת':'חסרות עוד '+missing}, חפש עוד באגים.</p>`:'<p class="note">יש לך את כל 6 האותיות. לחץ על אות כדי להכניס אותה, ועל משבצת כדי להחזיר.</p>'}
-    ${S.piece?'<p class="note">יש לך גם פיסת חוברת. <button type="button" class="btn" id="seePiece" style="padding:3px 10px;font-size:.8rem">להציץ בה</button></p>':''}
+    ${S.piece?'<p class="note">יש לך את הפתק של יורם. <button type="button" class="btn" id="seePiece" style="padding:3px 10px;font-size:.85rem">להציץ בו</button></p>':''}
     <div class="lockslots" id="ls" dir="rtl"></div><div class="tiles" id="tl"></div><div class="msg" id="lm"></div>
     <div class="actions"><button class="btn primary" id="tryOpen" type="button">לפתוח</button><button class="btn" id="clr" type="button">לנקות</button><button class="btn" data-close type="button">סגור</button></div>`,'#tl .tile');
   const draw=()=>{$('ls').innerHTML=slots.map((s,i)=>`<button type="button" class="slot ${s!=null?'filled':''}" data-i="${i}" aria-label="משבצת ${i+1}">${s!=null?S.letters[s]:''}</button>`).join('');
     $('tl').innerHTML=order.map(o=>`<button type="button" class="tile ${slots.includes(o.i)?'used':''}" data-i="${o.i}">${o.l}</button>`).join('')||'<span class="note">עוד אין אותיות</span>';};
   draw();
-  $('tl').addEventListener('click',e=>{const t=e.target.closest('.tile');if(!t||t.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;slots[k]=+t.dataset.i;draw();});
+  $('tl').addEventListener('click',e=>{const t=e.target.closest('.tile');if(!t||t.classList.contains('used'))return;SFX.tick();const k=slots.indexOf(null);if(k<0)return;slots[k]=+t.dataset.i;draw();});
   $('ls').addEventListener('click',e=>{const t=e.target.closest('.slot');if(!t)return;slots[+t.dataset.i]=null;draw();});
   $('clr').addEventListener('click',()=>{slots=Array(6).fill(null);draw();$('lm').textContent='';});
-  const sp=$('seePiece');if(sp)sp.addEventListener('click',()=>{$('lm').className='msg';$('lm').innerHTML='ד · ״הקשבה אמיתית לחלום שלכם. כל תכנון מתחיל בשיחה...״';});
+  const sp=$('seePiece');if(sp)sp.addEventListener('click',()=>{$('lm').className='msg';$('lm').innerHTML='״6 אותיות. ירוק, ארוך, ומחכה במגירת הירקות כבר חודשיים.״';});
   $('tryOpen').addEventListener('click',()=>{const w=slots.map(s=>s==null?'':S.letters[s]).join('');const m=$('lm');
     if(w.length<6){m.className='msg bad';m.textContent=missing?'חסרות אותיות. חפש עוד באגים בדירה.':'מלא את כל 6 המשבצות.';return;}
-    if(w===WORD){m.className='msg good';m.textContent='קליק. הדלת נפתחת.';setTimeout(()=>{closeModal();win();},700);return;}
-    S.tries++;m.className='msg bad';m.textContent=S.tries<2?'לא נפתח. נסה סדר אחר.':S.piece?'לא נפתח. רמז: המילה מתחילה באות ד, והיא קשורה ל״שיחה״.':'לא נפתח. אולי משהו בארון העליון יעזור.';});
+    if(w===WORD){SFX.win();vib([80,60,80,60,220]);m.className='msg good';m.textContent='קליק. הדלת נפתחת.';setTimeout(()=>{closeModal();win();},700);return;}
+    S.tries++;SFX.buzz();vib(250);m.className='msg bad';m.textContent=S.tries<2?'לא נפתח. נסה סדר אחר.':S.piece?'לא נפתח. תקרא שוב את הפתק של יורם: ירוק, ארוך, במגירת הירקות.':'לא נפתח. אולי יורם השאיר פתק איפשהו למעלה.';});
 }
 
 /* ---- hints ---- */
 $('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;
   let html;
-  if(S.found.size===8){S.lockHints++;html=S.lockHints===1?'כל האותיות אצלך. הפיסה מהחוברת מתחילה באות <b>ד</b> ומדברת על הקשבה ושיחה.':'המילה היא <b>דיאלוג</b>: ד, י, א, ל, ו, ג.';}
+  if(S.found.size===8){S.lockHints++;html=S.lockHints===1?'כל האותיות אצלך. מה ירוק וארוך, ומחכה במגירת הירקות?':'המילה היא <b>מלפפון</b>: מ, ל, פ, פ, ו, ן.';}
   else{const id=ORDER.find(k=>!S.found.has(k));const b=BUGS[id];const st=S.hintStep[id]||0;S.hintStep[id]=Math.min(1,st+1);
     html=`<b>${b.room}:</b> ${b.h[st]}`;if(id==='cooktop'&&!S.tape)html=`<b>${BUGS.dishwasher.room}:</b> ${BUGS.dishwasher.h[S.hintStep.dishwasher?1:0]}`;}
-  openModal(`<div class="tag">רמז ${S.hints} · נוסף 30 שניות</div><h2>רמז</h2><p>${html}</p><div class="actions"><button class="btn primary" data-close type="button">הבנתי</button></div>`);});
+  SFX.chime();openModal(`<div class="tag">רמז ${S.hints} · נוסף 30 שניות</div><h2>רמז</h2><p>${html}</p><div class="actions"><button class="btn primary" data-close type="button">הבנתי</button></div>`);});
 
 /* ---- win / end ---- */
 function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
@@ -504,18 +551,18 @@ function showEnd(){
     <div class="brand"><b>מירי פרידלנד</b> · תכנון ועיצוב פנים</div>
     <div><div class="tag">פרק 1 הושלם</div><h2>פתחת את המסדרון!</h2></div>
     <div class="stats"><div><b>${time}</b><span>זמן, כולל רמזים</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
-    <p style="margin:0">השיטה של אבא, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
+    <p style="margin:0">השיטה של יורם, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
     <div class="box"><h3>6 דברים לבדוק בסלון ובמטבח</h3><ol>
-      <li>מקום לימוד מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>שקעים מתכננים לפי הרהיטים.</li>
-      <li>בין השיש לארון העליון: בערך 60 ס״מ.</li><li>ליד הכיריים: 30 עד 40 ס״מ משטח בכל צד.</li><li>קודם רהיטים, אחר כך נקודות חשמל.</li></ol></div>
-    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. יענקי: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
+      <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
+      <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
+    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו: ״יורם, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
       <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
         <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
       <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div style="margin-top:6px"><a class="btn wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a></div>
         <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
     </div></div>
-    <div class="dad">אבא קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה אבא קלרוסנבסקי.</div>
+    <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
     <div class="actions" style="justify-content:center"><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
   $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
   $('again').addEventListener('click',()=>location.reload());
@@ -523,7 +570,7 @@ function showEnd(){
     try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
 }
 
-$('startBtn').addEventListener('click',()=>{$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
+$('startBtn').addEventListener('click',()=>{SFX.init();$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
 
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<innerHeight?88:68;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();renderLetters();renderTools();go('salon',true);
