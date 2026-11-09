@@ -441,6 +441,8 @@ const SFX=(()=>{let ac=null,master,musicG,sfxG,muted=false;
     buzz(){if(!ac)return;const t=ac.currentTime;tone(110,t,.22,'square',.16);tone(98,t+.24,.32,'square',.16);},
     win(){if(!ac)return;let t=ac.currentTime;[[60,.14],[64,.14],[67,.14],[72,.3],[67,.14],[72,.75]].forEach(([m,d])=>{brass(mtof(m),t,d,.2);brass(mtof(m+4),t,d,.09);t+=d*.9;});},
     toggle(){muted=!muted;try{localStorage.setItem('klr-muted',muted?'1':'0');}catch(e){}if(ac)master.gain.setTargetAtTime(muted?0:1,ac.currentTime,.05);return muted;},
+    pause(){if(ac&&ac.state==='running')ac.suspend();},
+    resume(){if(ac&&ac.state==='suspended'&&!document.hidden)ac.resume();},
     get muted(){return muted;}};
 })();
 function vib(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
@@ -449,6 +451,9 @@ const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>';
 function renderMute(){const b=$('muteBtn');b.innerHTML=SFX.muted?ICON_OFF:ICON_ON;b.setAttribute('aria-pressed',SFX.muted);b.setAttribute('aria-label',SFX.muted?'הפעלת צליל':'השתקה');}
 $('muteBtn').addEventListener('click',()=>{SFX.init();SFX.toggle();renderMute();});renderMute();
+document.addEventListener('visibilitychange',()=>{if(document.hidden)SFX.pause();else SFX.resume();});
+addEventListener('pagehide',()=>SFX.pause());addEventListener('blur',()=>SFX.pause());addEventListener('focus',()=>SFX.resume());
+host.addEventListener('pointerdown',()=>SFX.resume());
 
 /* ---- interaction ---- */
 const VIEWS={salon:{pos:[-1.2,1.6,-.4],at:[3.4,.8,-.2]},kitchen:{pos:[.6,1.6,.5],at:[-3.2,1.15,-1.9]},study:{pos:[-.4,1.55,-.9],at:[1.6,1.0,2.6]}};
