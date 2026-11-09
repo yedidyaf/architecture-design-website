@@ -451,9 +451,11 @@ const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>';
 function renderMute(){const b=$('muteBtn');b.innerHTML=SFX.muted?ICON_OFF:ICON_ON;b.setAttribute('aria-pressed',SFX.muted);b.setAttribute('aria-label',SFX.muted?'הפעלת צליל':'השתקה');}
 $('muteBtn').addEventListener('click',()=>{SFX.init();SFX.toggle();renderMute();});renderMute();
-document.addEventListener('visibilitychange',()=>{if(document.hidden)SFX.pause();else SFX.resume();});
-addEventListener('pagehide',()=>SFX.pause());addEventListener('blur',()=>SFX.pause());addEventListener('focus',()=>SFX.resume());
-host.addEventListener('pointerdown',()=>SFX.resume());
+function hold(){SFX.pause();if(S.start&&!S.end&&!S.pauseAt)S.pauseAt=performance.now();}
+function back(){if(document.hidden)return;SFX.resume();if(S.pauseAt){S.pausedMs=(S.pausedMs||0)+performance.now()-S.pauseAt;S.pauseAt=0;}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hold();else back();});
+addEventListener('pagehide',hold);addEventListener('blur',hold);addEventListener('focus',back);
+host.addEventListener('pointerdown',back);
 
 /* ---- interaction ---- */
 const VIEWS={salon:{pos:[-1.2,1.6,-.4],at:[3.4,.8,-.2]},kitchen:{pos:[.6,1.6,.5],at:[-3.2,1.15,-1.9]},study:{pos:[-.4,1.55,-.9],at:[1.6,1.0,2.6]}};
@@ -546,7 +548,7 @@ $('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;
 
 /* ---- win / end ---- */
 function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
-const elapsed=now=>now-S.start+S.hints*30000;
+const elapsed=now=>(S.pauseAt||now)-S.start-(S.pausedMs||0)+S.hints*30000;
 function win(){S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
   anim(1.6,t=>{leaf.rotation.y=-t*1.4;});setTimeout(showEnd,2000);}
 function showEnd(){
