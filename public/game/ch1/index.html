@@ -555,7 +555,7 @@ function showEnd(){
     <div class="box"><h3>6 דברים לבדוק בסלון ובמטבח</h3><ol>
       <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
       <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
-    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו: ״יורם, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
+    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
       <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
         <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
@@ -563,7 +563,7 @@ function showEnd(){
         <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
     </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
-    <div class="actions" style="justify-content:center"><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
+    <div class="actions" style="justify-content:center"><a class="btn primary" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
   $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
   $('again').addEventListener('click',()=>location.reload());
   $('copyPh').addEventListener('click',()=>{const b=$('copyPh');const ok=()=>{b.textContent='הועתק';};const fb=()=>{const r=document.createRange();r.selectNodeContents($('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='סמנתי, העתק ידנית';};
