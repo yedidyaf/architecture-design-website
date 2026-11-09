@@ -388,10 +388,16 @@ export default function ImageLightbox({
           <button
             type="button"
             onClick={() => setIndex((i) => (i + 1) % images.length)}
-            className="cursor-pointer whitespace-nowrap px-1 py-2 text-base font-medium text-brand underline decoration-1 underline-offset-4 [filter:drop-shadow(0_0_1px_rgba(255,255,255,0.95))_drop-shadow(0_0_3px_rgba(255,255,255,0.8))_drop-shadow(0_1px_2px_rgba(0,0,0,0.4))] transition-[filter] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-white/70 rounded-sm"
+            aria-label={`החלף בין לפני לאחרי${current.label ? `, מוצג: ${current.label}` : ""}`}
+            title="החלף בין לפני לאחרי"
+            className="flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-sm px-1 text-brand [filter:drop-shadow(0_0_1px_rgba(255,255,255,0.95))_drop-shadow(0_0_3px_rgba(255,255,255,0.8))_drop-shadow(0_1px_2px_rgba(0,0,0,0.4))] transition-[filter] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-white/70"
           >
-            החלף לפני/אחרי
-            {current.label ? <span className="sr-only">{`, מוצג: ${current.label}`}</span> : null}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7" aria-hidden="true">
+              <path d="M7 4L3 8l4 4" />
+              <path d="M3 8h14" />
+              <path d="M17 12l4 4-4 4" />
+              <path d="M21 16H7" />
+            </svg>
           </button>
         ) : null}
         <button
