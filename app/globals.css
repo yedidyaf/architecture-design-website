@@ -213,3 +213,37 @@ body {
     animation: lightbox-in 0.2s ease-out 0.15s both;
   }
 }
+
+/* Homepage logo: hand-drawn ripples + soft breathing glow. */
+@keyframes logoRad {
+  0% { transform: scale(0.62); opacity: 0; }
+  25% { opacity: 0.85; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes logoBreathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(159, 43, 53, 0); }
+  50% { box-shadow: 0 0 22px 5px rgba(159, 43, 53, 0.33); }
+}
+
+.logo-ring {
+  fill: none;
+  stroke: #9f2b35;
+  stroke-width: 1.6;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-glow {
+    animation: logoBreathe 3.6s ease-in-out infinite;
+  }
+  .logo-ring-1 { animation: logoRad 3.6s ease-out infinite; }
+  .logo-ring-2 { animation: logoRad 3.6s ease-out infinite 1.2s; }
+  .logo-ring-3 { animation: logoRad 3.6s ease-out infinite 2.4s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-rings { display: none; }
+}

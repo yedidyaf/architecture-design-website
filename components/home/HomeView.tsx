@@ -60,7 +60,7 @@ export type HomeViewProps = {
 export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "right", projects, testimonials }: HomeViewProps) {
   return (
     <main
-      className="flex-1 min-[900px]:grid"
+      className="flex-1 overflow-x-clip min-[900px]:grid"
       style={{ gridTemplateColumns: GRID_COLUMNS, gridTemplateRows: "auto 1fr", "--testimonials-inset": TESTIMONIALS_INSET } as CSSProperties}
     >
       {/* Decorative strip. Not sticky: it stretches to the full height of
@@ -91,12 +91,31 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           {logoSrc || name || tagline ? (
             <header className="text-center">
               {logoSrc ? (
-                <div className="relative mx-auto mb-6 h-42 w-42 max-w-full sm:mb-5 sm:h-36 sm:w-36">
+                <div className="logo-glow relative mx-auto mb-6 h-42 w-42 max-w-full rounded-full sm:mb-5 sm:h-36 sm:w-36">
+                  {/* Hand-drawn ripples behind the logo; absolutely positioned, so no layout shift. */}
+                  <svg
+                    className="logo-rings pointer-events-none absolute left-1/2 top-1/2 z-0 h-[220%] w-[220%] -translate-x-1/2 -translate-y-1/2 overflow-visible"
+                    viewBox="0 0 220 220"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <defs>
+                      <filter id="logoWobble">
+                        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" seed="9" result="n" />
+                        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" />
+                      </filter>
+                    </defs>
+                    <g filter="url(#logoWobble)">
+                      <circle className="logo-ring logo-ring-1" cx="110" cy="110" r="100" />
+                      <circle className="logo-ring logo-ring-2" cx="110" cy="110" r="100" />
+                      <circle className="logo-ring logo-ring-3" cx="110" cy="110" r="100" />
+                    </g>
+                  </svg>
                   <Image
                     src={logoSrc}
                     alt={name ? `${name} — לוגו` : "לוגו"}
                     fill
-                    className="object-contain"
+                    className="z-10 object-contain"
                     sizes="(max-width: 640px) 168px, 144px"
                     priority
                   />
