@@ -91,7 +91,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           {logoSrc || name || tagline ? (
             <header className="text-center">
               {logoSrc ? (
-                <div className="logo-glow relative mx-auto mb-20 h-42 w-42 max-w-full rounded-full sm:mb-[4.5rem] sm:h-36 sm:w-36">
+                <div className="logo-glow relative mx-auto mb-[8.25rem] h-42 w-42 max-w-full rounded-full sm:mb-[8.125rem] sm:h-36 sm:w-36">
                   {/* Hand-drawn ripples behind the logo; absolutely positioned, so no layout shift. */}
                   <svg
                     className="logo-rings pointer-events-none absolute left-1/2 top-1/2 z-0 h-[220%] w-[220%] -translate-x-1/2 -translate-y-1/2 overflow-visible"
