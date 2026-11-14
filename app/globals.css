@@ -247,3 +247,40 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .logo-rings { display: none; }
 }
+
+/* Homepage slogan inside three sideways arches (components/ArchSlogan.tsx).
+   The drawer slides in from the right; the full text sits in the markup as an
+   invisible placeholder while a typed copy is overlaid. Reduced motion shows
+   everything at once: no slide, no typing, no caret. */
+.arch-full {
+  color: transparent;
+}
+.arch-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  margin-inline-start: 1px;
+  vertical-align: -0.15em;
+  background: var(--brand);
+  animation: arch-caret-blink 1s steps(1) infinite;
+}
+@keyframes arch-caret-blink {
+  50% { opacity: 0; }
+}
+@keyframes arch-drawer-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arch-drawer {
+    animation: arch-drawer-in 1s cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arch-full {
+    color: inherit;
+  }
+  .arch-typed {
+    display: none;
+  }
+}
