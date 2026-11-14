@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
+import ArchSlogan from "@/components/ArchSlogan";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
 import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
@@ -124,10 +125,10 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
               {name ? (
                 <h1 className="brand-name font-brand-name text-[2.625rem] text-brand sm:text-5xl">{name}</h1>
               ) : null}
-              {tagline ? (
-                <p className="mx-auto mt-6 max-w-xl whitespace-pre-line text-balance text-base leading-relaxed text-brand-ink/90 sm:mt-4 sm:text-lg">
-                  {tagline.trim()}
-                </p>
+              {tagline?.trim() ? (
+                <div className="mt-2 sm:mt-0">
+                  <ArchSlogan lines={tagline.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean)} />
+                </div>
               ) : null}
             </header>
           ) : null}
