@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import ArchSlogan from "@/components/ArchSlogan";
+import BioReveal from "./BioReveal";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
 import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
@@ -134,9 +135,15 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           ) : null}
 
           {bio ? (
-            <div className={`mt-10 text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}>
+            <BioReveal
+              waitForSlogan={Boolean(tagline?.trim())}
+              className={`mt-10 text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
+            >
+              <noscript>
+                <style>{`.bio-reveal .bio-line{opacity:1!important;transform:none!important}`}</style>
+              </noscript>
               {bio}
-            </div>
+            </BioReveal>
           ) : null}
 
           <div className="mt-12 min-[900px]:hidden">
@@ -147,7 +154,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
 
       {/* Mobile: the same 460px column as the text above. */}
       <div
-        className="px-6 min-[900px]:mt-14 min-[900px]:px-[var(--testimonials-inset)]"
+        className="mt-10 px-6 min-[900px]:mt-24 min-[900px]:px-[var(--testimonials-inset)]"
         style={{ gridColumn: "2 / span 3", gridRow: "2" }}
       >
         <div className="mx-auto max-w-[460px] min-[900px]:max-w-[1000px] [&>section]:max-w-none [&>section]:px-0">

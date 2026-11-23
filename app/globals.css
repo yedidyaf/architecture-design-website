@@ -292,3 +292,27 @@ body {
     display: none;
   }
 }
+
+/* Homepage text (components/home/BioReveal.tsx): once the slogan has been
+   typed, each line rises into place one after the other. --i is the line's
+   index, set by BioReveal. Without JS (see the <noscript> in HomeView) or
+   with reduced motion, the text is simply there. */
+.bio-line {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bio-reveal .bio-line {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .bio-reveal.is-shown .bio-line {
+    animation: bio-rise 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 0.28s);
+  }
+}
+@keyframes bio-rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

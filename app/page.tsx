@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Children, isValidElement, type ReactNode } from "react";
 import ContactFab from "@/components/ContactFab";
 import HomeView, { type BioAlign } from "@/components/home/HomeView";
 import type { HomeProject } from "@/components/home/types";
@@ -40,10 +41,35 @@ function splitSoftBreaks(value: BioValue): BioValue {
   }) as unknown as BioValue;
 }
 
+function SoftBreak() {
+  return <br />;
+}
+
+// Each line (the parts of a paragraph between soft breaks) becomes its own
+// block-level .bio-line, so BioReveal can bring the lines in one by one.
+// Consecutive breaks keep their blank line; a trailing break is dropped.
+function BioLines({ children }: { children: ReactNode }) {
+  const lines: ReactNode[][] = [[]];
+  for (const child of Children.toArray(children)) {
+    if (isValidElement(child) && child.type === SoftBreak) lines.push([]);
+    else if (child !== "") lines[lines.length - 1].push(child);
+  }
+  if (lines.length > 1 && lines[lines.length - 1].length === 0) lines.pop();
+  return lines.map((line, i) => (
+    <span key={i} className="bio-line">
+      {line.length > 0 ? line : <br />}
+    </span>
+  ));
+}
+
 const bioComponents: PortableTextComponents = {
-  hardBreak: () => <br />,
+  hardBreak: SoftBreak,
   block: {
-    normal: ({ children }) => <p className="[&:not(:first-child)]:mt-5">{children}</p>,
+    normal: ({ children }) => (
+      <p className="[&:not(:first-child)]:mt-5">
+        <BioLines>{children}</BioLines>
+      </p>
+    ),
   },
   marks: {
     strong: ({ children }) => <strong className="font-bold">{children}</strong>,
@@ -93,7 +119,9 @@ export default async function Home() {
   const bioNode = Array.isArray(bio) ? (
     bio.length > 0 ? <PortableText value={splitSoftBreaks(bio)} components={bioComponents} /> : null
   ) : typeof bio === "string" && bio.trim() ? (
-    <p className="whitespace-pre-line">{bio}</p>
+    <p className="whitespace-pre-line">
+      <span className="bio-line">{bio}</span>
+    </p>
   ) : null;
 
   return (
