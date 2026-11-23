@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SLOGAN_DONE_EVENT } from "@/components/home/BioReveal";
 
 const DRAW_START = 400;
 const DRAW_MS = 2000;
@@ -91,6 +92,12 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
       }
       t += LINE_PAUSE;
     });
+    timers.push(
+      setTimeout(() => {
+        (window as Window & { __archSloganDone?: boolean }).__archSloganDone = true;
+        window.dispatchEvent(new Event(SLOGAN_DONE_EVENT));
+      }, t),
+    );
     return () => {
       timers.forEach(clearTimeout);
       setTyped(chars.map(() => 0));
