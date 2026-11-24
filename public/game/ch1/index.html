@@ -15,6 +15,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="הסלון של משפחת קלרוסנבסקי, חדר בריחה של מירי פרידלנד">
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};function track(n){try{window.va("event",{name:n});}catch(e){}}</script>
+<script defer src="/_vercel/insights/script.js"></script>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://miri-friedland.vercel.app/game/ch1/og.jpg">
 <meta property="og:description" content="מצא את 8 הבאגים התכנוניים בסלון של יורם ״המהנדס״. חדר בריחה של מירי פרידלנד.">
@@ -213,7 +215,7 @@ var msg={webgl:(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)?'<b
 lib:'<b>חלק מהמשחק לא נטען.</b> ייתכן שסינון האינטרנט חוסם אותו. נסה לרענן את הדף, או לפתוח מרשת אחרת.',
 other:'<b>משהו השתבש בטעינת המשחק.</b> נסה לרענן את הדף, או לפתוח אותו בכרום.'}[kind]||'';
 b.innerHTML=msg+(detail?'<small>'+String(detail).replace(/[<>&]/g,'')+'</small>':'');b.hidden=false;if(s){s.disabled=true;s.textContent='לא ניתן להתחיל';}};
-window.addEventListener('error',function(e){if(window.__gameReady)return;var t=e.target;if(t&&t.tagName){if(t.tagName==='SCRIPT')window.__showLoadErr('lib',t.src);return;}if(e.message)window.__showLoadErr('other',e.message);},true);
+window.addEventListener('error',function(e){if(window.__gameReady)return;var t=e.target;if(t&&t.tagName){if(t.tagName==='SCRIPT'&&!/_vercel/.test(t.src))window.__showLoadErr('lib',t.src);return;}if(e.message)window.__showLoadErr('other',e.message);},true);
 </script>
 <script src="three.min.js"></script>
 <script>
@@ -574,7 +576,7 @@ $('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;
 /* ---- win / end ---- */
 function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
 const elapsed=now=>(S.pauseAt||now)-S.start-(S.pausedMs||0)+S.hints*30000;
-function win(){S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
+function win(){track('game_finish');S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
   anim(1.6,t=>{leaf.rotation.y=-t*1.4;});setTimeout(showEnd,2000);}
 function showEnd(){
   const time=fmtT(elapsed(S.end));
@@ -589,20 +591,20 @@ function showEnd(){
       <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
     <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
-      <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
+      <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" onclick="track('contact_save')" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
         <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
-      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div style="margin-top:6px"><a class="btn wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a></div>
+      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div style="margin-top:6px"><a class="btn wa" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a></div>
         <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
     </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
-    <div class="actions" style="justify-content:center"><a class="btn primary" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
+    <div class="actions" style="justify-content:center"><a class="btn primary" onclick="track('site_click')" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
   $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
   $('again').addEventListener('click',()=>location.reload());
   $('copyPh').addEventListener('click',()=>{const b=$('copyPh');const ok=()=>{b.textContent='הועתק';};const fb=()=>{const r=document.createRange();r.selectNodeContents($('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='סמנתי, העתק ידנית';};
     try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
 }
 
-$('startBtn').addEventListener('click',()=>{SFX.init();$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
+$('startBtn').addEventListener('click',()=>{track('game_start');SFX.init();$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
 
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<innerHeight?88:68;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();renderLetters();renderTools();go('salon',true);
