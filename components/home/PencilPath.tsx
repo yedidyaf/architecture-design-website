@@ -15,8 +15,14 @@ const PEN_AT = 0.62;
 const STEP = 6;
 // Room between the text and the frame drawn round it.
 const FRAME_PAD = 28;
-// While writing the signature the pencil moves at least this many px a frame.
-const WRITE_SPEED = 5;
+// The pencil's pace, in px per second, whatever the scrolling: the arch is
+// drawn at about this speed, the signature is written a little slower.
+const DRAW_SPEED = 400;
+const WRITE_SPEED = 260;
+// The arch is an svg drawn at its own scale (viewBox 340 wide); the pencil,
+// its line width and its paper grain here are multiplied by that scale so
+// they are the very same as the arch's.
+const ARCH_VIEWBOX_W = 340;
 
 // Miri's signature, traced from her handwriting (units of the 420 x 660
 // photo crop), in writing order: the M, its dot, the f with its loop and
@@ -71,7 +77,7 @@ function smooth(pts: Pt[]): string {
 // [data-pencil-frame] and running round it in a soft loop that stays open on
 // one side, then on to the signature ([data-pencil-sig]). Returns the main
 // line and the signature strokes, or null when the parts aren't there.
-function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][] } | null {
+function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][]; scale: number } | null {
   const arch = box.querySelector<SVGSVGElement>("[data-pencil-arch]");
   const sigEl = box.querySelector<HTMLElement>("[data-pencil-sig]");
   if (!arch || !sigEl) return null;
@@ -190,7 +196,7 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][] } | null 
   sweepTo({ x: m0.x - 26, y: m0.y - 8 }, 1);
   // Points too close together make the curve kink; keep them apart.
   const main = pts.filter((q, i) => i === 0 || Math.hypot(q.x - pts[i - 1].x, q.y - pts[i - 1].y) > 14);
-  return { main, signature };
+  return { main, signature, scale: ar.width / ARCH_VIEWBOX_W };
 }
 
 // Desktop homepage: the gray pencil that drew the slogan arch carries on
@@ -201,49 +207,65 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][] } | null 
 export default function PencilPath() {
   const svgRef = useRef<SVGSVGElement>(null);
   const filterRef = useRef<SVGFilterElement>(null);
+  const lineRef = useRef<SVGGElement>(null);
   const mainRef = useRef<SVGPathElement>(null);
   const ghostRef = useRef<SVGPathElement>(null);
   const sigRef = useRef<SVGGElement>(null);
   const penRef = useRef<SVGGElement>(null);
+  const eraserRef = useRef<SVGGElement>(null);
 
   useEffect(() => {
     const svg = svgRef.current;
     const filter = filterRef.current;
+    const lineG = lineRef.current;
     const main = mainRef.current;
     const ghost = ghostRef.current;
     const sigG = sigRef.current;
     const pen = penRef.current;
+    const eraser = eraserRef.current;
     const box = svg?.parentElement;
-    if (!svg || !filter || !main || !ghost || !sigG || !pen || !box) return;
+    if (!svg || !filter || !lineG || !main || !ghost || !sigG || !pen || !eraser || !box) return;
     const desktop = window.matchMedia(DESKTOP_QUERY);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const flags = window as ArchDrawnFlag;
+    const [warp, , grain] = [...filter.children] as SVGElement[];
+    const displace = filter.children[1] as SVGElement;
 
     let len = 0;
     let strokes: { el: SVGPathElement; len: number }[] = [];
     let sigLen = 0;
     let ymax: number[] = [];
     let cur = 0;
+    let k = 1;
     let raf = 0;
+    let last = 0;
 
     const build = () => {
       if (!desktop.matches) return;
       const route = buildRoute(box);
       if (!route) return;
+      k = route.scale;
+      // The arch's pencil, at the arch's scale (see ArchSlogan).
       filter.setAttribute("width", String(box.clientWidth + 400));
       filter.setAttribute("height", String(box.clientHeight + 400));
+      warp.setAttribute("baseFrequency", String(0.03 / k));
+      displace.setAttribute("scale", String(2.5 * k));
+      grain.setAttribute("baseFrequency", String(1.4 / k));
+      lineG.setAttribute("stroke-width", String(2.3 * k));
+      ghost.setAttribute("stroke-width", String(1.2 * k));
+      ghost.setAttribute("transform", `translate(${0.9 * k} ${0.7 * k})`);
       const d = smooth(route.main);
       main.setAttribute("d", d);
       ghost.setAttribute("d", d);
       len = main.getTotalLength();
       sigG.replaceChildren();
-      strokes = route.signature.map((s) => {
+      strokes = route.signature.map((st) => {
         const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        el.setAttribute("d", smooth(s));
+        el.setAttribute("d", smooth(st));
         sigG.appendChild(el);
         return { el, len: el.getTotalLength() };
       });
-      sigLen = strokes.reduce((a, s) => a + s.len, 0);
+      sigLen = strokes.reduce((a, st) => a + st.len, 0);
       ymax = [];
       let m = -Infinity;
       for (let l = 0; l <= len; l += STEP) {
@@ -267,46 +289,63 @@ export default function PencilPath() {
       return i >= ymax.length ? total : Math.min(len, i * STEP);
     };
 
-    // Draws everything up to `cur` and puts the pencil there: its point when
-    // drawing (step >= 0), its eraser when rubbing out.
-    const paint = (step: number) => {
+    // Draws everything up to `cur`. Drawing (dir > 0) shows the pencil at
+    // the end of the line, rubbing out (dir < 0) shows only an eraser, which
+    // trembles a little as it works.
+    const paint = (dir: number) => {
       const m = Math.min(cur, len);
       main.style.strokeDasharray = ghost.style.strokeDasharray = String(len);
       main.style.strokeDashoffset = String(len - m);
       ghost.style.strokeDashoffset = String(len - Math.max(0, m - 6));
       let rest = cur - len;
       let tip: DOMPoint | null = m > 1 && cur < len ? main.getPointAtLength(m) : null;
-      for (const s of strokes) {
-        const drawn = Math.max(0, Math.min(s.len, rest));
-        s.el.style.strokeDasharray = String(s.len);
-        s.el.style.strokeDashoffset = String(s.len - drawn);
-        if (rest > 0 && rest < s.len) tip = s.el.getPointAtLength(drawn);
-        rest -= s.len;
+      for (const st of strokes) {
+        const drawn = Math.max(0, Math.min(st.len, rest));
+        st.el.style.strokeDasharray = String(st.len);
+        st.el.style.strokeDashoffset = String(st.len - drawn);
+        if (rest > 0 && rest < st.len) tip = st.el.getPointAtLength(drawn);
+        rest -= st.len;
       }
-      if (!tip || reduce) {
-        pen.style.opacity = "0";
-        return;
+      const moving = tip !== null && dir !== 0 && !reduce;
+      pen.style.opacity = moving && dir > 0 ? "1" : "0";
+      eraser.style.opacity = moving && dir < 0 ? "1" : "0";
+      if (!moving || !tip) return;
+      if (dir > 0) {
+        // Same pose and the same slight hand tremor as the arch's pencil.
+        pen.setAttribute(
+          "transform",
+          `translate(${tip.x} ${tip.y + Math.sin(cur * 0.35) * 0.6 * k}) rotate(-50) scale(${k})`,
+        );
+      } else {
+        const jx = Math.sin(cur * 0.9) * 1.2 * k;
+        const jy = Math.cos(cur * 1.3) * 1.2 * k;
+        const ja = Math.sin(cur * 0.7) * 6;
+        eraser.setAttribute(
+          "transform",
+          `translate(${tip.x + jx} ${tip.y + jy}) rotate(${-30 + ja}) scale(${k})`,
+        );
       }
-      const erasing = step < -0.3;
-      pen.setAttribute(
-        "transform",
-        erasing
-          ? `translate(${tip.x} ${tip.y}) rotate(130) translate(-78 0)`
-          : `translate(${tip.x} ${tip.y}) rotate(-50)`,
-      );
-      pen.style.opacity = "1";
     };
 
-    const frame = () => {
+    const frame = (now: number) => {
       raf = 0;
+      const dt = Math.min(0.05, last ? (now - last) / 1000 : 1 / 60);
+      last = now;
       const t = target();
       const delta = t - cur;
-      let step = delta * 0.09;
-      if (cur >= len - 1 && Math.abs(step) < WRITE_SPEED) step = Math.sign(delta) * Math.min(WRITE_SPEED, Math.abs(delta));
-      if (Math.abs(delta) < 0.5) step = delta;
+      if (Math.abs(delta) < 0.5) {
+        cur = t;
+        last = 0;
+        paint(0);
+        return;
+      }
+      // Steady pace, never a leap: fast scrolling just leaves the pencil
+      // a little behind, and it catches up at its own speed.
+      const speed = cur >= len ? WRITE_SPEED : DRAW_SPEED;
+      const step = Math.sign(delta) * Math.min(Math.abs(delta), speed * dt);
       cur += step;
-      paint(step);
-      if (cur !== t) schedule();
+      paint(Math.sign(step));
+      schedule();
     };
     function schedule() {
       if (!raf && len > 0) raf = requestAnimationFrame(frame);
@@ -336,7 +375,7 @@ export default function PencilPath() {
   }, []);
 
   // Same pencil as the arch (ArchSlogan): graphite stroke with paper grain
-  // and a faint second line beside it.
+  // and a faint second line beside it. Sizes are set from the arch's scale.
   return (
     <svg
       ref={svgRef}
@@ -347,7 +386,7 @@ export default function PencilPath() {
       <defs>
         <filter ref={filterRef} id="pencilPathTex" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2000" height="6000">
           <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="w" />
-          <feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" result="d" />
+          <feDisplacementMap in="SourceGraphic" in2="w" scale="2.5" result="d" />
           <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="5" result="g" />
           <feColorMatrix
             in="g"
@@ -358,18 +397,24 @@ export default function PencilPath() {
           <feComposite in="d" in2="ga" operator="in" />
         </filter>
       </defs>
-      <g filter="url(#pencilPathTex)" fill="none" stroke="#4a4546" strokeLinecap="round" strokeLinejoin="round">
-        <path ref={ghostRef} strokeWidth="1.2" opacity="0.35" transform="translate(0.9 0.7)" style={{ strokeDasharray: "100000", strokeDashoffset: "100000" }} />
-        <path ref={mainRef} strokeWidth="2.3" style={{ strokeDasharray: "100000", strokeDashoffset: "100000" }} />
-        <g ref={sigRef} strokeWidth="2.1" />
+      <g ref={lineRef} filter="url(#pencilPathTex)" fill="none" stroke="#4a4546" strokeLinecap="round" strokeLinejoin="round">
+        <path ref={ghostRef} opacity="0.35" style={{ strokeDasharray: "100000", strokeDashoffset: "100000" }} />
+        <path ref={mainRef} style={{ strokeDasharray: "100000", strokeDashoffset: "100000" }} />
+        <g ref={sigRef} />
       </g>
-      <g ref={penRef} style={{ opacity: 0, transition: "opacity .4s" }}>
+      <g ref={penRef} style={{ opacity: 0, transition: "opacity .3s" }}>
         <polygon points="0,0 13,-4 13,4" fill="#e8c9a0" />
         <polygon points="0,0 4.5,-1.4 4.5,1.4" fill="#3b3536" />
         <rect x="13" y="-4" width="52" height="8" fill="#9f2b35" />
         <rect x="13" y="-4" width="52" height="2.6" fill="#b8434d" />
         <rect x="65" y="-4.3" width="5" height="8.6" fill="#c9c2bf" />
         <rect x="70" y="-4" width="8" height="8" rx="2" fill="#e6a6a6" />
+      </g>
+      {/* A pink eraser, its rubbing edge centred on the end of the line. */}
+      <g ref={eraserRef} style={{ opacity: 0, transition: "opacity .3s" }}>
+        <rect x="-9" y="-22" width="18" height="24" rx="3" fill="#e6a6a6" />
+        <rect x="-9" y="-22" width="18" height="7" rx="3" fill="#cf8a8f" />
+        <rect x="-9" y="-4" width="18" height="6" rx="2.5" fill="#d99599" />
       </g>
     </svg>
   );
