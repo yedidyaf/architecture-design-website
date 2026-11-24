@@ -11,16 +11,17 @@ export type ArchDrawnFlag = Window & { __archDrawn?: boolean };
 type Pt = { x: number; y: number };
 
 const DESKTOP_QUERY = "(min-width: 900px)";
-// The pencil sits this far down the viewport: the line is drawn up to there.
-const PEN_AT = 0.62;
+// The line is drawn down to this far down the viewport: the bottom of the screen.
+const PEN_AT = 0.97;
 // Spacing of the precomputed samples along the line, in px.
 const STEP = 6;
 // Room between the text and the frame drawn round it.
 const FRAME_PAD = 28;
-// The pencil's pace, in px per second, whatever the scrolling: the arch is
-// drawn at about this speed, the signature is written a little slower.
+// The pencil's pace, in px per second, whatever the scrolling: the arch's
+// pace for most of the line, quicker over the last stretch and the signature.
 const DRAW_SPEED = 400;
-const WRITE_SPEED = 260;
+const FINISH_SPEED = 700;
+const FINISH_STRETCH = 600;
 // The arch is an svg drawn at its own scale (viewBox 340 wide); the pencil,
 // its line width and its paper grain here are multiplied by that scale so
 // they are the very same as the arch's.
@@ -365,7 +366,7 @@ export default function PencilPath() {
       }
       // Steady pace, never a leap: fast scrolling just leaves the pencil
       // a little behind, and it catches up at its own speed.
-      const speed = cur >= len ? WRITE_SPEED : DRAW_SPEED;
+      const speed = cur >= len - FINISH_STRETCH ? FINISH_SPEED : DRAW_SPEED;
       const step = Math.sign(delta) * Math.min(Math.abs(delta), speed * dt);
       cur += step;
       paint(Math.sign(step));
