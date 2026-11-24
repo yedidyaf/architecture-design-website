@@ -41,6 +41,27 @@ function splitSoftBreaks(value: BioValue): BioValue {
   }) as unknown as BioValue;
 }
 
+// The homepage shows the About text one screen at a time. In Studio, Enter
+// starts a new line and an empty line (Enter twice) starts a new screen; a
+// soft break (Shift+Enter) is a new line too. Text written before this rule,
+// with no empty lines at all, gets one screen per paragraph instead.
+function isEmptyBlock(block: Record<string, unknown>): boolean {
+  if (block._type !== "block" || !Array.isArray(block.children)) return false;
+  return (block.children as { text?: unknown }[]).every(
+    (c) => typeof c.text !== "string" || c.text.trim() === "",
+  );
+}
+function splitScreens(value: BioValue): BioValue[] {
+  const blocks = (Array.isArray(value) ? value : [value]) as unknown as Record<string, unknown>[];
+  if (!blocks.some(isEmptyBlock)) return blocks.map((b) => [b] as unknown as BioValue);
+  const screens: Record<string, unknown>[][] = [[]];
+  for (const block of blocks) {
+    if (isEmptyBlock(block)) screens.push([]);
+    else screens[screens.length - 1].push(block);
+  }
+  return screens.filter((s) => s.length > 0) as unknown as BioValue[];
+}
+
 function SoftBreak() {
   return <br />;
 }
@@ -66,7 +87,7 @@ const bioComponents: PortableTextComponents = {
   hardBreak: SoftBreak,
   block: {
     normal: ({ children }) => (
-      <p className="[&:not(:first-child)]:mt-5">
+      <p>
         <BioLines>{children}</BioLines>
       </p>
     ),
@@ -115,14 +136,21 @@ export default async function Home() {
     }`
   );
 
+  const bioScreens: ReactNode[] = [];
   const bio = about?.bio;
-  const bioNode = Array.isArray(bio) ? (
-    bio.length > 0 ? <PortableText value={splitSoftBreaks(bio)} components={bioComponents} /> : null
-  ) : typeof bio === "string" && bio.trim() ? (
-    <p className="whitespace-pre-line">
-      <span className="bio-line reveal">{bio}</span>
-    </p>
-  ) : null;
+  if (Array.isArray(bio)) {
+    for (const screen of splitScreens(bio)) {
+      bioScreens.push(<PortableText value={splitSoftBreaks(screen)} components={bioComponents} />);
+    }
+  } else if (typeof bio === "string") {
+    for (const part of bio.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean)) {
+      bioScreens.push(
+        <p className="whitespace-pre-line">
+          <span className="bio-line reveal">{part}</span>
+        </p>,
+      );
+    }
+  }
 
   return (
     <>
@@ -130,7 +158,7 @@ export default async function Home() {
         name={about?.name}
         logoSrc={about?.logo ? urlFor(about.logo as never).width(800).height(800).fit("max").url() : undefined}
         tagline={about?.tagline}
-        bio={bioNode}
+        bioScreens={bioScreens}
         bioAlign={about?.bioAlign}
         projects={projects.map((p) => ({
           _id: p._id,

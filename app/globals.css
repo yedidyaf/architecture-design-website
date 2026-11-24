@@ -330,3 +330,23 @@ body {
     transform: translateY(14px);
   }
 }
+
+/* Homepage screens (components/home/HomeView.tsx): the page snaps from one
+   full-screen step to the next. The footer is a snap point too, so the very
+   end of the page stays reachable. */
+html:has(.home-screens) {
+  scroll-snap-type: y mandatory;
+}
+html:has(.home-screens) body > footer {
+  scroll-snap-align: end;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-hint-arrow {
+    animation: hint-bob 2s ease-in-out infinite;
+  }
+}
+@keyframes hint-bob {
+  50% {
+    transform: translateY(5px);
+  }
+}

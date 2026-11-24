@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SLOGAN_DONE_EVENT } from "@/components/ScrollReveal";
 
 const DRAW_START = 400;
 const DRAW_MS = 2000;
@@ -44,8 +43,19 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
     let first = true;
     // Redraws pause while the arch is off screen or the tab is hidden.
-    let onScreen = true;
-    const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting));
+    let onScreen = false;
+    let started = false;
+    // The first drawing waits until the arch's screen is in view.
+    const io = new IntersectionObserver(
+      ([e]) => {
+        onScreen = e.isIntersecting;
+        if (onScreen && !started) {
+          started = true;
+          timer = setTimeout(draw, DRAW_START);
+        }
+      },
+      { threshold: 0.5 },
+    );
     io.observe(main);
     const place = (d: number) => {
       const pt = main.getPointAtLength(d);
@@ -96,7 +106,6 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
         draw();
       }, ERASE_MS);
     };
-    timer = setTimeout(draw, DRAW_START);
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
@@ -125,12 +134,6 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
       }
       t += LINE_PAUSE;
     });
-    timers.push(
-      setTimeout(() => {
-        (window as Window & { __archSloganDone?: boolean }).__archSloganDone = true;
-        window.dispatchEvent(new Event(SLOGAN_DONE_EVENT));
-      }, t),
-    );
     return () => {
       timers.forEach(clearTimeout);
       setTyped(chars.map(() => 0));
