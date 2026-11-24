@@ -140,7 +140,16 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .end{position:fixed;inset:0;z-index:40;background:#F7EFEC;overflow:auto;direction:rtl;display:flex;justify-content:center}
 .end .in{width:100%;max-width:520px;padding:calc(24px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
 .end h2{font-size:2rem;margin:0;font-weight:800;line-height:1.05}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.guess{border-top:1px dashed var(--line);margin-top:14px;padding-top:12px}
+.guess label{font-weight:600;display:block;margin-bottom:6px}
+.grow{display:flex;gap:8px}
+.grow input{flex:1;min-width:0;font:inherit;font-size:1.2rem;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;direction:rtl;background:#fff;color:var(--ink)}
+.grow input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.gword{display:flex;gap:6px;justify-content:center;margin:12px 0;direction:rtl}
+.gl{width:42px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#C9BDBA;background:#F4EEEC}
+.gl.on{color:#fff;background:var(--accent)}
+.sendrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .stats div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 .stats b{display:block;font-size:1.25rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
 .stats span{font-size:.76rem;color:var(--muted)}
@@ -328,7 +337,7 @@ const socketGrp=grp(g,0,0,0);box(.09,.09,.015,mat(0xFFFFFF,.4),3.4,.3,-2.79,sock
 const cordM=new THREE.MeshStandardMaterial({color:0xF0F0F0,roughness:.5,emissive:0x000000});
 const cordCurve=new THREE.CatmullRomCurve3([[3.4,.3,-2.78],[3.45,.015,-2.72],[3.9,.012,-1.9],[3.95,.012,-.9],[4.0,.012,-.1],[4.05,.012,.45]].map(p=>new THREE.Vector3(...p)));
 const cord=new THREE.Mesh(new THREE.TubeGeometry(cordCurve,80,.011,6,false),cordM);cord.castShadow=true;socketGrp.add(cord);
-const cordHit=new THREE.Mesh(new THREE.TubeGeometry(cordCurve,40,.07,6,false),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));socketGrp.add(cordHit);
+const cordHit=new THREE.Mesh(new THREE.TubeGeometry(cordCurve,40,.14,6,false),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));socketGrp.add(cordHit);
 const fl=grp(g,4.05,0,.55);cyl(.14,.16,.03,M.black,0,.015,0,fl);cyl(.012,.012,1.5,M.black,0,.76,0,fl);const fs=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.26,24,1,true),new THREE.MeshStandardMaterial({color:0xF2EBDD,roughness:.9,side:THREE.DoubleSide,emissive:0xFFDDAA,emissiveIntensity:.3}));fs.position.y=1.55;fl.add(fs);
 const fll=new THREE.PointLight(0xFFD8A0,.6,4,2);fll.position.set(0,1.5,0);fl.add(fll);
 
@@ -353,7 +362,7 @@ const slideB=grp(g,-2.6,0,2.78);box(.88,2.3,.04,M.glass,.43,1.16,-.06,slideB,fal
 
 /* ---- dining + pendant ---- */
 const dt=grp(g,-.2,0,.9);box(1.6,.05,.9,M.oak,0,.75,0,dt);[[-.72,-.36],[.72,-.36],[-.72,.36],[.72,.36]].forEach(([a,b])=>box(.06,.73,.06,M.oak,a,.365,b,dt));
-chair(dt,-.42,.62,Math.PI);chair(dt,.42,.62,Math.PI);chair(dt,-.42,-.62,0);chair(dt,.42,-.62,0);cyl(.06,.08,.22,mat(0x9F2B35,.5),0,.89,0,dt);for(let i=0;i<5;i++)sph(.035,M.leaf2,R(-.06,.06),1.05+R(0,.1),R(-.06,.06),dt);
+const dch=[chair(dt,-.42,.62,Math.PI),chair(dt,.42,.62,Math.PI),chair(dt,-.42,-.62,0),chair(dt,.42,-.62,0)];cyl(.06,.08,.22,mat(0x9F2B35,.5),0,.89,0,dt);for(let i=0;i<5;i++)sph(.035,M.leaf2,R(-.06,.06),1.05+R(0,.1),R(-.06,.06),dt);
 const pend=grp(g,1.45,H,-1.0);cyl(.006,.006,.8,M.black,0,-.4,0,pend);const shade=new THREE.Mesh(new THREE.CylinderGeometry(.08,.26,.22,28,1,true),new THREE.MeshStandardMaterial({color:0x2E2A26,roughness:.4,metalness:.4,side:THREE.DoubleSide}));shade.position.y=-.9;shade.castShadow=true;pend.add(shade);
 const bulb=sph(.05,new THREE.MeshBasicMaterial({color:0xFFE6B5}),0,-.96,0,pend);bulb.castShadow=false;const spl=new THREE.SpotLight(0xFFD9A0,6,4,.7,.6,1.5);spl.position.set(0,-.95,0);pend.add(spl);spl.target.position.set(0,-H,0);pend.add(spl.target);
 
@@ -440,12 +449,23 @@ target(dt,'d-table','שולחן אוכל',()=>say('שולחן יפה מעץ אל
 target(shelf,'d-shelf','ספרייה',()=>say('ספרייה מושלמת. יורם הרכיב אותה לבד, ונשארו רק ארבעה ברגים.'));
 target(plant1,'d-plant','עציץ',()=>say('הפיקוס במקום הנכון: ליד הזכוכית, באור מלא. הוא היחיד פה שמרוצה.'));
 target(painting,'d-art','תמונה',()=>say('תמונה בגובה הנכון, מעל הספה. אין פה באג, יש פה טעם טוב.'));
-target(tall,'d-tall','ארון גבוה',()=>say('ארון אחסון גבוה. הוא בסדר. השכנים שלו פחות.'));
+target(tall,'d-tall','ארון גבוה',()=>say('תבלינים שפג תוקפם בשנה שעברה. יורם: <b>״זה עדיין טוב.״</b>'));
 target(slideB,'d-balcony','דלת המרפסת',()=>say('המרפסת נעולה. יורם: ״לשם נגיע בסוף. אם בכלל.״'));
 target(doorE,'d-entry','דלת הכניסה',()=>say('דלת הכניסה. יורם: ״אף אחד לא יוצא מפה בלי לראות את המסדרון שלי!״'));
 target(binG,'bin','פח מחזור',()=>say('בפח המחזור: הוראות ההרכבה של הספרייה. <b>יורם לא צריך הוראות.</b>'));
 target(cert,'d-cert','תעודה ממוסגרת',()=>say('תעודת ״מהנדס״ ממוסגרת. יורם הדפיס אותה במדפסת הביתית, אחרי קורס של 40 דקות ביוטיוב. <b>הדיו עוד לא התייבש.</b>'));
 target(doorC,'lock','דלת המסדרון (נעולה)',()=>openLock());
+
+/* ---- more things to click ---- */
+function hitBox(par,w,h,d,x,y,z,id,name,msg){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));m.position.set(x,y,z);par.add(m);target(m,id,name,typeof msg==='function'?msg:()=>say(msg));return m;}
+hitBox(kit,.04,.8,.6,-3.86,.45,-1.9,'dishwasher','מגירות',dwClick);
+hitBox(kit,.8,.8,.04,-2.8,.45,-2.17,'d-sink','ארון מתחת לכיור','מתחת לכיור: חומרי ניקוי, ונזילה קטנה. יורם: <b>״זה לא נזילה, זה לחות.״</b>');
+let potsN=0;hitBox(kit,.75,.8,.04,-2.0,.45,-2.17,'d-pots','ארון',()=>say(potsN++%2?'שקיות. בתוך שקיות. <b>בתוך שקית.</b>':'סירים. המכסים בארון אחר. <b>איזה? אף אחד לא יודע.</b>'));
+hitBox(kit,.6,.8,.04,-1.3,.45,-2.17,'d-oven','ארון מתחת לכיריים','מתחת לכיריים אין תנור. יורם: <b>״מי צריך תנור כשיש מיקרו?״</b>');
+hitBox(kit,.04,2.1,.6,-3.88,1.1,-.2,'d-plates','ארון צלחות','רק צלחות כאן. <b>ושלוש קופסאות בלי מכסה.</b>');
+[['כיסא אוכל שמתנדנד קצת. יורם: <b>״זה ארגונומי.״</b>'],['על הכיסא הזה מונחים בגדים כבר שלושה שבועות. <b>הוא כבר לא כיסא, הוא ארון.</b>'],['הכיסא של סבתא. <b>אף אחד לא יושב עליו, גם כשסבתא לא פה.</b>'],['כיסא שקנו ביד 2. <b>הדבר היחיד בבית שמישהו תכנן.</b>']].forEach(([m],i)=>target(dch[i],'d-dchair'+i,'כיסא',()=>say(m)));
+hitBox(g,2.0,1.8,.02,1.5,1.45,2.74,'d-win','חלון','נוף פתוח לחניה. יורם: <b>״זה נוף פתוח!״</b>');
+hitBox(g,.02,1.2,1.2,-4.43,1.55,1.3,'d-kwin','חלון','יורם ניקה את החלון הזה פעם אחת. <b>ב-2019.</b>');
 
 /* ---- sound + vibration ---- */
 const SFX=(()=>{let ac=null,master,musicG,sfxG,muted=false;
@@ -545,13 +565,19 @@ function bug(id,delay){
       if(b.key==='note'){S.piece=true;renderTools();}
       if(S.found.size===8&&!b.key)onClose=()=>{goDoor();};
       if(S.found.size===8&&b.key){const prev=onClose;onClose=()=>{prev&&prev();setTimeout(goDoor,400);};}
+      if(S.guessed&&S.letters.length===6&&b.letters.length){onClose=()=>{toast('<b>האות האחרונה!</b> הדלת של יורם נפתחת.');setTimeout(win,700);};}
     }
   },again?0:delay);
 }
 
 /* ---- lock ---- */
 function goDoor(){go('salon');setTimeout(()=>aim(new THREE.Vector3(4.5,1.3,-1.6)),60);toast('מצאת את כל 8 הבאגים! עכשיו לדלת המסדרון: <b>הדלת עם השלט ״לא להיכנס!״</b>.');}
+function litWord(){const pool=[...S.letters];return [...WORD].map(ch=>{const k=pool.indexOf(ch);if(k>=0){pool.splice(k,1);return `<span class="gl on">${ch}</span>`;}return `<span class="gl">${ch}</span>`;}).join('');}
+function guessedModal(fresh){const left=6-S.letters.length;
+  openModal(`<div class="tag">${fresh?'ניחוש מוקדם':'דלת המסדרון'}</div><h2>${fresh?'מצוין! פיצחת את הסיסמה':'את הסיסמה כבר פיצחת'}</h2><p>פיצחת אותה תוך <b>${fmtT(S.guessAt)}</b>, והזמן הזה נשמר לך.</p><div class="gword">${litWord()}</div><p>אבל המנעול של יורם נפתח רק עם כל 6 האותיות. ${left===1?'חסרה לך עוד אות אחת':'חסרות לך עוד '+left+' אותיות'}. כשתמצא את האחרונה, הדלת תיפתח לבד.</p><div class="actions"><button class="btn primary" data-close type="button">להמשיך לחפש</button></div>`);}
+const normW=w=>w.replace(/\s/g,'').replace(/ך/g,'כ').replace(/ם/g,'מ').replace(/ן/g,'נ').replace(/ף/g,'פ').replace(/ץ/g,'צ');
 function openLock(){
+  if(S.guessed){if(S.letters.length===6){win();return;}guessedModal(false);return;}
   let slots=Array(6).fill(null);const order=S.letters.map((l,i)=>({l,i})).sort(()=>Math.random()-.5);
   const missing=6-S.letters.length;
   openModal(`<div class="tag">דלת המסדרון</div><h2>מנעול של 6 אותיות</h2>
@@ -559,7 +585,12 @@ function openLock(){
     ${missing?`<p class="note">יש לך ${S.letters.length} מתוך 6 אותיות. ${missing===1?'חסרה עוד אחת':'חסרות עוד '+missing}, חפש עוד באגים.</p>`:'<p class="note">יש לך את כל 6 האותיות. לחץ על אות כדי להכניס אותה, ועל משבצת כדי להחזיר.</p>'}
     ${S.piece?'<p class="note">יש לך את הפתק של יורם. <button type="button" class="btn" id="seePiece" style="padding:3px 10px;font-size:.85rem">להציץ בו</button></p>':''}
     <div class="lockslots" id="ls" dir="rtl"></div><div class="tiles" id="tl"></div><div class="msg" id="lm"></div>
-    <div class="actions"><button class="btn primary" id="tryOpen" type="button">לפתוח</button><button class="btn" id="clr" type="button">לנקות</button><button class="btn" data-close type="button">סגור</button></div>`,'#tl .tile');
+    <div class="actions"><button class="btn primary" id="tryOpen" type="button">לפתוח</button><button class="btn" id="clr" type="button">לנקות</button><button class="btn" data-close type="button">סגור</button></div>
+    ${missing?`<div class="guess"><label for="gw">יודע כבר את המילה? הקלד אותה</label><div class="grow"><input id="gw" autocomplete="off" spellcheck="false" maxlength="12"><button class="btn" id="gbtn" type="button">לבדוק</button></div><div class="msg" id="gm"></div></div>`:''}`,'#tl .tile');
+  const gb=$('gbtn');if(gb){const check=()=>{const v=$('gw').value,m=$('gm');if(!v.trim())return;
+      if(normW(v)===normW(WORD)){track('early_guess');S.guessed=true;S.guessAt=elapsed(performance.now());SFX.fanfare();vib([60,40,90]);guessedModal(true);return;}
+      S.tries++;SFX.buzz();vib(200);m.className='msg bad';m.textContent='לא זה. יורם בטוח שאף אחד לא ינחש.';};
+    gb.addEventListener('click',check);$('gw').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check();}});}
   const draw=()=>{$('ls').innerHTML=slots.map((s,i)=>`<button type="button" class="slot ${s!=null?'filled':''}" data-i="${i}" aria-label="משבצת ${i+1}">${s!=null?S.letters[s]:''}</button>`).join('');
     $('tl').querySelectorAll('.tile').forEach(t=>t.classList.toggle('used',slots.includes(+t.dataset.i)));};
   $('tl').innerHTML=order.map(o=>`<button type="button" class="tile" data-i="${o.i}">${o.l}</button>`).join('')||'<span class="note">עוד אין אותיות</span>';
@@ -589,11 +620,12 @@ function win(){track('game_finish');S.end=performance.now();lockScr.material.col
   anim(1.6,t=>{leaf.rotation.y=-t*1.4;});setTimeout(showEnd,2000);}
 function showEnd(){
   const time=fmtT(elapsed(S.end));
-  const msg=`פתרתי את פרק 1 של משפחת קלרוסנבסקי ב-${time}! תעדכני אותי כשפרק 2 עולה`;
+  const g=S.guessAt?fmtT(S.guessAt):'';
+  const msg=g?`פתרתי את פרק 1 של משפחת קלרוסנבסקי ב-${time} (ואת הסיסמה פיצחתי כבר ב-${g})! תעדכני אותי כשפרק 2 עולה`:`פתרתי את פרק 1 של משפחת קלרוסנבסקי ב-${time}! תעדכני אותי כשפרק 2 עולה`;
   $('endIn').innerHTML=`
     <div class="brand"><b>מירי פרידלנד</b> · תכנון ועיצוב פנים</div>
     <div><div class="tag">פרק 1 הושלם</div><h2>פתחת את המסדרון!</h2></div>
-    <div class="stats"><div><b>${time}</b><span>זמן, כולל רמזים</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
+    <div class="stats">${g?`<div><b>${g}</b><span>פיצחת את הסיסמה</span></div>`:''}<div><b>${time}</b><span>${g?'סיימת את הדירה':'זמן, כולל רמזים'}</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
     <p style="margin:0">השיטה של יורם, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
     <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
       <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
@@ -602,9 +634,8 @@ function showEnd(){
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
       <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" onclick="track('contact_save')" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
         <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
-      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div style="margin-top:6px"><a class="btn wa" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a></div>
-        <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div>
-        <div class="note" style="margin-top:6px">אין וואטסאפ? אפשר גם במייל: <a href="mailto:mirivlin@gmail.com" onclick="track('email_click')">mirivlin@gmail.com</a></div></div></div>
+      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div class="sendrow"><a class="btn wa" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a><a class="btn primary" onclick="track('email_click')" href="mailto:mirivlin@gmail.com?subject=${encodeURIComponent('משפחת קלרוסנבסקי · פרק 1')}&body=${encodeURIComponent(msg)}">לשלוח במייל</a></div>
+        <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
     </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
     <div class="actions" style="justify-content:center"><a class="btn primary" onclick="track('site_click')" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
