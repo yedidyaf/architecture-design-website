@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
-import { Allura } from "next/font/google";
 import ArchSlogan from "@/components/ArchSlogan";
 import ScrollHint from "@/components/ScrollHint";
 import Testimonials from "@/components/Testimonials";
@@ -49,9 +48,6 @@ const SCREEN = "flex min-h-svh snap-start flex-col items-center justify-center p
 // pencil line (PencilPath) that runs between and around them.
 const STEP = `${SCREEN} min-[900px]:min-h-0 min-[900px]:py-0 min-[900px]:mt-[230px]`;
 
-// Placeholder handwriting for the signature at the end of the pencil line,
-// until Miri's own signature replaces it.
-const signatureFont = Allura({ weight: "400", subsets: ["latin"] });
 
 export type HomeViewProps = {
   name?: string;
@@ -157,7 +153,7 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
             <section key={i} className={STEP}>
               <div
                 data-pencil-frame=""
-                className={`w-full min-[900px]:w-fit min-[900px]:max-w-[85%] text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
+                className={`w-full min-[900px]:w-fit min-[900px]:max-w-[78%] text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
               >
                 {screen}
               </div>
@@ -165,14 +161,12 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
           ))}
 
           {tagline?.trim() && bioScreens.length > 0 ? (
+            // Room for Miri's signature, which PencilPath writes here.
             <div
               data-pencil-sig=""
-              dir="ltr"
-              className={`pencil-sig mx-auto mt-[200px] hidden w-max text-[68px] leading-tight text-brand min-[900px]:block ${signatureFont.className}`}
+              className="mx-auto mt-[200px] hidden h-[198px] w-[126px] min-[900px]:block"
               aria-hidden="true"
-            >
-              <span>M. Friedland</span>
-            </div>
+            />
           ) : null}
 
           {projects.length > 0 ? (
