@@ -242,7 +242,10 @@ export default async function ProjectPage({
         <div className={TEXT_ALIGN_CLASS[project.textAlign ?? "right"] ?? TEXT_ALIGN_CLASS.right}>
           {/* One lightbox for all the article's images, in page order. */}
           <LightboxGallery>
-            <PortableText value={project.body ?? []} components={portableTextComponents} />
+            {/* Each block of the article rises in as it scrolls into view (ScrollReveal). */}
+            <div data-reveal-children="">
+              <PortableText value={project.body ?? []} components={portableTextComponents} />
+            </div>
           </LightboxGallery>
         </div>
 

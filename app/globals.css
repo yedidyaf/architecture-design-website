@@ -293,26 +293,40 @@ body {
   }
 }
 
-/* Homepage text (components/home/BioReveal.tsx): once the slogan has been
-   typed, each line rises into place one after the other. --i is the line's
-   index, set by BioReveal. Without JS (see the <noscript> in HomeView) or
-   with reduced motion, the text is simply there. */
+/* Scroll reveal (components/ScrollReveal.tsx): elements start hidden and
+   rise into place when the visitor scrolls to them. The homepage text lines
+   (.bio-line) rise more slowly and from closer, line by line. Reduced motion
+   shows everything; without JS the <noscript> in the layout does. */
 .bio-line {
   display: block;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .bio-reveal .bio-line {
+  .reveal:not(.is-in),
+  [data-reveal-children] > :not(.is-in) {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(28px);
   }
-  .bio-reveal.is-shown .bio-line {
-    animation: bio-rise 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-    animation-delay: calc(var(--i, 0) * 0.28s);
+  .reveal.is-in,
+  [data-reveal-children] > .is-in {
+    animation: reveal-rise 1.2s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+  }
+  .bio-line.reveal:not(.is-in) {
+    transform: translateY(14px);
+  }
+  .bio-line.reveal.is-in {
+    animation-name: bio-rise;
+    animation-duration: 1.5s;
+  }
+}
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
   }
 }
 @keyframes bio-rise {
-  to {
-    opacity: 1;
-    transform: none;
+  from {
+    opacity: 0;
+    transform: translateY(14px);
   }
 }
