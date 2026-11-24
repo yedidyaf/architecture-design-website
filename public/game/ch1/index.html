@@ -209,7 +209,7 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
 
 <script>
 window.__showLoadErr=function(kind,detail){var b=document.getElementById('loadErr'),s=document.getElementById('startBtn');if(!b||window.__loadErrShown)return;window.__loadErrShown=1;
-var msg={webgl:'<b>הטלפון או הדפדפן הזה לא מצליחים להציג את הגרפיקה של המשחק.</b> נסה לפתוח את הקישור בכרום: בוואטסאפ לוחצים על שלוש הנקודות ובוחרים ״פתח בדפדפן״. אפשר גם לשחק ממחשב.',
+var msg={webgl:(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)?'<b>הטלפון או הדפדפן הזה לא מצליחים להציג את הגרפיקה של המשחק.</b> נסה לפתוח את הקישור בכרום: בוואטסאפ לוחצים על שלוש הנקודות ובוחרים ״פתח בדפדפן״. אפשר גם לשחק ממחשב.':'<b>הדפדפן לא מצליח להפעיל את הגרפיקה של המשחק.</b> בדרך כלל זה כי ״האצת חומרה״ כבויה. בכרום: הגדרות ← מערכת ← להפעיל את ״שימוש בהאצת גרפיקה כשאפשר״, ואז ״הפעלה מחדש״. באדג׳: הגדרות ← מערכת וביצועים ← אותה אפשרות. אם זה לא עוזר, נסה דפדפן אחר או מהטלפון.'),
 lib:'<b>חלק מהמשחק לא נטען.</b> ייתכן שסינון האינטרנט חוסם אותו. נסה לרענן את הדף, או לפתוח מרשת אחרת.',
 other:'<b>משהו השתבש בטעינת המשחק.</b> נסה לרענן את הדף, או לפתוח אותו בכרום.'}[kind]||'';
 b.innerHTML=msg+(detail?'<small>'+String(detail).replace(/[<>&]/g,'')+'</small>':'');b.hidden=false;if(s){s.disabled=true;s.textContent='לא ניתן להתחיל';}};
@@ -226,7 +226,7 @@ const $=id=>document.getElementById(id);
 const fmtN=n=>n.toLocaleString('he-IL')+' ₪';
 
 const host=$('scene');
-let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true});}catch(e){window.__showLoadErr('webgl',e&&e.message);return;}
+let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true});}catch(e1){try{renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'low-power'});}catch(e){window.__showLoadErr('webgl',e&&e.message);return;}}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=THREE.sRGBEncoding;
