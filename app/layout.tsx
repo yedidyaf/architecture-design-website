@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Amatic_SC, Assistant } from "next/font/google";
 import Footer from "@/components/Footer";
+import ScrollReveal from "@/components/ScrollReveal";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -66,8 +67,12 @@ export default function RootLayout({
       className={`${assistant.variable} ${amaticSC.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <noscript>
+          <style>{`.reveal,[data-reveal-children]>*{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
         {children}
         <Footer />
+        <ScrollReveal />
         <Analytics />
       </body>
     </html>

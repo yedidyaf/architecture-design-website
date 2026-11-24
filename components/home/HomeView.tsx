@@ -1,7 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import ArchSlogan from "@/components/ArchSlogan";
-import BioReveal from "./BioReveal";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
 import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
@@ -88,7 +87,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
         />
       </aside>
 
-      <div className="px-6 pt-16 sm:pt-14 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
+      <div className="px-6 pt-28 sm:pt-24 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
         <div className="mx-auto max-w-[460px] min-[900px]:max-w-none">
           {logoSrc || name || tagline ? (
             <header className="text-center">
@@ -135,18 +134,17 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
           ) : null}
 
           {bio ? (
-            <BioReveal
-              waitForSlogan={Boolean(tagline?.trim())}
+            // Lines reveal on scroll (ScrollReveal); while the slogan is
+            // still being typed, the ones already in view wait for it.
+            <div
+              data-reveal-after-slogan={tagline?.trim() ? "" : undefined}
               className={`mt-10 text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
             >
-              <noscript>
-                <style>{`.bio-reveal .bio-line{opacity:1!important;transform:none!important}`}</style>
-              </noscript>
               {bio}
-            </BioReveal>
+            </div>
           ) : null}
 
-          <div className="mt-12 min-[900px]:hidden">
+          <div className="reveal mt-12 min-[900px]:hidden">
             <MobileProjects projects={projects} />
           </div>
         </div>
@@ -154,7 +152,7 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
 
       {/* Mobile: the same 460px column as the text above. */}
       <div
-        className="mt-10 px-6 min-[900px]:mt-24 min-[900px]:px-[var(--testimonials-inset)]"
+        className="reveal mt-28 px-6 min-[900px]:mt-44 min-[900px]:px-[var(--testimonials-inset)]"
         style={{ gridColumn: "2 / span 3", gridRow: "2" }}
       >
         <div className="mx-auto max-w-[460px] min-[900px]:max-w-[1000px] [&>section]:max-w-none [&>section]:px-0">

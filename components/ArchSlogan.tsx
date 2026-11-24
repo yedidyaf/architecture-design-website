@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SLOGAN_DONE_EVENT } from "@/components/home/BioReveal";
+import { SLOGAN_DONE_EVENT } from "@/components/ScrollReveal";
 
 const DRAW_START = 400;
 const DRAW_MS = 2000;
 const TYPE_AFTER_DRAW = 300; // pencil fade (0.5s) overlaps; typing starts this long after the arch is done
 const ARCH_PATH = "M334,60 L122,60 A60,60 0 0 0 122,180 L334,180";
 const LINE_PAUSE = 350;
+// After each drawing the arch stays this long, fades out, and is drawn again.
+const REDRAW_EVERY = 7000;
+const ERASE_MS = 600;
 const SPEEDS = [70, 60]; // ms per character, per line
 
 // One arch lying on its side (open to the right), drawn live by a pencil,
@@ -22,20 +25,28 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
   const mainRef = useRef<SVGPathElement>(null);
   const ghostRef = useRef<SVGPathElement>(null);
   const pencilRef = useRef<SVGGElement>(null);
+  const groupRef = useRef<SVGGElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const main = mainRef.current;
     const ghost = ghostRef.current;
     const pencil = pencilRef.current;
-    if (!main || !ghost || !pencil) return;
+    const group = groupRef.current;
+    if (!main || !ghost || !pencil || !group) return;
     const len = main.getTotalLength();
     for (const el of [main, ghost]) {
       el.style.strokeDasharray = String(len);
       el.style.strokeDashoffset = String(len);
     }
     let raf = 0;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let typeTimer: ReturnType<typeof setTimeout> | undefined;
+    let first = true;
+    // Redraws pause while the arch is off screen or the tab is hidden.
+    let onScreen = true;
+    const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting));
+    io.observe(main);
     const place = (d: number) => {
       const pt = main.getPointAtLength(d);
       pencil.setAttribute(
@@ -43,32 +54,54 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
         `translate(${pt.x} ${pt.y + Math.sin(d * 0.35) * 0.6}) rotate(-50)`,
       );
     };
-    timers.push(
-      setTimeout(() => {
-        const t0 = performance.now();
-        pencil.style.opacity = "1";
-        const frame = (now: number) => {
-          const k = Math.min(1, (now - t0) / DRAW_MS);
-          const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-          const d = len * eased;
-          main.style.strokeDashoffset = String(len - d);
-          ghost.style.strokeDashoffset = String(len - Math.max(0, d - 6));
-          place(d);
-          if (k < 1) {
-            raf = requestAnimationFrame(frame);
-            return;
-          }
-          ghost.style.strokeDashoffset = "0";
-          pencil.style.opacity = "0";
-          timers.push(setTimeout(() => setDrawn(true), TYPE_AFTER_DRAW));
-        };
-        place(0);
-        raf = requestAnimationFrame(frame);
-      }, DRAW_START),
-    );
+    const reset = () => {
+      main.style.strokeDashoffset = String(len);
+      ghost.style.strokeDashoffset = String(len);
+    };
+    const draw = () => {
+      const t0 = performance.now();
+      place(0);
+      pencil.style.opacity = "1";
+      const frame = (now: number) => {
+        const k = Math.min(1, (now - t0) / DRAW_MS);
+        const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        const d = len * eased;
+        main.style.strokeDashoffset = String(len - d);
+        ghost.style.strokeDashoffset = String(len - Math.max(0, d - 6));
+        place(d);
+        if (k < 1) {
+          raf = requestAnimationFrame(frame);
+          return;
+        }
+        ghost.style.strokeDashoffset = "0";
+        pencil.style.opacity = "0";
+        if (first) {
+          first = false;
+          typeTimer = setTimeout(() => setDrawn(true), TYPE_AFTER_DRAW);
+        }
+        timer = setTimeout(redraw, REDRAW_EVERY);
+      };
+      raf = requestAnimationFrame(frame);
+    };
+    // The arch fades away and the pencil draws it again; the slogan stays.
+    const redraw = () => {
+      if (!onScreen || document.hidden) {
+        timer = setTimeout(redraw, 1000);
+        return;
+      }
+      group.style.opacity = "0";
+      timer = setTimeout(() => {
+        reset();
+        group.style.opacity = "1";
+        draw();
+      }, ERASE_MS);
+    };
+    timer = setTimeout(draw, DRAW_START);
     return () => {
       cancelAnimationFrame(raf);
-      timers.forEach(clearTimeout);
+      clearTimeout(timer);
+      clearTimeout(typeTimer);
+      io.disconnect();
     };
   }, []);
 
@@ -129,7 +162,11 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
               <feComposite in="d" in2="ga" operator="in" />
             </filter>
           </defs>
-          <g filter="url(#pencilTex)" fill="none" stroke="#4a4546" strokeLinecap="round" strokeLinejoin="round">
+          <g
+            ref={groupRef}
+            style={{ transition: `opacity ${ERASE_MS}ms ease` }}
+            filter="url(#pencilTex)"
+            fill="none" stroke="#4a4546" strokeLinecap="round" strokeLinejoin="round">
             <path
               ref={ghostRef}
               className="arch-line"

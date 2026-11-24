@@ -46,7 +46,7 @@ function SoftBreak() {
 }
 
 // Each line (the parts of a paragraph between soft breaks) becomes its own
-// block-level .bio-line, so BioReveal can bring the lines in one by one.
+// block-level .bio-line, so ScrollReveal can bring the lines in one by one.
 // Consecutive breaks keep their blank line; a trailing break is dropped.
 function BioLines({ children }: { children: ReactNode }) {
   const lines: ReactNode[][] = [[]];
@@ -56,7 +56,7 @@ function BioLines({ children }: { children: ReactNode }) {
   }
   if (lines.length > 1 && lines[lines.length - 1].length === 0) lines.pop();
   return lines.map((line, i) => (
-    <span key={i} className="bio-line">
+    <span key={i} className="bio-line reveal">
       {line.length > 0 ? line : <br />}
     </span>
   ));
@@ -120,7 +120,7 @@ export default async function Home() {
     bio.length > 0 ? <PortableText value={splitSoftBreaks(bio)} components={bioComponents} /> : null
   ) : typeof bio === "string" && bio.trim() ? (
     <p className="whitespace-pre-line">
-      <span className="bio-line">{bio}</span>
+      <span className="bio-line reveal">{bio}</span>
     </p>
   ) : null;
 
