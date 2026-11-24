@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import ArchSlogan from "@/components/ArchSlogan";
+import ScrollHint from "@/components/ScrollHint";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
 import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
@@ -40,12 +41,15 @@ const GRID_COLUMNS = `${SIDE_COLUMN_WIDTH}px minmax(0, 1fr) min(${TEXT_TRACK}px,
 
 type Testimonial = { _id: string; clientName: string; quote: string };
 
+// One full-screen step of the homepage, its content centered.
+const SCREEN = "flex min-h-svh snap-start flex-col items-center justify-center py-16";
+
 export type HomeViewProps = {
   name?: string;
   logoSrc?: string;
   tagline?: string;
-  /** The About text, already rendered (Portable Text) on the server. */
-  bio?: ReactNode;
+  /** The About text, already rendered on the server, one entry per screen. */
+  bioScreens: ReactNode[];
   bioAlign?: BioAlign;
   projects: HomeProject[];
   testimonials: Testimonial[];
@@ -56,9 +60,9 @@ export type HomeViewProps = {
 //
 // >= 900px: illustrations on the right, the reading column centered, the
 // projects centered in the left gutter (see GRID_COLUMNS).
-// < 900px: one column (header, bio, posts preview, testimonials); the
+// < 900px: one column of screens (logo, slogan, text, posts, testimonials); the
 // projects open in a full-screen overlay and the illustrations are hidden.
-export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "right", projects, testimonials }: HomeViewProps) {
+export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign = "right", projects, testimonials }: HomeViewProps) {
   return (
     <main
       className="flex-1 overflow-x-clip min-[900px]:grid"
@@ -87,10 +91,14 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
         />
       </aside>
 
-      <div className="px-6 pt-28 sm:pt-24 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
+      {/* The reading column is a stack of full-screen "screens" with one
+          thing on each: logo and name, the slogan arch, each part of the
+          text, the posts (mobile), then the testimonials. The page snaps
+          from screen to screen (globals.css, .home-screens). */}
+      <div className="home-screens px-6 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
         <div className="mx-auto max-w-[460px] min-[900px]:max-w-none">
-          {logoSrc || name || tagline ? (
-            <header className="text-center">
+          {logoSrc || name ? (
+            <header className={`${SCREEN} relative text-center`}>
               {logoSrc ? (
                 <div className="logo-glow relative mx-auto mb-[8.25rem] h-42 w-42 max-w-full rounded-full sm:mb-[8.125rem] sm:h-36 sm:w-36">
                   {/* Hand-drawn ripples behind the logo; absolutely positioned, so no layout shift. */}
@@ -125,37 +133,42 @@ export default function HomeView({ name, logoSrc, tagline, bio, bioAlign = "righ
               {name ? (
                 <h1 className="brand-name font-brand-name text-[2.625rem] text-brand sm:text-5xl">{name}</h1>
               ) : null}
-              {tagline?.trim() ? (
-                <div className="mt-2 sm:mt-0">
-                  <ArchSlogan lines={tagline.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean)} />
-                </div>
-              ) : null}
+              <ScrollHint />
             </header>
           ) : null}
 
-          {bio ? (
-            // Lines reveal on scroll (ScrollReveal); while the slogan is
-            // still being typed, the ones already in view wait for it.
-            <div
-              data-reveal-after-slogan={tagline?.trim() ? "" : undefined}
-              className={`mt-10 text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
-            >
-              {bio}
-            </div>
+          {tagline?.trim() ? (
+            <section className={SCREEN}>
+              <ArchSlogan lines={tagline.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean)} />
+            </section>
           ) : null}
 
-          <div className="reveal mt-12 min-[900px]:hidden">
-            <MobileProjects projects={projects} />
-          </div>
+          {bioScreens.map((screen, i) => (
+            <section key={i} className={SCREEN}>
+              <div
+                className={`w-full text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
+              >
+                {screen}
+              </div>
+            </section>
+          ))}
+
+          {projects.length > 0 ? (
+            <section className={`${SCREEN} min-[900px]:hidden`}>
+              <div className="reveal w-full">
+                <MobileProjects projects={projects} />
+              </div>
+            </section>
+          ) : null}
         </div>
       </div>
 
       {/* Mobile: the same 460px column as the text above. */}
       <div
-        className="reveal mt-28 px-6 min-[900px]:mt-44 min-[900px]:px-[var(--testimonials-inset)]"
+        className={`${SCREEN} px-6 min-[900px]:px-[var(--testimonials-inset)]`}
         style={{ gridColumn: "2 / span 3", gridRow: "2" }}
       >
-        <div className="mx-auto max-w-[460px] min-[900px]:max-w-[1000px] [&>section]:max-w-none [&>section]:px-0">
+        <div className="reveal mx-auto w-full max-w-[460px] min-[900px]:max-w-[1000px] [&>section]:max-w-none [&>section]:px-0">
           <Testimonials testimonials={testimonials} />
         </div>
       </div>

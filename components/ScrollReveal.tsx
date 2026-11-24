@@ -2,17 +2,9 @@
 
 import { useEffect } from "react";
 
-/** Fired on window by ArchSlogan when the slogan has finished typing. */
-export const SLOGAN_DONE_EVENT = "arch-slogan:done";
-
-type Flags = Window & { __archSloganDone?: boolean };
-
 // What reveals on scroll: anything with .reveal, and every direct child of an
 // element marked data-reveal-children (e.g. the blocks of an article).
 const SELECTOR = ".reveal, [data-reveal-children] > *";
-// Elements inside [data-reveal-after-slogan] also wait for the homepage
-// slogan to finish typing. If it never reports, they stop waiting after this.
-const SLOGAN_FALLBACK_MS = 10000;
 // Elements that come into view together enter one after another.
 const STAGGER_S = 0.35;
 
@@ -24,9 +16,7 @@ const STAGGER_S = 0.35;
 // the <noscript> in the layout).
 export default function ScrollReveal() {
   useEffect(() => {
-    const flags = window as Flags;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const waiting = new Set<Element>(); // in view, held back for the slogan
 
     const show = (els: Element[]) => {
       els.forEach((el, i) => {
@@ -34,20 +24,14 @@ export default function ScrollReveal() {
         el.classList.add("is-in");
       });
     };
-    const sloganDone = () => Boolean(flags.__archSloganDone);
-    const gated = (el: Element) => !sloganDone() && el.closest("[data-reveal-after-slogan]") !== null;
 
     const io = new IntersectionObserver(
       (entries) => {
         const ready: Element[] = [];
         for (const e of entries) {
-          if (!e.isIntersecting) {
-            waiting.delete(e.target);
-            continue;
-          }
+          if (!e.isIntersecting) continue;
           io.unobserve(e.target);
-          if (gated(e.target)) waiting.add(e.target);
-          else ready.push(e.target);
+          ready.push(e.target);
         }
         show(ready);
       },
@@ -68,19 +52,9 @@ export default function ScrollReveal() {
     const mo = new MutationObserver(scan);
     mo.observe(document.body, { childList: true, subtree: true });
 
-    const release = () => {
-      flags.__archSloganDone = true;
-      show([...waiting]);
-      waiting.clear();
-    };
-    window.addEventListener(SLOGAN_DONE_EVENT, release);
-    const fallback = window.setTimeout(release, SLOGAN_FALLBACK_MS);
-
     return () => {
       io.disconnect();
       mo.disconnect();
-      window.removeEventListener(SLOGAN_DONE_EVENT, release);
-      window.clearTimeout(fallback);
     };
   }, []);
 
