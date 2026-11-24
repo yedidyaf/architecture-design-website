@@ -331,14 +331,22 @@ body {
   }
 }
 
-/* Homepage screens (components/home/HomeView.tsx): the page snaps from one
-   full-screen step to the next. The footer is a snap point too, so the very
-   end of the page stays reachable. */
-html:has(.home-screens) {
-  scroll-snap-type: y mandatory;
+/* Homepage screens (components/home/HomeView.tsx). On phones the page snaps
+   from one full-screen step to the next; the footer is a snap point too, so
+   the very end of the page stays reachable. On desktop it scrolls freely
+   and smoothly through the same screens. */
+@media (max-width: 899.98px) {
+  html:has(.home-screens) {
+    scroll-snap-type: y mandatory;
+  }
+  html:has(.home-screens) body > footer {
+    scroll-snap-align: end;
+  }
 }
-html:has(.home-screens) body > footer {
-  scroll-snap-align: end;
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  html:has(.home-screens) {
+    scroll-behavior: smooth;
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   .scroll-hint-arrow {
