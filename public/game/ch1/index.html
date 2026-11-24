@@ -83,6 +83,16 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .lt.got{border-style:solid;border-color:var(--accent);animation:pop .45s}
 @keyframes pop{50%{transform:scale(1.2)}}
 .tool{font:inherit;font-size:.8rem;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:5px 9px;cursor:pointer}
+.tool.new{border-color:var(--accent);background:var(--accent-soft);animation:glow 1s 5}
+.btn.pulse{animation:glow 1.1s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 7px rgba(159,43,53,.28)}}
+.newitem{display:flex;justify-content:center;margin:6px 0 10px;animation:spinIn .7s ease}
+@keyframes spinIn{from{transform:scale(.3) rotate(-25deg);opacity:0}}
+.scrollcue{position:fixed;left:0;right:0;bottom:0;z-index:41;display:flex;justify-content:center;padding:46px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,rgba(247,239,236,0),#F7EFEC 65%);pointer-events:none;transition:opacity .3s}
+.scrollcue button{pointer-events:auto;font:inherit;font-weight:800;color:#fff;background:var(--accent);border:0;border-radius:99px;padding:9px 18px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(74,44,48,.25);cursor:pointer}
+.scrollcue svg{width:18px;height:18px;animation:bob 1.2s infinite}
+@keyframes bob{50%{transform:translateY(4px)}}
+.scrollcue.gone{opacity:0;pointer-events:none}.scrollcue.gone button{pointer-events:none}
 .inv .div{width:1px;height:26px;background:var(--line)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
 .chip{font:inherit;font-size:.88rem;font-weight:600;border:0;background:var(--glass);color:var(--ink);padding:8px 14px;border-radius:99px;cursor:pointer;box-shadow:0 4px 14px rgba(40,20,20,.15)}
@@ -426,7 +436,7 @@ const BUGS={
 };
 const ORDER=['shtender','rug','pendant','cabinets','dishwasher','fridge','cooktop','socket'];
 
-const S={found:new Set(),letters:[],tape:false,piece:false,cost:0,hints:0,hintStep:{},start:0,end:0,tries:0,lockHints:0};
+const S={found:new Set(),letters:[],tape:false,piece:false,cost:0,hints:0,hintStep:{},start:0,end:0,tries:0,lockHints:0,nextNudge:90000};
 const anims=[];function anim(dur,fn,done){anims.push({t:0,dur,fn,done});}
 
 target(study,'d-chair','כיסא',()=>say('כיסא נוח. השאלה מה רואים כשיושבים עליו.'));
@@ -537,6 +547,8 @@ $('wrap').addEventListener('click',e=>{if(e.target===$('wrap'))closeModal();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('wrap').hidden)closeModal();});
 
 function renderLetters(flash){$('letters').innerHTML=Array.from({length:6},(_,i)=>{const l=S.letters[i];return `<div class="lt ${l?'got':''}" style="${l&&i!==flash?'animation:none':''}">${l||''}</div>`;}).join('');}
+const TAPE_SVG=(()=>{let t='';for(let x=70;x<=150;x+=8)t+=`<line x1="${x}" y1="70" x2="${x}" y2="${(x-70)%16?77:81}"/>`;return `<svg viewBox="0 0 165 110" width="170" height="114" aria-hidden="true"><rect x="58" y="68" width="100" height="18" rx="2" fill="#F7D35A" stroke="#B88F10" stroke-width="2"/><g stroke="#4A2C30" stroke-width="2">${t}</g><rect x="152" y="64" width="8" height="26" rx="2" fill="#7A7F86"/><circle cx="52" cy="54" r="46" fill="#F2C230" stroke="#B88F10" stroke-width="4"/><circle cx="52" cy="54" r="30" fill="none" stroke="#D9A91E" stroke-width="3"/><circle cx="52" cy="54" r="12" fill="#4A2C30"/><rect x="18" y="92" width="34" height="11" rx="4" fill="#4A2C30"/></svg>`;})();
+function flashTool(k){renderTools();const b=document.querySelector(`.tool[data-tool="${k}"]`);if(b){b.classList.add('new');setTimeout(()=>b.classList.remove('new'),5200);}toast('<b>סרט המדידה</b> בכלים שלך, למטה.');}
 function renderTools(){const t=[];if(S.tape)t.push('<button type="button" class="tool" data-tool="tape">סרט מדידה</button>');if(S.piece)t.push('<button type="button" class="tool" data-tool="piece">הפתק של יורם</button>');
   $('tools').innerHTML=t.length?t.join(''):'<span class="note">עדיין אין</span>';}
 $('tools').addEventListener('click',e=>{const b=e.target.closest('.tool');if(!b)return;if(b.dataset.tool==='piece')showPiece();else toast('סרט מדידה. לחץ על משהו שצריך למדוד, והוא יימדד אוטומטית.');});
@@ -547,7 +559,7 @@ function showPiece(){SFX.chime();openModal(`<div class="tag">בארון העלי
 
 function bug(id,delay){
   const b=BUGS[id];const again=S.found.has(id);
-  if(!again){S.found.add(id);$('cnt').textContent=S.found.size;b.letters.forEach(l=>S.letters.push(l));}
+  if(!again){S.found.add(id);$('cnt').textContent=S.found.size;b.letters.forEach(l=>S.letters.push(l));S.nextNudge=elapsed(performance.now())+90000;$('hintBtn').classList.remove('pulse');}
   const rewards=[];
   if(b.letters.length)rewards.push(`<div class="reward"><span>${b.letters.length>1?'קיבלת אותיות':'קיבלת אות'}</span><b>${b.letters.join(' ')}</b></div>`);
   if(b.key==='tape')rewards.push(`<div class="reward tool"><span>סגרת את המדיח ופתחת את המגירה. בפנים:</span><b>סרט מדידה</b></div>`);
@@ -561,7 +573,7 @@ function bug(id,delay){
     if(!again){SFX.fanfare();vib([60,40,90]);if(b.letters.length)setTimeout(()=>SFX.chime(),550);if(b.cost)setTimeout(()=>SFX.kaching(),900);}else SFX.pop();
     if(!again){
       renderLetters(S.letters.length-1);addCost(b.cost);
-      if(b.key==='tape'){S.tape=true;renderTools();onClose=()=>{anim(.8,t=>{dwDoor.rotation.x=Math.PI/2*(1-t);drawer.position.x=-3.89+t*.38;},()=>{tapeOnDrawer.visible=false;});SFX.chime();toast('מצאת <b>סרט מדידה</b>. עכשיו אפשר למדוד דברים בדירה.');};}
+      if(b.key==='tape'){S.tape=true;renderTools();onClose=()=>{anim(.8,t=>{dwDoor.rotation.x=Math.PI/2*(1-t);drawer.position.x=-3.89+t*.38;},()=>{tapeOnDrawer.visible=false;});SFX.chime();openModal(`<div class="tag">חפץ חדש</div><h2>מצאת סרט מדידה!</h2><div class="newitem">${TAPE_SVG}</div><p>הוא נוסף לכלים שלך, בתחתית המסך. עכשיו אפשר למדוד דברים בדירה. <b>אולי כדאי לבדוק שוב את הכיריים?</b></p><div class="actions"><button class="btn primary" data-close type="button">מעולה</button></div>`);onClose=()=>flashTool('tape');};}
       if(b.key==='note'){S.piece=true;renderTools();}
       if(S.found.size===8&&!b.key)onClose=()=>{goDoor();};
       if(S.found.size===8&&b.key){const prev=onClose;onClose=()=>{prev&&prev();setTimeout(goDoor,400);};}
@@ -606,7 +618,7 @@ function openLock(){
 }
 
 /* ---- hints ---- */
-$('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;
+$('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;$('hintBtn').classList.remove('pulse');S.nextNudge=elapsed(performance.now())+90000;
   let html;
   if(S.found.size===8){S.lockHints++;html=S.lockHints===1?'כל האותיות אצלך. מה ירוק וארוך, ומחכה במגירת הירקות?':'המילה היא <b>מלפפון</b>: מ, ל, פ, פ, ו, ן.';}
   else{const id=ORDER.find(k=>!S.found.has(k));const b=BUGS[id];const st=S.hintStep[id]||0;S.hintStep[id]=Math.min(1,st+1);
@@ -627,9 +639,6 @@ function showEnd(){
     <div><div class="tag">פרק 1 הושלם</div><h2>פתחת את המסדרון!</h2></div>
     <div class="stats">${g?`<div><b>${g}</b><span>פיצחת את הסיסמה</span></div>`:''}<div><b>${time}</b><span>${g?'סיימת את הדירה':'זמן, כולל רמזים'}</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
     <p style="margin:0">השיטה של יורם, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
-    <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
-      <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
-      <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>ליד צד הצירים של המקרר משאירים מרווח.</li><li>מדיח לא מתקינים בפינה מול מגירות.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
     <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
       <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" onclick="track('contact_save')" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
@@ -638,8 +647,14 @@ function showEnd(){
         <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
     </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
+    <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
+      <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
+      <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>ליד צד הצירים של המקרר משאירים מרווח.</li><li>מדיח לא מתקינים בפינה מול מגירות.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
     <div class="actions" style="justify-content:center"><a class="btn primary" onclick="track('site_click')" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
   $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
+  const endEl=$('end');let cue=$('cue');if(!cue){cue=document.createElement('div');cue.className='scrollcue';cue.id='cue';cue.innerHTML='<button type="button">יש עוד למטה<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>';endEl.appendChild(cue);
+    cue.querySelector('button').addEventListener('click',()=>endEl.scrollBy({top:endEl.clientHeight*.7,behavior:'smooth'}));}
+  const upd=()=>{cue.classList.toggle('gone',endEl.scrollTop>80||endEl.scrollHeight<=endEl.clientHeight+20);};endEl.addEventListener('scroll',upd,{passive:true});setTimeout(upd,50);
   $('again').addEventListener('click',()=>location.reload());
   $('copyPh').addEventListener('click',()=>{const b=$('copyPh');const ok=()=>{b.textContent='הועתק';};const fb=()=>{const r=document.createRange();r.selectNodeContents($('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='סמנתי, העתק ידנית';};
     try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
@@ -658,7 +673,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(!S.start&&!reduce)tYaw+=dt*.05;
   for(let i=anims.length-1;i>=0;i--){const a=anims[i];a.t+=dt;const t=Math.min(1,a.t/a.dur);a.fn(t);if(t>=1){anims.splice(i,1);a.done&&a.done();}}
   if(!reduce){face.position.y=1.02+Math.sin(now*.003)*.006;}
-  if(S.start&&!S.end)$('timer').textContent=fmtT(elapsed(now));
+  if(S.start&&!S.end){const el=elapsed(now);$('timer').textContent=fmtT(el);if(!S.pauseAt&&$('wrap').hidden&&el>S.nextNudge){S.nextNudge=el+120000;$('hintBtn').classList.add('pulse');SFX.chime();toast('נתקעת? <b>לחץ על ״רמז״ למעלה</b> ותקבל כיוון. כל רמז מוסיף 30 שניות.');}}
   renderer.render(scene,camera);requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 window.__gameReady=1;
