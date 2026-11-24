@@ -99,12 +99,19 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][] } | null 
     if ((n % 2 === 1) !== (firstSide === lastSide)) n += 1;
     const weights = Array.from({ length: n }, () => between(0.45, 1.7));
     const sum = weights.reduce((a, w) => a + w, 0);
+    // Turn radii: shares of the gap, so the last run lands exactly at the
+    // target's height. Leaving the arch, the first turn is a roomy one and
+    // the others share what is left.
+    const radii = weights.map((w) => (gap * w) / sum / 2);
+    if (first && radii[0] < 36) {
+      const rest = sum - weights[0];
+      radii[0] = n === 1 ? gap / 2 : Math.min(36, gap / 4);
+      if (n > 1) for (let k = 1; k < n; k++) radii[k] = ((gap / 2 - radii[0]) * weights[k]) / rest;
+    }
     let y = from.y;
     let x = from.x;
     let side = firstSide;
-    weights.forEach((w, k) => {
-      let r = (gap * w) / sum / 2;
-      if (first && k === 0) r = Math.max(r, 36);
+    radii.forEach((r, k) => {
       // A turn now and then stays short, like a little hook.
       const short = R() < 0.35;
       let tx =
@@ -115,7 +122,9 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][] } | null 
           : short
             ? W * between(0.36, 0.5)
             : W * between(-0.04, 0.34);
-      tx = side > 0 ? Math.max(tx, x + 40) : Math.min(tx, x - 40);
+      // Room for a full, easy bend after the last run.
+      const room = r * 0.75 + 60;
+      tx = side > 0 ? Math.max(tx, x + room) : Math.min(tx, x - room);
       // The last turn sits beyond the target, so the line comes back to it
       // in one easy run instead of doubling back.
       if (k === n - 1) tx = side > 0 ? Math.max(tx, to.x + 80) : Math.min(tx, to.x - 80);
