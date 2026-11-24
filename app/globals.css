@@ -358,3 +358,14 @@ body {
     transform: translateY(5px);
   }
 }
+
+/* Signature at the end of the desktop pencil line (components/home/PencilPath.tsx):
+   it writes itself left to right once the line reaches it. */
+.pencil-sig span {
+  display: block;
+  clip-path: inset(0 100% 0 0);
+}
+.pencil-sig.is-signed span {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.8s ease-in-out;
+}
