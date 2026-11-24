@@ -2,8 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
-/** Fired on window by ArchSlogan when the pencil has finished the arch. */
+/** Fired on window when the pencil has finished the slogan arch. */
 export const ARCH_DRAWN_EVENT = "arch-slogan:drawn";
+/** The slogan arch, in its svg's 340 x 240 viewBox (ArchSlogan). */
+export const ARCH_PATH = "M334,60 L122,60 A60,60 0 0 0 122,180 L334,180";
 export type ArchDrawnFlag = Window & { __archDrawn?: boolean };
 
 type Pt = { x: number; y: number };
@@ -71,13 +73,15 @@ function smooth(pts: Pt[]): string {
   return d;
 }
 
-// The route, in coordinates relative to `box`: from the end of the slogan
-// arch ([data-pencil-arch], an svg with viewBox 0 0 340 240 whose line ends
-// at 334,180 heading right), snaking down in uneven sweeps to each
+// The route, in coordinates relative to `box`: the slogan arch itself (drawn
+// over the arch's own svg, [data-pencil-arch], viewBox 0 0 340 240), then
+// from its end (334,180, heading right) snaking down in uneven sweeps to each
 // [data-pencil-frame] and running round it in a soft loop that stays open on
 // one side, then on to the signature ([data-pencil-sig]). Returns the main
 // line and the signature strokes, or null when the parts aren't there.
-function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][]; scale: number } | null {
+function buildRoute(
+  box: HTMLElement,
+): { arch: string; main: Pt[]; signature: Pt[][]; scale: number } | null {
   const arch = box.querySelector<SVGSVGElement>("[data-pencil-arch]");
   const sigEl = box.querySelector<HTMLElement>("[data-pencil-sig]");
   if (!arch || !sigEl) return null;
@@ -88,7 +92,13 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][]; scale: n
   const rel = (x: number, y: number): Pt => ({ x: x - b0.left, y: y - b0.top });
 
   const ar = arch.getBoundingClientRect();
-  const start = rel(ar.left + (ar.width * 334) / 340, ar.top + (ar.height * 180) / 240);
+  const k = ar.width / ARCH_VIEWBOX_W;
+  const o = rel(ar.left, ar.top);
+  const X = (x: number) => (o.x + x * k).toFixed(1);
+  const Y = (y: number) => (o.y + y * k).toFixed(1);
+  // The arch itself, where the arch's own svg has it: the line starts here.
+  const archD = `M${X(334)},${Y(60)} L${X(122)},${Y(60)} A${(60 * k).toFixed(1)},${(60 * k).toFixed(1)} 0 0 0 ${X(122)},${Y(180)} L${X(334)},${Y(180)}`;
+  const start = { x: o.x + 334 * k, y: o.y + 180 * k };
   const pts: Pt[] = [start, { x: start.x + 18, y: start.y + 2 }];
   let heading = 1; // +1 moving right, -1 moving left
   let first = true;
@@ -188,15 +198,15 @@ function buildRoute(box: HTMLElement): { main: Pt[]; signature: Pt[][]; scale: n
   // The signature, centred on its placeholder; the line runs in just short
   // of where the pencil starts the M.
   const sr = sigEl.getBoundingClientRect();
-  const o = rel(sr.left, sr.top);
-  const ox = o.x + (sr.width - SIG_BOX.w * SIG_SCALE) / 2;
-  const oy = o.y + (sr.height - SIG_BOX.h * SIG_SCALE) / 2;
+  const so = rel(sr.left, sr.top);
+  const ox = so.x + (sr.width - SIG_BOX.w * SIG_SCALE) / 2;
+  const oy = so.y + (sr.height - SIG_BOX.h * SIG_SCALE) / 2;
   const signature = SIGNATURE.map((s) => s.map((q) => ({ x: ox + q.x * SIG_SCALE, y: oy + q.y * SIG_SCALE })));
   const m0 = signature[0][0];
   sweepTo({ x: m0.x - 26, y: m0.y - 8 }, 1);
   // Points too close together make the curve kink; keep them apart.
   const main = pts.filter((q, i) => i === 0 || Math.hypot(q.x - pts[i - 1].x, q.y - pts[i - 1].y) > 14);
-  return { main, signature, scale: ar.width / ARCH_VIEWBOX_W };
+  return { arch: archD, main, signature, scale: k };
 }
 
 // Desktop homepage: the gray pencil that drew the slogan arch carries on
@@ -237,6 +247,7 @@ export default function PencilPath() {
     let ymax: number[] = [];
     let cur = 0;
     let k = 1;
+    let archLen = Infinity;
     let raf = 0;
     let last = 0;
 
@@ -254,10 +265,12 @@ export default function PencilPath() {
       lineG.setAttribute("stroke-width", String(2.3 * k));
       ghost.setAttribute("stroke-width", String(1.2 * k));
       ghost.setAttribute("transform", `translate(${0.9 * k} ${0.7 * k})`);
-      const d = smooth(route.main);
+      // One line: the arch, then the route on from its end.
+      const d = `${route.arch} ${smooth(route.main).replace(/^M[^ ]+/, "")}`;
       main.setAttribute("d", d);
       ghost.setAttribute("d", d);
       len = main.getTotalLength();
+      archLen = 612.5 * k;
       sigG.replaceChildren();
       strokes = route.signature.map((st) => {
         const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -280,7 +293,6 @@ export default function PencilPath() {
 
     const target = () => {
       if (reduce) return len + sigLen;
-      if (!flags.__archDrawn) return 0;
       const total = len + sigLen;
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) return total;
       const edge = window.innerHeight * PEN_AT - box.getBoundingClientRect().top;
@@ -298,7 +310,7 @@ export default function PencilPath() {
       main.style.strokeDashoffset = String(len - m);
       ghost.style.strokeDashoffset = String(len - Math.max(0, m - 6));
       let rest = cur - len;
-      let tip: DOMPoint | null = m > 1 && cur < len ? main.getPointAtLength(m) : null;
+      let tip: DOMPoint | null = m > 0.5 && cur <= len ? main.getPointAtLength(m) : null;
       for (const st of strokes) {
         const drawn = Math.max(0, Math.min(st.len, rest));
         st.el.style.strokeDasharray = String(st.len);
@@ -306,11 +318,23 @@ export default function PencilPath() {
         if (rest > 0 && rest < st.len) tip = st.el.getPointAtLength(drawn);
         rest -= st.len;
       }
-      const moving = tip !== null && dir !== 0 && !reduce;
-      pen.style.opacity = moving && dir > 0 ? "1" : "0";
-      eraser.style.opacity = moving && dir < 0 ? "1" : "0";
-      if (!moving || !tip) return;
-      if (dir > 0) {
+      // The slogan is typed once the pencil has been round the arch.
+      if (cur >= archLen && !flags.__archDrawn) {
+        flags.__archDrawn = true;
+        window.dispatchEvent(new Event(ARCH_DRAWN_EVENT));
+      }
+      if (cur >= len + sigLen - 0.5 && strokes.length) {
+        const lastStroke = strokes[strokes.length - 1];
+        tip = lastStroke.el.getPointAtLength(lastStroke.len);
+      }
+      // The pencil stays at the end of the line, also at rest; only while
+      // rubbing out is it an eraser instead.
+      const show = tip !== null && cur > 0.5 && !reduce;
+      const erasing = show && dir < 0;
+      pen.style.opacity = show && !erasing ? "1" : "0";
+      eraser.style.opacity = erasing ? "1" : "0";
+      if (!show || !tip) return;
+      if (!erasing) {
         // Same pose and the same slight hand tremor as the arch's pencil.
         pen.setAttribute(
           "transform",
@@ -379,6 +403,7 @@ export default function PencilPath() {
   return (
     <svg
       ref={svgRef}
+      data-pencil-path=""
       className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full overflow-visible min-[900px]:block"
       aria-hidden="true"
       focusable="false"
