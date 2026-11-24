@@ -1,23 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ARCH_DRAWN_EVENT, type ArchDrawnFlag } from "@/components/home/PencilPath";
+import { ARCH_DRAWN_EVENT, ARCH_PATH, type ArchDrawnFlag } from "@/components/home/PencilPath";
 
 const DRAW_START = 400;
 const DRAW_MS = 2000;
-const TYPE_AFTER_DRAW = 300; // pencil fade (0.5s) overlaps; typing starts this long after the arch is done
-const ARCH_PATH = "M334,60 L122,60 A60,60 0 0 0 122,180 L334,180";
+const TYPE_AFTER_DRAW = 300; // typing starts this long after the arch is done
 const LINE_PAUSE = 350;
-// After each drawing the arch stays this long, fades out, and is drawn again.
-const REDRAW_EVERY = 7000;
-const ERASE_MS = 600;
 const SPEEDS = [70, 60]; // ms per character, per line
 
+// Desktop homepage: the arch is the start of the pencil line (PencilPath),
+// which draws it over this svg and carries straight on.
+const sharedLine = () =>
+  window.matchMedia("(min-width: 900px)").matches && document.querySelector("[data-pencil-path]") !== null;
+
 // One arch lying on its side (open to the right), drawn live by a pencil,
-// with the slogan typed inside once it is done. The reduced-motion fallbacks
-// live in globals.css (.arch-*); the full text is always in the markup (invisible
-// placeholder) so crawlers and screen readers get it, and the typed overlay
-// is purely visual.
+// with the slogan typed inside once it is done. On phones it draws itself
+// once and the pencil rests at the end; on desktop the shared pencil line
+// draws it. The reduced-motion fallbacks live in globals.css (.arch-*); the
+// full text is always in the markup (invisible placeholder) so crawlers and
+// screen readers get it, and the typed overlay is purely visual.
 export default function ArchSlogan({ lines }: { lines: string[] }) {
   const [typed, setTyped] = useState<number[]>(() => lines.map(() => 0));
   const [active, setActive] = useState(-1); // line that currently holds the caret
@@ -25,15 +27,30 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
   const mainRef = useRef<SVGPathElement>(null);
   const ghostRef = useRef<SVGPathElement>(null);
   const pencilRef = useRef<SVGGElement>(null);
-  const groupRef = useRef<SVGGElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let typeTimer: ReturnType<typeof setTimeout> | undefined;
+    const startTyping = () => {
+      typeTimer = setTimeout(() => setDrawn(true), TYPE_AFTER_DRAW);
+    };
+
+    if (sharedLine()) {
+      if ((window as ArchDrawnFlag).__archDrawn) {
+        startTyping();
+        return () => clearTimeout(typeTimer);
+      }
+      window.addEventListener(ARCH_DRAWN_EVENT, startTyping, { once: true });
+      return () => {
+        window.removeEventListener(ARCH_DRAWN_EVENT, startTyping);
+        clearTimeout(typeTimer);
+      };
+    }
+
     const main = mainRef.current;
     const ghost = ghostRef.current;
     const pencil = pencilRef.current;
-    const group = groupRef.current;
-    if (!main || !ghost || !pencil || !group) return;
+    if (!main || !ghost || !pencil) return;
     const len = main.getTotalLength();
     for (const el of [main, ghost]) {
       el.style.strokeDasharray = String(len);
@@ -41,33 +58,12 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
     }
     let raf = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let typeTimer: ReturnType<typeof setTimeout> | undefined;
-    let first = true;
-    // Redraws pause while the arch is off screen or the tab is hidden.
-    let onScreen = false;
-    let started = false;
-    // The first drawing waits until the arch's screen is in view.
-    const io = new IntersectionObserver(
-      ([e]) => {
-        onScreen = e.isIntersecting;
-        if (onScreen && !started) {
-          started = true;
-          timer = setTimeout(draw, DRAW_START);
-        }
-      },
-      { threshold: 0.5 },
-    );
-    io.observe(main);
     const place = (d: number) => {
       const pt = main.getPointAtLength(d);
       pencil.setAttribute(
         "transform",
         `translate(${pt.x} ${pt.y + Math.sin(d * 0.35) * 0.6}) rotate(-50)`,
       );
-    };
-    const reset = () => {
-      main.style.strokeDashoffset = String(len);
-      ghost.style.strokeDashoffset = String(len);
     };
     const draw = () => {
       const t0 = performance.now();
@@ -84,31 +80,22 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
           raf = requestAnimationFrame(frame);
           return;
         }
+        // Done: the pencil stays where it finished.
         ghost.style.strokeDashoffset = "0";
-        pencil.style.opacity = "0";
-        if (first) {
-          first = false;
-          typeTimer = setTimeout(() => setDrawn(true), TYPE_AFTER_DRAW);
-          (window as ArchDrawnFlag).__archDrawn = true;
-          window.dispatchEvent(new Event(ARCH_DRAWN_EVENT));
-        }
-        timer = setTimeout(redraw, REDRAW_EVERY);
+        startTyping();
       };
       raf = requestAnimationFrame(frame);
     };
-    // The arch fades away and the pencil draws it again; the slogan stays.
-    const redraw = () => {
-      if (!onScreen || document.hidden) {
-        timer = setTimeout(redraw, 1000);
-        return;
-      }
-      group.style.opacity = "0";
-      timer = setTimeout(() => {
-        reset();
-        group.style.opacity = "1";
-        draw();
-      }, ERASE_MS);
-    };
+    // Drawn once, when the arch's screen comes into view.
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        timer = setTimeout(draw, DRAW_START);
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(main);
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
@@ -146,7 +133,9 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
 
   return (
     <section className="arch-section -mx-6 overflow-x-hidden min-[900px]:mx-0">
-      <div className="relative mx-auto aspect-[340/240] w-[min(440px,94vw)]">
+      {/* Phones: nudged left (the svg has room on that side) so the pencil
+          resting at the arch's end stays on screen. */}
+      <div className="relative mx-auto aspect-[340/240] w-[min(440px,94vw)] max-[899px]:-translate-x-[12vw]">
         <svg
           data-pencil-arch=""
           className="absolute inset-0 h-full w-full overflow-visible"
@@ -170,8 +159,6 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
             </filter>
           </defs>
           <g
-            ref={groupRef}
-            style={{ transition: `opacity ${ERASE_MS}ms ease` }}
             filter="url(#pencilTex)"
             fill="none" stroke="#4a4546" strokeLinecap="round" strokeLinejoin="round">
             <path
