@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ARCH_DRAWN_EVENT, type ArchDrawnFlag } from "@/components/home/PencilPath";
 
 const DRAW_START = 400;
 const DRAW_MS = 2000;
@@ -88,6 +89,8 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
         if (first) {
           first = false;
           typeTimer = setTimeout(() => setDrawn(true), TYPE_AFTER_DRAW);
+          (window as ArchDrawnFlag).__archDrawn = true;
+          window.dispatchEvent(new Event(ARCH_DRAWN_EVENT));
         }
         timer = setTimeout(redraw, REDRAW_EVERY);
       };
@@ -145,6 +148,7 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
     <section className="arch-section -mx-6 overflow-x-hidden min-[900px]:mx-0">
       <div className="relative mx-auto aspect-[340/240] w-[min(440px,94vw)]">
         <svg
+          data-pencil-arch=""
           className="absolute inset-0 h-full w-full overflow-visible"
           viewBox="0 0 340 240"
           fill="none"

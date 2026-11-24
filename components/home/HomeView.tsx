@@ -1,9 +1,11 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
+import { Allura } from "next/font/google";
 import ArchSlogan from "@/components/ArchSlogan";
 import ScrollHint from "@/components/ScrollHint";
 import Testimonials from "@/components/Testimonials";
 import MobileProjects from "./MobileProjects";
+import PencilPath from "./PencilPath";
 import { ARROW_SLOT, SIDE_COLUMN_WIDTH, TESTIMONIALS_INSET, TEXT_TRACK } from "./layout";
 import ProjectsColumn from "./ProjectsColumn";
 import type { HomeProject } from "./types";
@@ -43,6 +45,13 @@ type Testimonial = { _id: string; clientName: string; quote: string };
 
 // One full-screen step of the homepage, its content centered.
 const SCREEN = "flex min-h-svh snap-start flex-col items-center justify-center py-16";
+// On desktop the steps after the first stand closer together, joined by the
+// pencil line (PencilPath) that runs between and around them.
+const STEP = `${SCREEN} min-[900px]:min-h-0 min-[900px]:py-0 min-[900px]:mt-[230px]`;
+
+// Placeholder handwriting for the signature at the end of the pencil line,
+// until Miri's own signature replaces it.
+const signatureFont = Allura({ weight: "400", subsets: ["latin"] });
 
 export type HomeViewProps = {
   name?: string;
@@ -95,8 +104,9 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
           thing on each: logo and name, the slogan arch, each part of the
           text, the posts (mobile), then the testimonials. The page snaps
           from screen to screen (globals.css, .home-screens). */}
-      <div className="home-screens px-6 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
-        <div className="mx-auto max-w-[460px] min-[900px]:max-w-none">
+      <div className="home-screens relative px-6 min-[900px]:px-0" style={{ gridColumn: "3", gridRow: "1" }}>
+        {tagline?.trim() && bioScreens.length > 0 ? <PencilPath /> : null}
+        <div className="relative z-10 mx-auto max-w-[460px] min-[900px]:max-w-none">
           {logoSrc || name ? (
             <header className={`${SCREEN} relative text-center`}>
               {logoSrc ? (
@@ -138,20 +148,32 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
           ) : null}
 
           {tagline?.trim() ? (
-            <section className={SCREEN}>
+            <section className={`${STEP} min-[900px]:!mt-0`}>
               <ArchSlogan lines={tagline.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean)} />
             </section>
           ) : null}
 
           {bioScreens.map((screen, i) => (
-            <section key={i} className={SCREEN}>
+            <section key={i} className={STEP}>
               <div
-                className={`w-full text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
+                data-pencil-frame=""
+                className={`w-full min-[900px]:w-fit min-[900px]:max-w-[85%] text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
               >
                 {screen}
               </div>
             </section>
           ))}
+
+          {tagline?.trim() && bioScreens.length > 0 ? (
+            <div
+              data-pencil-sig=""
+              dir="ltr"
+              className={`pencil-sig mx-auto mt-[200px] hidden w-max text-[68px] leading-tight text-brand min-[900px]:block ${signatureFont.className}`}
+              aria-hidden="true"
+            >
+              <span>M. Friedland</span>
+            </div>
+          ) : null}
 
           {projects.length > 0 ? (
             <section className={`${SCREEN} min-[900px]:hidden`}>
@@ -165,7 +187,7 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
 
       {/* Mobile: the same 460px column as the text above. */}
       <div
-        className={`${SCREEN} px-6 min-[900px]:px-[var(--testimonials-inset)]`}
+        className={`${SCREEN} px-6 min-[900px]:mt-[200px] min-[900px]:min-h-0 min-[900px]:px-[var(--testimonials-inset)]`}
         style={{ gridColumn: "2 / span 3", gridRow: "2" }}
       >
         <div className="reveal mx-auto w-full max-w-[460px] min-[900px]:max-w-[1000px] [&>section]:max-w-none [&>section]:px-0">
