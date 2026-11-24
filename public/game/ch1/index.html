@@ -124,6 +124,9 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .rules{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:.93rem;margin:12px 0 4px;color:var(--muted)}
 .rules b{color:var(--ink)}
 .brand{font-size:.74rem;color:var(--muted)}
+.loaderr{background:#FFF1EF;border:1px solid #E9B7B2;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:.98rem;line-height:1.5}
+.loaderr b{color:var(--accent)}
+.loaderr small{display:block;color:var(--muted);font-size:.75rem;margin-top:6px;direction:ltr;text-align:left;word-break:break-all}
 .brand b{color:var(--accent)}
 .end{position:fixed;inset:0;z-index:40;background:#F7EFEC;overflow:auto;direction:rtl;display:flex;justify-content:center}
 .end .in{width:100%;max-width:520px;padding:calc(24px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
@@ -197,15 +200,25 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
       <b>איך</b><span>גרור כדי להסתכל מסביב. לחץ על חפצים כדי לבדוק אותם. כדאי להפעיל צליל.</span>
       <b>רמז</b><span>אפשר לבקש רמז בכל רגע. כל רמז מוסיף 30 שניות לזמן.</span>
     </div>
+    <div class="loaderr" id="loadErr" hidden></div>
     <div class="actions"><button class="btn primary" id="startBtn" type="button">להיכנס לדירה</button></div>
   </div>
 </div>
 
 <div class="end" id="end" hidden><div class="in" id="endIn"></div></div>
 
+<script>
+window.__showLoadErr=function(kind,detail){var b=document.getElementById('loadErr'),s=document.getElementById('startBtn');if(!b||window.__loadErrShown)return;window.__loadErrShown=1;
+var msg={webgl:'<b>הטלפון או הדפדפן הזה לא מצליחים להציג את הגרפיקה של המשחק.</b> נסה לפתוח את הקישור בכרום: בוואטסאפ לוחצים על שלוש הנקודות ובוחרים ״פתח בדפדפן״. אפשר גם לשחק ממחשב.',
+lib:'<b>חלק מהמשחק לא נטען.</b> ייתכן שסינון האינטרנט חוסם אותו. נסה לרענן את הדף, או לפתוח מרשת אחרת.',
+other:'<b>משהו השתבש בטעינת המשחק.</b> נסה לרענן את הדף, או לפתוח אותו בכרום.'}[kind]||'';
+b.innerHTML=msg+(detail?'<small>'+String(detail).replace(/[<>&]/g,'')+'</small>':'');b.hidden=false;if(s){s.disabled=true;s.textContent='לא ניתן להתחיל';}};
+window.addEventListener('error',function(e){if(window.__gameReady)return;var t=e.target;if(t&&t.tagName){if(t.tagName==='SCRIPT')window.__showLoadErr('lib',t.src);return;}if(e.message)window.__showLoadErr('other',e.message);},true);
+</script>
 <script src="three.min.js"></script>
 <script>
 (function(){
+if(typeof THREE==='undefined'){window.__showLoadErr('lib','three.js missing');return;}
 const WORD='מלפפון';
 const PHONE_INTL='972546563464', PHONE='054-656-3464';
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -213,7 +226,7 @@ const $=id=>document.getElementById(id);
 const fmtN=n=>n.toLocaleString('he-IL')+' ₪';
 
 const host=$('scene');
-const renderer=new THREE.WebGLRenderer({antialias:true});
+let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true});}catch(e){window.__showLoadErr('webgl',e&&e.message);return;}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=THREE.sRGBEncoding;
@@ -605,6 +618,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(S.start&&!S.end)$('timer').textContent=fmtT(elapsed(now));
   renderer.render(scene,camera);requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
+window.__gameReady=1;
 })();
 </script>
 
