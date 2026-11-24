@@ -57,19 +57,44 @@ function rng(seed: number) {
   };
 }
 
-// A smooth curve through the points (Catmull-Rom as cubic Béziers): every
-// turn is rounded, nothing comes to a point.
+// A smooth curve through the points: centripetal Catmull-Rom, as cubic
+// Béziers. Every turn is rounded and, unlike the plain variant, unevenly
+// spaced points can't make it loop or come to a point.
 function smooth(pts: Pt[]): string {
   const f = (n: number) => n.toFixed(1);
+  const dist = (a: Pt, b: Pt) => Math.sqrt(Math.hypot(b.x - a.x, b.y - a.y));
   let d = `M${f(pts[0].x)},${f(pts[0].y)}`;
   for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i];
     const p1 = pts[i];
     const p2 = pts[i + 1];
-    const p3 = pts[i + 2] ?? p2;
-    d += ` C${f(p1.x + (p2.x - p0.x) / 6)},${f(p1.y + (p2.y - p0.y) / 6)} ${f(p2.x - (p3.x - p1.x) / 6)},${f(
-      p2.y - (p3.y - p1.y) / 6,
-    )} ${f(p2.x)},${f(p2.y)}`;
+    const p0 = pts[i - 1];
+    const p3 = pts[i + 2];
+    const d2 = dist(p1, p2);
+    let c1: Pt = { x: p1.x + (p2.x - p1.x) / 3, y: p1.y + (p2.y - p1.y) / 3 };
+    let c2: Pt = { x: p2.x - (p2.x - p1.x) / 3, y: p2.y - (p2.y - p1.y) / 3 };
+    if (p0) {
+      const d1 = dist(p0, p1);
+      if (d1 > 1e-3) {
+        const den = 3 * d1 * (d1 + d2);
+        const w = 2 * d1 * d1 + 3 * d1 * d2 + d2 * d2;
+        c1 = {
+          x: (d1 * d1 * p2.x - d2 * d2 * p0.x + w * p1.x) / den,
+          y: (d1 * d1 * p2.y - d2 * d2 * p0.y + w * p1.y) / den,
+        };
+      }
+    }
+    if (p3) {
+      const d3 = dist(p2, p3);
+      if (d3 > 1e-3) {
+        const den = 3 * d3 * (d3 + d2);
+        const w = 2 * d3 * d3 + 3 * d3 * d2 + d2 * d2;
+        c2 = {
+          x: (d3 * d3 * p1.x - d2 * d2 * p3.x + w * p2.x) / den,
+          y: (d3 * d3 * p1.y - d2 * d2 * p3.y + w * p2.y) / den,
+        };
+      }
+    }
+    d += ` C${f(c1.x)},${f(c1.y)} ${f(c2.x)},${f(c2.y)} ${f(p2.x)},${f(p2.y)}`;
   }
   return d;
 }
@@ -108,8 +133,30 @@ function buildRoute(
   // direction `arrive`. Turns alternate sides; how many, how wide and how
   // tall vary, so no two stretches look alike.
   const sweepTo = (to: Pt, arrive: number) => {
-    const from = pts[pts.length - 1];
-    const gap = to.y - from.y;
+    let from = pts[pts.length - 1];
+    let gap = to.y - from.y;
+    // Now and then the line just drops, mostly straight down with a gentle
+    // wobble, instead of sweeping from side to side. It drops in a column on
+    // the side it is heading towards; heading away, it turns once first.
+    const column = to.x - arrive * between(70, 160);
+    if (gap > 150 && R() < 0.6) {
+      if (Math.sign(column - from.x) !== heading && gap > 260) {
+        const r = between(34, 54);
+        let tx = heading > 0 ? W * between(0.7, 0.98) : W * between(0.02, 0.3);
+        tx = heading > 0 ? Math.max(tx, from.x + r + 60) : Math.min(tx, from.x - r - 60);
+        tx = Math.min(W + 50, Math.max(-60, tx));
+        pts.push({ x: tx - heading * r * 0.75, y: from.y });
+        pts.push({ x: tx, y: from.y + r });
+        pts.push({ x: tx - heading * r * 0.75, y: from.y + 2 * r });
+        heading = -heading;
+        from = pts[pts.length - 1];
+        gap = to.y - from.y;
+      }
+      if (Math.sign(column - from.x) === heading && Math.abs(column - from.x) > 80) {
+        dropTo(to, arrive, column);
+        return;
+      }
+    }
     const firstSide = heading;
     const lastSide = -arrive;
     let n = Math.max(1, Math.round(gap / 150));
@@ -161,6 +208,28 @@ function buildRoute(
     first = false;
   };
 
+  // The vertical stretch: bend down into a column at x = `column`, wobble
+  // down it, then curve into `to` moving in direction `arrive`.
+  function dropTo(to: Pt, arrive: number, column: number) {
+    const from = pts[pts.length - 1];
+    let y = from.y;
+    // Bend down without passing the column (it may be close).
+    pts.push({ x: from.x + heading * Math.min(between(30, 50), Math.abs(column - from.x) * 0.5), y: y + between(16, 26) });
+    if (Math.abs(column - from.x) > 80) pts.push({ x: from.x + (column - from.x) * 0.6, y: y + between(30, 44) });
+    y += 60;
+    pts.push({ x: column, y });
+    let side = R() < 0.5 ? 1 : -1;
+    // Each wobble keeps well clear of the bend at the bottom.
+    while (y + 95 < to.y - 44 - 60) {
+      y += between(60, 95);
+      pts.push({ x: column + side * between(10, 38), y });
+      side = -side;
+    }
+    pts.push({ x: column, y: to.y - 44 });
+    pts.push({ x: to.x - arrive * 34, y: to.y - 3 });
+    pts.push(to);
+  }
+
   // A soft, slightly squared loop round the text (a superellipse), entered
   // at the top and left open on one side.
   const frames = [...box.querySelectorAll<HTMLElement>("[data-pencil-frame]")];
@@ -205,8 +274,27 @@ function buildRoute(
   const signature = SIGNATURE.map((s) => s.map((q) => ({ x: ox + q.x * SIG_SCALE, y: oy + q.y * SIG_SCALE })));
   const m0 = signature[0][0];
   sweepTo({ x: m0.x - 26, y: m0.y - 8 }, 1);
-  // Points too close together make the curve kink; keep them apart.
-  const main = pts.filter((q, i) => i === 0 || Math.hypot(q.x - pts[i - 1].x, q.y - pts[i - 1].y) > 14);
+  // Points too close together make the curve kink; keep them apart. And no
+  // point may send the line back the way it came: drop any where it would
+  // turn by more than 110 degrees.
+  let main = pts.filter((q, i) => i === 0 || Math.hypot(q.x - pts[i - 1].x, q.y - pts[i - 1].y) > 14);
+  for (let changed = true; changed; ) {
+    changed = false;
+    for (let i = 1; i < main.length - 1; i++) {
+      const a = main[i - 1];
+      const b = main[i];
+      const c = main[i + 1];
+      const t1 = Math.atan2(b.y - a.y, b.x - a.x);
+      const t2 = Math.atan2(c.y - b.y, c.x - b.x);
+      let turn = Math.abs(t2 - t1);
+      if (turn > Math.PI) turn = 2 * Math.PI - turn;
+      if (turn > (110 * Math.PI) / 180) {
+        main = main.filter((_, j) => j !== i);
+        changed = true;
+        break;
+      }
+    }
+  }
   return { arch: archD, main, signature, scale: k };
 }
 
@@ -366,8 +454,13 @@ export default function PencilPath() {
       }
       // Steady pace, never a leap: fast scrolling just leaves the pencil
       // a little behind, and it catches up at its own speed.
+      // Drawing keeps the pencil's own pace; rubbing out follows the
+      // scrolling closely, at whatever speed the visitor scrolls back up.
       const speed = cur >= len - FINISH_STRETCH ? FINISH_SPEED : DRAW_SPEED;
-      const step = Math.sign(delta) * Math.min(Math.abs(delta), speed * dt);
+      const step =
+        delta < 0
+          ? Math.min(-0.5, delta * 0.35)
+          : Math.min(delta, speed * dt);
       cur += step;
       paint(Math.sign(step));
       schedule();
