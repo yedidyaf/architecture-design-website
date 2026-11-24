@@ -152,6 +152,13 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .end h2{font-size:2rem;margin:0;font-weight:800;line-height:1.05}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .guess{border-top:1px dashed var(--line);margin-top:14px;padding-top:12px}
+.after h3{font-size:1.3rem}
+.gal{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 8px;margin-bottom:6px}
+.gal:empty{display:none}
+.gi{flex:0 0 78%;scroll-snap-align:start;position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:#EDE3DF;max-width:100%;display:block}
+.gi img{width:100%;height:100%;object-fit:cover;display:block}
+.gi span{position:absolute;bottom:0;right:0;left:0;padding:22px 12px 8px;background:linear-gradient(rgba(30,15,15,0),rgba(30,15,15,.72));color:#fff;font-weight:700}
+.btn.big{display:block;text-align:center;font-size:1.12rem;padding:12px 18px}
 .guess label{font-weight:600;display:block;margin-bottom:6px}
 .grow{display:flex;gap:8px}
 .grow input{flex:1;min-width:0;font:inherit;font-size:1.2rem;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;direction:rtl;background:#fff;color:var(--ink)}
@@ -628,7 +635,12 @@ $('hintBtn').addEventListener('click',()=>{if(!S.start||S.end)return;S.hints++;$
 /* ---- win / end ---- */
 function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
 const elapsed=now=>(S.pauseAt||now)-S.start-(S.pausedMs||0)+S.hints*30000;
-function win(){track('game_finish');S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
+let projP=null;
+const SITE='https://miri-friedland.vercel.app';
+function loadProjects(){if(projP)return projP;const q='*[_type == "project" && defined(coverImage) && defined(title) && defined(slug.current)] | order(order asc)[0...3]{title, "slug": slug.current, "img": coverImage.asset->url}';
+  projP=fetch('https://idxc49mm.apicdn.sanity.io/v2023-05-03/data/query/production?query='+encodeURIComponent(q)).then(r=>r.ok?r.json():{result:[]}).then(j=>Array.isArray(j.result)?j.result.filter(p=>p.img&&p.slug):[]).catch(()=>[]);return projP;}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function win(){loadProjects();track('game_finish');S.end=performance.now();lockScr.material.color.set(0x5AE08A);go('salon');aim(new THREE.Vector3(4.5,1.2,-1.6));
   anim(1.6,t=>{leaf.rotation.y=-t*1.4;});setTimeout(showEnd,2000);}
 function showEnd(){
   const time=fmtT(elapsed(S.end));
@@ -639,6 +651,7 @@ function showEnd(){
     <div><div class="tag">פרק 1 הושלם</div><h2>פתחת את המסדרון!</h2></div>
     <div class="stats">${g?`<div><b>${g}</b><span>פיצחת את הסיסמה</span></div>`:''}<div><b>${time}</b><span>${g?'סיימת את הדירה':'זמן, כולל רמזים'}</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
     <p style="margin:0">השיטה של יורם, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
+    <div class="box after"><h3 id="afterH">ככה זה נראה כשמתכננים נכון</h3><div class="gal" id="gal"></div><a class="btn primary big" onclick="track('site_click')" href="${SITE}" target="_blank" rel="noopener">לאתר של מירי</a></div>
     <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
     <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
       <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" onclick="track('contact_save')" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
@@ -650,12 +663,14 @@ function showEnd(){
     <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
       <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
       <li>בין השיש לארון העליון: 50–55 ס״מ.</li><li>ליד הכיריים משאירים משטח עבודה בשני הצדדים.</li><li>ליד צד הצירים של המקרר משאירים מרווח.</li><li>מדיח לא מתקינים בפינה מול מגירות.</li><li>את התאורה נמקם בהתאם לריהוט.</li></ol></div>
-    <div class="actions" style="justify-content:center"><a class="btn primary" onclick="track('site_click')" href="https://miri-friedland.vercel.app" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
+    <div class="actions" style="justify-content:center"><a class="btn" onclick="track('site_click_bottom')" href="${SITE}" target="_blank" rel="noopener">לאתר של מירי</a><button class="btn" id="again" type="button">לשחק שוב</button></div>`;
   $('end').hidden=false;$('end').scrollTop=0;$('bottom').hidden=true;
   const endEl=$('end');let cue=$('cue');if(!cue){cue=document.createElement('div');cue.className='scrollcue';cue.id='cue';cue.innerHTML='<button type="button">יש עוד למטה<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>';endEl.appendChild(cue);
     cue.querySelector('button').addEventListener('click',()=>endEl.scrollBy({top:endEl.clientHeight*.7,behavior:'smooth'}));}
   const upd=()=>{cue.classList.toggle('gone',endEl.scrollTop>80||endEl.scrollHeight<=endEl.clientHeight+20);};endEl.addEventListener('scroll',upd,{passive:true});setTimeout(upd,50);
   $('again').addEventListener('click',()=>location.reload());
+  loadProjects().then(list=>{const gal=$('gal');if(!gal)return;if(!list.length){$('afterH').textContent='רוצה לראות איך נראה בית שמתכננים נכון?';return;}
+    gal.innerHTML=list.map(p=>`<a class="gi" href="${SITE}/projects/${encodeURIComponent(p.slug)}" target="_blank" rel="noopener" onclick="track('project_click')"><img src="${p.img}?w=640&h=480&fit=crop&auto=format" alt="${esc(p.title)}" loading="lazy"><span>${esc(p.title)}</span></a>`).join('');});
   $('copyPh').addEventListener('click',()=>{const b=$('copyPh');const ok=()=>{b.textContent='הועתק';};const fb=()=>{const r=document.createRange();r.selectNodeContents($('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='סמנתי, העתק ידנית';};
     try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
 }
