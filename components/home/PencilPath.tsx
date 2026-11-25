@@ -416,9 +416,11 @@ export default function PencilPath() {
         const lastStroke = strokes[strokes.length - 1];
         tip = lastStroke.el.getPointAtLength(lastStroke.len);
       }
-      // The pencil stays at the end of the line, also at rest; only while
-      // rubbing out is it an eraser instead.
-      const show = tip !== null && cur > 0.5 && !reduce;
+      // The pencil is there only while it moves: it fades away when it has
+      // caught up with the scrolling (the bottom of the screen) or finished
+      // the signature, and comes back as soon as it moves on. While rubbing
+      // out it is an eraser instead.
+      const show = tip !== null && cur > 0.5 && !reduce && dir !== 0;
       const erasing = show && dir < 0;
       pen.style.opacity = show && !erasing ? "1" : "0";
       eraser.style.opacity = erasing ? "1" : "0";
