@@ -186,6 +186,9 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .share{text-align:center;display:flex;flex-direction:column;gap:8px;padding:4px 0}
 .share .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .share .btn{border-radius:999px;font-weight:700}
+.ch2 .sub{margin:-4px 0 2px;font-size:.88rem;opacity:.75}
+.ch2 .or{display:flex;align-items:center;gap:10px;font-size:.85rem;opacity:.6;margin:4px 0}
+.ch2 .or::before,.ch2 .or::after{content:"";flex:1;border-top:1px solid rgba(255,255,255,.3)}
 .ch2 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ch2 .ph{display:flex;justify-content:center;align-items:center;gap:10px;font-size:.88rem;opacity:.8}
 .ch2 .ph span{direction:ltr;font-weight:700;user-select:all}
@@ -668,12 +671,16 @@ function showEnd(){
     <div class="box after"><h3 id="afterH">ככה זה נראה כשמתכננים נכון</h3><div class="gal" id="gal"></div><a class="btn primary big" onclick="track('site_click')" href="${SITE}" target="_blank" rel="noopener">לאתר של מירי</a></div>
     <div class="share"><div><b>נהנית?</b> תעביר את המשחק לחבר</div><div class="two"><button type="button" class="btn" id="shareBtn">לשלוח לחבר</button><button type="button" class="btn" id="copyLink">להעתיק קישור</button></div></div>
     <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p>
-      <div class="ch2"><p class="lead">פרק 2 יעלה בקרוב, רק בסטטוס של מירי. כדי שיגיע אליך:</p>
-        <div class="st"><span>1</span>שומרים את מירי באנשי הקשר</div>
+      <div class="ch2"><p class="lead">פרק 2 יעלה בקרוב. כדי שיגיע אליך, יש שתי דרכים:</p>
+        <div class="st"><span>1</span>במייל</div>
+        <p class="sub">שולחים למירי מייל, והפרק יגיע אליך לתיבה.</p>
+        <a class="btn ghost" onclick="track('email_click')" href="mailto:mirivlin@gmail.com?subject=${encodeURIComponent('משפחת קלרוסנבסקי · פרק 1')}&body=${encodeURIComponent(msg)}">לשלוח מייל</a>
+        <div class="or">או</div>
+        <div class="st"><span>2</span>בוואטסאפ</div>
+        <p class="sub">שומרים את מירי באנשי הקשר ושולחים לה הודעה.</p>
         <a class="btn lite" onclick="track('contact_save')" href="miri-friedland.vcf">שמירה באנשי הקשר</a>
         <div class="ph"><span id="ph">${PHONE}</span><button type="button" id="copyPh">להעתיק</button></div>
-        <div class="st"><span>2</span>שולחים לה הודעה קצרה</div>
-        <div class="two"><a class="btn ghost" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">בוואטסאפ</a><a class="btn ghost" onclick="track('email_click')" href="mailto:mirivlin@gmail.com?subject=${encodeURIComponent('משפחת קלרוסנבסקי · פרק 1')}&body=${encodeURIComponent(msg)}">במייל</a></div>
+        <a class="btn ghost" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a>
       </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
     <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
