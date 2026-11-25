@@ -176,6 +176,17 @@ html,body{height:100%;margin:0;overflow:hidden;background:#2a2220;font-family:va
 .teaser{background:var(--ink);color:#fff;border-radius:12px;padding:16px}
 .teaser p{margin:0 0 6px;line-height:1.5}
 .teaser .h{font-family:var(--hand);font-size:1.8rem;line-height:1}
+.ch2{border-top:1px solid rgba(255,255,255,.18);margin-top:12px;padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.ch2 .lead{margin:0 0 4px;font-size:.95rem;opacity:.85}
+.ch2 .st{display:flex;align-items:center;gap:8px;font-weight:700;margin-top:4px}
+.ch2 .st span{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex:none}
+.teaser .btn{display:block;text-align:center;font-weight:700;border-radius:999px;padding:10px 16px}
+.btn.lite{background:#fff;border-color:#fff;color:var(--ink)}
+.btn.ghost{background:transparent;border:1.5px solid rgba(255,255,255,.55);color:#fff}
+.ch2 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ch2 .ph{display:flex;justify-content:center;align-items:center;gap:10px;font-size:.88rem;opacity:.8}
+.ch2 .ph span{direction:ltr;font-weight:700;user-select:all}
+.ch2 .ph button{background:none;border:0;color:#fff;text-decoration:underline;font:inherit;cursor:pointer;padding:2px}
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start}
 .step .n{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
@@ -652,13 +663,14 @@ function showEnd(){
     <div class="stats">${g?`<div><b>${g}</b><span>פיצחת את הסיסמה</span></div>`:''}<div><b>${time}</b><span>${g?'סיימת את הדירה':'זמן, כולל רמזים'}</span></div><div><b>${S.hints}</b><span>רמזים</span></div><div><b>${fmtN(S.cost)}</b><span>עלות התיקונים</span></div></div>
     <p style="margin:0">השיטה של יורם, ח.ס.כ.ו.ן, חסכה 15,000 ₪ על אדריכלית. בינתיים היא עלתה ${fmtN(S.cost)}. ונשארו עוד שני פרקים.</p>
     <div class="box after"><h3 id="afterH">ככה זה נראה כשמתכננים נכון</h3><div class="gal" id="gal"></div><a class="btn primary big" onclick="track('site_click')" href="${SITE}" target="_blank" rel="noopener">לאתר של מירי</a></div>
-    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p><p style="opacity:.8;margin:0">פרק 2 יעלה בקרוב, <b>רק בסטטוס של מירי.</b></p></div>
-    <div class="box"><h3>כדי לראות את פרק 2</h3><div class="steps">
-      <div class="step"><span class="n">1</span><div><b>שמור את מירי באנשי הקשר</b><div style="margin-top:6px"><a class="btn primary" onclick="track('contact_save')" href="miri-friedland.vcf">לשמור באנשי הקשר</a></div>
-        <div class="contact"><span class="note">או ידנית:</span><code id="ph">${PHONE}</code><button type="button" class="btn" id="copyPh" style="padding:4px 12px;font-size:.85rem">להעתיק</button></div></div></div>
-      <div class="step"><span class="n">2</span><div><b>שלח לה הודעה</b><div class="sendrow"><a class="btn wa" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">לשלוח בוואטסאפ</a><a class="btn primary" onclick="track('email_click')" href="mailto:mirivlin@gmail.com?subject=${encodeURIComponent('משפחת קלרוסנבסקי · פרק 1')}&body=${encodeURIComponent(msg)}">לשלוח במייל</a></div>
-        <div class="note" style="margin-top:4px">ככה מירי שומרת גם אותך, והסטטוס יגיע אליך.</div></div></div>
-    </div></div>
+    <div class="teaser"><div class="h">פרק 2: לילה בחדרים</div><p>ערב. המשפחה חוזרת הביתה. עידו, הבן של יורם: ״אבא, אני לא מצליח להירדם...״</p>
+      <div class="ch2"><p class="lead">פרק 2 יעלה בקרוב, רק בסטטוס של מירי. כדי שיגיע אליך:</p>
+        <div class="st"><span>1</span>שומרים את מירי באנשי הקשר</div>
+        <a class="btn lite" onclick="track('contact_save')" href="miri-friedland.vcf">שמירה באנשי הקשר</a>
+        <div class="ph"><span id="ph">${PHONE}</span><button type="button" id="copyPh">להעתיק</button></div>
+        <div class="st"><span>2</span>שולחים לה הודעה קצרה</div>
+        <div class="two"><a class="btn ghost" onclick="track('whatsapp_click')" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">בוואטסאפ</a><a class="btn ghost" onclick="track('email_click')" href="mailto:mirivlin@gmail.com?subject=${encodeURIComponent('משפחת קלרוסנבסקי · פרק 1')}&body=${encodeURIComponent(msg)}">במייל</a></div>
+      </div></div>
     <div class="dad">יורם קלרוסנבסקי שמר את המספר של האדריכלית רק אחרי השיפוץ.<br>אל תהיה יורם.</div>
     <div class="box"><h3>8 דברים לבדוק בסלון ובמטבח</h3><ol>
       <li>מקום עבודה מקבל אור מהצד, לא מקדימה.</li><li>שטיח בסלון: לפחות הרגליים הקדמיות של הספה עליו.</li><li>נפזר שקעים לפי גודל החדר.</li>
