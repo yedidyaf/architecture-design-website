@@ -107,6 +107,7 @@ function smooth(pts: Pt[]): string {
 // line and the signature strokes, or null when the parts aren't there.
 function buildRoute(
   box: HTMLElement,
+  vertical: boolean,
 ): { arch: string; main: Pt[]; signature: Pt[][]; scale: number } | null {
   const arch = box.querySelector<SVGSVGElement>("[data-pencil-arch]");
   const sigEl = box.querySelector<HTMLElement>("[data-pencil-sig]");
@@ -125,9 +126,29 @@ function buildRoute(
   // The arch itself, where the arch's own svg has it: the line starts here.
   const archD = `M${X(334)},${Y(60)} L${X(122)},${Y(60)} A${(60 * k).toFixed(1)},${(60 * k).toFixed(1)} 0 0 0 ${X(122)},${Y(180)} L${X(334)},${Y(180)}`;
   const start = { x: o.x + 334 * k, y: o.y + 180 * k };
-  const pts: Pt[] = [start, { x: start.x + 18, y: start.y + 2 }];
+  // Phones (vertical): the line bends straight down out of the arch.
+  const pts: Pt[] = vertical
+    ? [start, { x: start.x + 18, y: start.y + 3 }, { x: start.x + 32, y: start.y + 20 }, { x: start.x + 38, y: start.y + 48 }]
+    : [start, { x: start.x + 18, y: start.y + 2 }];
   let heading = 1; // +1 moving right, -1 moving left
   let first = true;
+
+  // Phones: almost straight down to `to`, easing across sideways on the way,
+  // with a gentle wobble.
+  const descend = (to: Pt) => {
+    const fr = pts[pts.length - 1];
+    const n = Math.max(1, Math.floor((to.y - fr.y) / 80));
+    let side = R() < 0.5 ? 1 : -1;
+    for (let i = 1; i < n; i++) {
+      const t = i / n;
+      const e = t * t * (3 - 2 * t);
+      // The wobble fades out towards both ends, so turns are met calmly.
+      const taper = Math.sin(Math.PI * t);
+      pts.push({ x: fr.x + (to.x - fr.x) * e + side * between(6, 16) * taper, y: fr.y + (to.y - fr.y) * t });
+      side = -side;
+    }
+    pts.push(to);
+  };
 
   // Sweeps from the current point down to `to`, arriving there moving in
   // direction `arrive`. Turns alternate sides; how many, how wide and how
@@ -239,10 +260,13 @@ function buildRoute(
     const tl = rel(r.left, r.top);
     const cx = tl.x + r.width / 2;
     const cy = tl.y + r.height / 2;
-    const a = r.width / 2 + FRAME_PAD + between(-6, 10);
+    // Phones have less room: a closer frame.
+    const pad = vertical ? 16 : FRAME_PAD;
+    const a = r.width / 2 + pad + between(-6, 10);
     // Even a one-line part gets a real loop round it.
-    const b = Math.max(58, r.height / 2 + FRAME_PAD) + between(-4, 8);
-    const p = between(2.6, 3.6);
+    const b = Math.max(vertical ? 48 : 58, r.height / 2 + pad) + between(-4, 8);
+    // Phones: wide, low frames around short text stay rounder at the ends.
+    const p = vertical ? between(2.2, 2.8) : between(2.6, 3.6);
     const wob = between(0, Math.PI * 2);
     const at = (deg: number): Pt => {
       const t = (deg * Math.PI) / 180;
@@ -259,8 +283,18 @@ function buildRoute(
     const dir = clockwise ? 1 : -1;
     const from = clockwise ? 255 : 285;
     const span = between(214, 226);
-    sweepTo(at(from), dir);
+    if (vertical) {
+      const e = at(from);
+      descend({ x: e.x - dir * 20, y: e.y - 26 });
+      pts.push(e);
+    } else {
+      sweepTo(at(from), dir);
+    }
     for (let d = 12; d <= span; d += 12) pts.push(at(from + dir * d));
+    if (vertical) {
+      const end = pts[pts.length - 1];
+      pts.push({ x: end.x - dir * 16, y: end.y + 12 });
+    }
     heading = -dir;
     clockwise = R() < 0.7 ? !clockwise : clockwise;
   }
@@ -273,7 +307,8 @@ function buildRoute(
   const oy = so.y + (sr.height - SIG_BOX.h * SIG_SCALE) / 2;
   const signature = SIGNATURE.map((s) => s.map((q) => ({ x: ox + q.x * SIG_SCALE, y: oy + q.y * SIG_SCALE })));
   const m0 = signature[0][0];
-  sweepTo({ x: m0.x - 26, y: m0.y - 8 }, 1);
+  if (vertical) descend({ x: m0.x - 18, y: m0.y - 12 });
+  else sweepTo({ x: m0.x - 26, y: m0.y - 8 }, 1);
   // Points too close together make the curve kink; keep them apart. And no
   // point may send the line back the way it came: drop any where it would
   // turn by more than 110 degrees.
@@ -298,11 +333,11 @@ function buildRoute(
   return { arch: archD, main, signature, scale: k };
 }
 
-// Desktop homepage: the gray pencil that drew the slogan arch carries on
-// drawing as the visitor scrolls. Its line snakes down, loops round each part
-// of the text and ends in Miri's signature. Scrolling back up turns the pencil
-// round and its eraser rubs the line out. Phones (the screen-by-screen
-// layout) don't get it.
+// Homepage: the gray pencil draws the slogan arch and carries on drawing as
+// the visitor scrolls. On desktop its line snakes down; on phones (screen by
+// screen) it runs almost straight down. Either way it loops round each part
+// of the text and ends in Miri's signature, and scrolling back up rubs it out
+// with the eraser.
 export default function PencilPath() {
   const svgRef = useRef<SVGSVGElement>(null);
   const filterRef = useRef<SVGFilterElement>(null);
@@ -341,8 +376,7 @@ export default function PencilPath() {
     let last = 0;
 
     const build = () => {
-      if (!desktop.matches) return;
-      const route = buildRoute(box);
+      const route = buildRoute(box, !desktop.matches);
       if (!route) return;
       k = route.scale;
       // The arch's pencil, at the arch's scale (see ArchSlogan).
@@ -500,7 +534,7 @@ export default function PencilPath() {
     <svg
       ref={svgRef}
       data-pencil-path=""
-      className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full overflow-visible min-[900px]:block"
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible"
       aria-hidden="true"
       focusable="false"
     >

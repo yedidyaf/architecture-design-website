@@ -9,15 +9,14 @@ const TYPE_AFTER_DRAW = 300; // typing starts this long after the arch is done
 const LINE_PAUSE = 350;
 const SPEEDS = [70, 60]; // ms per character, per line
 
-// Desktop homepage: the arch is the start of the pencil line (PencilPath),
-// which draws it over this svg and carries straight on.
-const sharedLine = () =>
-  window.matchMedia("(min-width: 900px)").matches && document.querySelector("[data-pencil-path]") !== null;
+// Homepage: the arch is the start of the pencil line (PencilPath), which
+// draws it over this svg and carries straight on.
+const sharedLine = () => document.querySelector("[data-pencil-path]") !== null;
 
 // One arch lying on its side (open to the right), drawn live by a pencil,
-// with the slogan typed inside once it is done. On phones it draws itself
-// once and the pencil rests at the end; on desktop the shared pencil line
-// draws it. The reduced-motion fallbacks live in globals.css (.arch-*); the
+// with the slogan typed inside once it is done. On the homepage the shared
+// pencil line draws it; anywhere else it draws itself once and the pencil
+// rests at the end. The reduced-motion fallbacks live in globals.css (.arch-*); the
 // full text is always in the markup (invisible placeholder) so crawlers and
 // screen readers get it, and the typed overlay is purely visual.
 export default function ArchSlogan({ lines }: { lines: string[] }) {
@@ -133,8 +132,8 @@ export default function ArchSlogan({ lines }: { lines: string[] }) {
 
   return (
     <section className="arch-section -mx-6 overflow-x-hidden min-[900px]:mx-0">
-      {/* Phones: nudged left (the svg has room on that side) so the pencil
-          resting at the arch's end stays on screen. */}
+      {/* Phones: nudged left (the svg has room on that side) so the line
+          has room to bend down past the arch's end. */}
       <div className="relative mx-auto aspect-[340/240] w-[min(440px,94vw)] max-[899px]:-translate-x-[12vw]">
         <svg
           data-pencil-arch=""

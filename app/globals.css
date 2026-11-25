@@ -268,13 +268,11 @@ body {
   50% { opacity: 0; }
 }
 /* Pencil-drawn arch: before JS measures the path, keep it hidden (1000 is
-   longer than the path); the pencil starts invisible. On the desktop homepage
-   the shared pencil line (PencilPath) draws the arch, so the arch's own
-   strokes and pencil stay hidden there. */
-@media (min-width: 900px) {
-  .home-screens:has(svg[data-pencil-path]) [data-pencil-arch] > g {
-    visibility: hidden;
-  }
+   longer than the path); the pencil starts invisible. On the homepage the
+   shared pencil line (PencilPath) draws the arch, so the arch's own strokes
+   and pencil stay hidden there. */
+.home-screens:has(svg[data-pencil-path]) [data-pencil-arch] > g {
+  visibility: hidden;
 }
 .arch-line {
   stroke-dasharray: 1000;
