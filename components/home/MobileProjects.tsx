@@ -48,9 +48,6 @@ const closedOnServer = () => false;
 // back brings the overlay back. Module scope survives client navigation.
 let savedScroll = 0;
 
-// Sits above the global "under construction" notice (z-100) so the back
-// arrow is the only thing at the top.
-//
 // Mobile-only: a small auto-scrolling preview of the projects (one tap
 // target) that opens a full-screen grid of them (2 across). The only chrome is a back arrow at the top.
 export default function MobileProjects({ projects }: { projects: HomeProject[] }) {
