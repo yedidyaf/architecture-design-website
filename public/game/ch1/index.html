@@ -741,6 +741,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   renderer.render(scene,camera);requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 window.__gameReady=1;
+if(new URLSearchParams(location.search).get('preview')==='end'){track=function(){};$('intro').hidden=true;go('salon',true);S.start=performance.now()-372000;S.hints=1;S.cost=1200;setTimeout(win,300);}
 })();
 </script>
 
