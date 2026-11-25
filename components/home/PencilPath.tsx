@@ -182,7 +182,9 @@ function buildRoute(
     const lastSide = -arrive;
     let n = Math.max(1, Math.round(gap / 150));
     if ((n % 2 === 1) !== (firstSide === lastSide)) n += 1;
-    const weights = Array.from({ length: n }, () => between(0.45, 1.7));
+    // No turn so tight it reads as a point: in a short gap, fewer turns.
+    while (n > 2 && gap / n / 2 < 34) n -= 2;
+    const weights = Array.from({ length: n }, () => between(0.6, 1.5));
     const sum = weights.reduce((a, w) => a + w, 0);
     // Turn radii: shares of the gap, so the last run lands exactly at the
     // target's height. Leaving the arch, the first turn is a roomy one and
@@ -214,9 +216,12 @@ function buildRoute(
       // in one easy run instead of doubling back.
       if (k === n - 1) tx = side > 0 ? Math.max(tx, to.x + 80) : Math.min(tx, to.x - 80);
       tx = Math.min(W + 50, Math.max(-60, tx));
-      const dx = tx - x;
-      if (Math.abs(dx) > 140) pts.push({ x: x + dx * between(0.4, 0.6), y: y + between(-5, 5) });
-      pts.push({ x: tx - side * r * 0.75, y });
+      // A long run gets a point midway, measured to where the turn begins
+      // so it never crowds the turn.
+      const entry = tx - side * r * 0.75;
+      const dx = entry - x;
+      if (Math.abs(dx) > 120) pts.push({ x: x + dx * between(0.4, 0.6), y: y + between(-5, 5) });
+      pts.push({ x: entry, y });
       pts.push({ x: tx + side * between(0, 6), y: y + r });
       y += 2 * r;
       x = tx - side * r * 0.75;
@@ -262,11 +267,27 @@ function buildRoute(
     const cy = tl.y + r.height / 2;
     // Phones have less room: a closer frame.
     const pad = vertical ? 16 : FRAME_PAD;
-    const a = r.width / 2 + pad + between(-6, 10);
+    let a = r.width / 2 + pad + between(-6, 10);
     // Even a one-line part gets a real loop round it.
-    const b = Math.max(vertical ? 48 : 58, r.height / 2 + pad) + between(-4, 8);
-    // Phones: wide, low frames around short text stay rounder at the ends.
-    const p = vertical ? between(2.2, 2.8) : between(2.6, 3.6);
+    let b = Math.max(vertical ? 48 : 58, r.height / 2 + pad) + between(-4, 8);
+    const p = vertical ? between(2.6, 3) : between(2.6, 3.6);
+    // The loop must never cross the text. A rounded loop cuts the corners of
+    // the block it surrounds, so grow it until each corner of the text, plus
+    // a margin, is inside. On a phone it may not get wider than the screen;
+    // there it grows taller instead.
+    const cornerX = r.width / 2 + 12;
+    const cornerY = r.height / 2 + 12;
+    const reach = (cornerX / a) ** p + (cornerY / b) ** p;
+    if (reach > 1) {
+      const grow = reach ** (1 / p);
+      a *= grow;
+      b *= grow;
+    }
+    const maxA = vertical ? Math.min(cx, W - cx) - 4 : Infinity;
+    if (a > maxA && maxA > cornerX + 4) {
+      a = maxA;
+      b = Math.max(b, cornerY / (1 - (cornerX / a) ** p) ** (1 / p));
+    }
     const wob = between(0, Math.PI * 2);
     const at = (deg: number): Pt => {
       const t = (deg * Math.PI) / 180;
@@ -285,7 +306,7 @@ function buildRoute(
     const span = between(214, 226);
     if (vertical) {
       const e = at(from);
-      descend({ x: e.x - dir * 20, y: e.y - 26 });
+      descend({ x: e.x - dir * 44, y: e.y - 40 });
       pts.push(e);
     } else {
       sweepTo(at(from), dir);
@@ -293,7 +314,8 @@ function buildRoute(
     for (let d = 12; d <= span; d += 12) pts.push(at(from + dir * d));
     if (vertical) {
       const end = pts[pts.length - 1];
-      pts.push({ x: end.x - dir * 16, y: end.y + 12 });
+      // Leave the loop with an easy bend down.
+      pts.push({ x: end.x - dir * 24, y: end.y + 6 }, { x: end.x - dir * 38, y: end.y + 34 });
     }
     heading = -dir;
     clockwise = R() < 0.7 ? !clockwise : clockwise;
