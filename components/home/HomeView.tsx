@@ -153,7 +153,7 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
             <section key={i} className={STEP}>
               <div
                 data-pencil-frame=""
-                className={`w-full min-[900px]:w-fit min-[900px]:max-w-[78%] text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
+                className={`w-fit max-w-[80%] min-[900px]:max-w-[78%] text-[18px] leading-[1.9] text-brand-ink [&_strong]:text-brand ${ALIGN_CLASS[bioAlign]}`}
               >
                 {screen}
               </div>
@@ -161,12 +161,11 @@ export default function HomeView({ name, logoSrc, tagline, bioScreens, bioAlign 
           ))}
 
           {tagline?.trim() && bioScreens.length > 0 ? (
-            // Room for Miri's signature, which PencilPath writes here.
-            <div
-              data-pencil-sig=""
-              className="mx-auto mt-[200px] hidden h-[198px] w-[126px] min-[900px]:block"
-              aria-hidden="true"
-            />
+            // Room for Miri's signature, which PencilPath writes here: its own
+            // screen on phones, the end of the line on desktop.
+            <section className={STEP} aria-hidden="true">
+              <div data-pencil-sig="" className="h-[198px] w-[126px]" />
+            </section>
           ) : null}
 
           {projects.length > 0 ? (
