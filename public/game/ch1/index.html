@@ -571,10 +571,10 @@ let drag=null;const tip=$('tip');
 host.addEventListener('pointerdown',e=>{if(!$('wrap').hidden)return;drag={x:e.clientX,y:e.clientY,m:0,yaw:tYaw,pitch:tPitch};host.setPointerCapture(e.pointerId);});
 host.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.max(drag.m,Math.hypot(dx,dy));if(drag.m>6){host.classList.add('drag');tYaw=drag.yaw+dx*.005;tPitch=Math.max(-1.1,Math.min(.9,drag.pitch+dy*.004));tip.hidden=true;}return;}
   if(e.pointerType!=='mouse'||!$('wrap').hidden)return;const t=pick(e.clientX,e.clientY);host.classList.toggle('point',!!t);if(t){tip.hidden=false;tip.textContent=t.name;tip.style.left=e.clientX+'px';tip.style.top=e.clientY+'px';}else tip.hidden=true;});
-host.addEventListener('pointerup',e=>{if(!drag)return;const m=drag.m;drag=null;host.classList.remove('drag');if(m<=6&&S.start&&!S.end){const t=pick(e.clientX,e.clientY);if(t){t.onClick();}}});
+host.addEventListener('pointerup',e=>{if(!drag)return;const m=drag.m;drag=null;host.classList.remove('drag');if(m<=6&&S.start&&!S.end){const t=pick(e.clientX,e.clientY);if(t){S.picked=true;t.onClick();}}});
 function aimAt(obj){const c=new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());aim(c);}
 
-let toastT=0;function toast(s){const t=$('toast');t.innerHTML=s;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>t.style.opacity=0,3800);}
+let toastT=0;function toast(s,ms){const t=$('toast');t.innerHTML=s;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>t.style.opacity=0,ms||3800);}
 function openModal(html,focus){$('modal').innerHTML=html;$('wrap').hidden=false;tip.hidden=true;$('modal').scrollTop=0;$('modal').querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));const f=$('modal').querySelector(focus||'.btn.primary,button');if(f)setTimeout(()=>f.focus({preventScroll:true}),40);}
 let onClose=null;function closeModal(){$('wrap').hidden=true;const f=onClose;onClose=null;if(f)f();}
 $('wrap').addEventListener('click',e=>{if(e.target===$('wrap'))closeModal();});
@@ -724,7 +724,8 @@ function showEnd(){
     try{navigator.clipboard.writeText(PHONE).then(ok,fb);}catch(e){fb();}});
 }
 
-$('startBtn').addEventListener('click',()=>{track('game_start');SFX.init();$('intro').hidden=true;go('salon',true);S.start=performance.now();setTimeout(()=>toast('<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.'),500);});
+$('startBtn').addEventListener('click',()=>{track('game_start');SFX.init();$('intro').hidden=true;go('salon',true);S.start=performance.now();const HOW='<b>גרור</b> כדי להסתכל מסביב. <b>לחץ</b> על חפצים כדי לבדוק אותם. אפשר לעבור בין אזורים בכפתורים למטה.';setTimeout(()=>toast(HOW,7000),500);
+  const howT=setInterval(()=>{if(S.picked||S.end){clearInterval(howT);return;}if(S.pauseAt||!$('wrap').hidden||+$('toast').style.opacity>0)return;toast(HOW,6000);},12000);});
 
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<innerHeight?88:68;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();renderLetters();renderTools();go('salon',true);
